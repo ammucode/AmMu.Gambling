@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import useAuthInfo from "@/hooks/use-auth-info";
 import { authClient, useAnonymousSignInMutation, useSignInMutation, useSignOutMutation, useSignUpMutation } from "@/lib/convex/auth-client";
 import { useAuth } from "kitcn/react";
 import { useState } from "react";
@@ -8,12 +9,7 @@ interface AuthDialogContentProps {
   close: () => void;
 }
 export function AuthDialogContent({close}: AuthDialogContentProps) {
-  const { hasSession, isLoading } = useAuth();
-  const {data: sessionData} = authClient.useSession();
-  const user = sessionData?.user;
-  const hasUser = !!user;
-  const isGuest = hasUser && user.isAnonymous;
-  const hasAccount = hasUser && user.isAnonymous;
+  const { authLoading, hasUser, hasAccount, isGuest} = useAuthInfo();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

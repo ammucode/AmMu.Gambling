@@ -4,6 +4,9 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
+import Sidebar from "@/components/blocks/sidebar/sidebar";
+import { UIProviders } from "@/components/ui-providers";
+import { SidebarInset } from "@/components/ui/sidebar";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'})
 
@@ -24,7 +27,12 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
     >
       <body>
-        <ThemeProvider><Providers>{children}</Providers></ThemeProvider>
+        <ThemeProvider><Providers><UIProviders>
+          <Sidebar />
+          <SidebarInset>
+            {children}
+          </SidebarInset>
+        </UIProviders></Providers></ThemeProvider>
       </body>
     </html>
   )
