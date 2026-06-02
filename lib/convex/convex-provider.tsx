@@ -1,14 +1,16 @@
 'use client';
 
 import { QueryClientProvider as TanstackQueryClientProvider } from '@tanstack/react-query';
+import { ConvexAuthProvider } from 'kitcn/auth/client';
 import {
-  ConvexProvider,
   ConvexReactClient,
   getConvexQueryClientSingleton,
   getQueryClientSingleton,
 } from 'kitcn/react';
+import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 
+import { authClient } from '@/lib/convex/auth-client';
 import { CRPCProvider } from '@/lib/convex/crpc';
 import { createQueryClient } from '@/lib/convex/query-client';
 
@@ -19,14 +21,7 @@ export function AppConvexProvider({
 }: {
   children: ReactNode;
 }) {
-  return (
-    <ConvexProvider client={convex}>
-      <QueryProvider>{children}</QueryProvider>
-    </ConvexProvider>
-  );
-}
-
-function QueryProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const queryClient = getQueryClientSingleton(createQueryClient);
   const convexQueryClient = getConvexQueryClientSingleton({
     convex,
@@ -34,10 +29,22 @@ function QueryProvider({ children }: { children: ReactNode }) {
   });
 
   return (
-    <TanstackQueryClientProvider client={queryClient}>
-      <CRPCProvider convexClient={convex} convexQueryClient={convexQueryClient}>
-        {children}
-      </CRPCProvider>
-    </TanstackQueryClientProvider>
+    <ConvexAuthProvider
+      authClient={authClient}
+      client={convex}
+      convexQueryClient={convexQueryClient}
+      onMutationUnauthorized={() => {
+        router.push('/auth');
+      }}
+      onQueryUnauthorized={() => {
+        router.push('/auth');
+      }}
+    >
+      <TanstackQueryClientProvider client={queryClient}>
+        <CRPCProvider convexClient={convex} convexQueryClient={convexQueryClient}>
+          {children}
+        </CRPCProvider>
+      </TanstackQueryClientProvider>
+    </ConvexAuthProvider>
   );
 }

@@ -1,7 +1,7 @@
 import { api } from '@convex/api';
-import { createCallerFactory } from 'kitcn/server';
+import { convexBetterAuth } from 'kitcn/auth/nextjs';
 
-export const { createContext, createCaller } = createCallerFactory({
+export const { createContext, createCaller, handler } = convexBetterAuth({
   api,
   convexSiteUrl: process.env.NEXT_PUBLIC_CONVEX_SITE_URL!,
 });
