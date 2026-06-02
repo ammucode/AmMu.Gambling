@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
 import { publicMutation, publicQuery } from '../lib/crpc';
+import { messagesTable } from './schema';
+import { createDoc } from '../lib/document';
 
 export const list = publicQuery
   .output(
@@ -13,13 +15,17 @@ export const list = publicQuery
     )
   )
   .query(async ({ ctx }) => {
-    const rows = await ctx.db.query('messages').order('desc').take(10);
-
-    return rows.map((row) => ({
-      id: row._id,
-      body: row.body,
-      createdAt: new Date(row._creationTime),
-    }));
+    return await ctx.orm.query.messages.findMany({
+      columns: {
+        id: true,
+        body: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      limit: 10,
+    })
   });
 
 export const create = publicMutation
@@ -28,7 +34,9 @@ export const create = publicMutation
       body: z.string().trim().min(1).max(120),
     })
   )
-  .output(z.string())
+  // .output()
   .mutation(async ({ ctx, input }) =>
-    await ctx.db.insert('messages', { body: input.body })
+    await ctx.orm.insert(messagesTable).values(createDoc({
+      body: input.body
+    }))
   );

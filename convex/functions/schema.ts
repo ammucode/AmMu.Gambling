@@ -9,6 +9,8 @@ import {
 
 export const messagesTable = convexTable('messages', {
   body: text().notNull(),
+  createdAt: timestamp().notNull(),
+  updatedAt: timestamp().notNull(),
 });
 
 export const userTable = convexTable(

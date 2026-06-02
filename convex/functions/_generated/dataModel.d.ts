@@ -325,8 +325,14 @@ export type DataModel = {
     vectorIndexes: {};
   };
   messages: {
-    document: { body: string; _id: Id<"messages">; _creationTime: number };
-    fieldPaths: "_creationTime" | "_id" | "body";
+    document: {
+      body: string;
+      createdAt: number;
+      updatedAt: number;
+      _id: Id<"messages">;
+      _creationTime: number;
+    };
+    fieldPaths: "_creationTime" | "_id" | "body" | "createdAt" | "updatedAt";
     indexes: {
       by_id: ["_id"];
       by_creation_time: ["_creationTime"];

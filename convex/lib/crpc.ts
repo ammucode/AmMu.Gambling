@@ -1,6 +1,11 @@
+import { getAuthUserIdentity } from 'kitcn/auth';
 import { CRPCError } from 'kitcn/server';
+
 import type { ActionCtx, MutationCtx, QueryCtx } from '../functions/generated/server';
 import { initCRPC } from '../functions/generated/server';
+import { GenericQueryCtx } from 'convex/server';
+import { DataModel } from '../functions/_generated/dataModel';
+import { MarkNonNull, Simplify } from '../../lib/types';
 
 const c = initCRPC
   .meta<{
@@ -8,34 +13,20 @@ const c = initCRPC
   }>()
   .create();
 
-type IdentityUser = {
-  id: string;
-  email?: string | null;
-  name?: string | null;
-};
+const optionalAuthMiddleware = c.middleware(async ({ ctx, next }) => {
+  const identity = await getAuthUserIdentity(ctx);
+  if (!identity) return next({ ctx: {...ctx, user: null} });
+  const user = await ctx.orm.query.user.findFirst({
+    where: { id: identity.subject },
+  });
+  if (!user) return next({ ctx: {...ctx, user: null}  });
+  return next({ ctx: { ...ctx, user: (user as typeof user|null) } });
+});
 
-function requireAuth<T>(user: T | null): T {
-  if (!user) {
-    throw new CRPCError({ code: 'UNAUTHORIZED', message: 'Not authenticated' });
-  }
-
-  return user;
-}
-
-async function getIdentityUser(
-  ctx: QueryCtx | MutationCtx | ActionCtx
-): Promise<IdentityUser | null> {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    return null;
-  }
-
-  return {
-    id: identity.subject,
-    email: identity.email,
-    name: identity.name,
-  };
-}
+const authMiddleware = optionalAuthMiddleware.pipe(async ({ ctx, next }) => {
+  if (ctx.user == null) throw new CRPCError({ code: 'UNAUTHORIZED' })
+  return next({ ctx: ctx as MarkNonNull<typeof ctx, 'user'> });
+});
 
 export const publicQuery = c.query;
 export const publicAction = c.action;
@@ -47,95 +38,25 @@ export const privateAction = c.action.internal();
 
 export const optionalAuthQuery = c.query
   .meta({ auth: 'optional' })
-  .use(async ({ ctx, next }) => {
-    const user = await getIdentityUser(ctx);
-
-    return next({
-      ctx: {
-        ...ctx,
-        user,
-        userId: user?.id ?? null,
-      },
-    });
-  });
+  .use(optionalAuthMiddleware);
 
 export const authQuery = c.query
   .meta({ auth: 'required' })
-  .use(async ({ ctx, next }) => {
-    const user = requireAuth(await getIdentityUser(ctx));
-
-    return next({
-      ctx: {
-        ...ctx,
-        user,
-        userId: user.id,
-      },
-    });
-  });
+  .use(authMiddleware);
 
 export const optionalAuthMutation = c.mutation
   .meta({ auth: 'optional' })
-  .use(async ({ ctx, next }) => {
-    const user = await getIdentityUser(ctx);
-
-    return next({
-      ctx: {
-        ...ctx,
-        user,
-        userId: user?.id ?? null,
-      },
-    });
-  });
+  .use(optionalAuthMiddleware);
 
 export const authMutation = c.mutation
   .meta({ auth: 'required' })
-  .use(async ({ ctx, next }) => {
-    const user = requireAuth(await getIdentityUser(ctx));
-
-    return next({
-      ctx: {
-        ...ctx,
-        user,
-        userId: user.id,
-      },
-    });
-  });
+  .use(authMiddleware);
 
 export const authAction = c.action
   .meta({ auth: 'required' })
-  .use(async ({ ctx, next }) => {
-    const user = requireAuth(await getIdentityUser(ctx));
-
-    return next({
-      ctx: {
-        ...ctx,
-        user,
-        userId: user.id,
-      },
-    });
-  });
+  .use(authMiddleware);
 
 export const publicRoute = c.httpAction;
-export const authRoute = c.httpAction.use(async ({ ctx, next }) => {
-  const user = requireAuth(await getIdentityUser(ctx));
-
-  return next({
-    ctx: {
-      ...ctx,
-      user,
-      userId: user.id,
-    },
-  });
-});
-export const optionalAuthRoute = c.httpAction.use(async ({ ctx, next }) => {
-  const user = await getIdentityUser(ctx);
-
-  return next({
-    ctx: {
-      ...ctx,
-      user,
-      userId: user?.id ?? null,
-    },
-  });
-});
+export const authRoute = c.httpAction.use(authMiddleware);
+export const optionalAuthRoute = c.httpAction.use(optionalAuthMiddleware);
 export const router = c.router;

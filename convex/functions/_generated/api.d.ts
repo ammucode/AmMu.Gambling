@@ -21,7 +21,7 @@ import type { GenericId as Id } from "convex/values";
  */
 export declare const api: {
   messages: {
-    create: FunctionReference<"mutation", "public", { body: string }, string>;
+    create: FunctionReference<"mutation", "public", { body: string }, any>;
     list: FunctionReference<
       "query",
       "public",
