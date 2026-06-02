@@ -5,48 +5,52 @@ import { useAuth } from 'kitcn/react';
 import { useState } from 'react';
 import {
   authClient,
+  useAnonymousSignInMutation,
+  useSignInMutation,
   useSignInMutationOptions,
+  useSignOutMutation,
   useSignOutMutationOptions,
+  useSignUpMutation,
   useSignUpMutationOptions,
 } from '@/lib/convex/auth-client';
+import { Button } from '@/components/ui/button';
 
 export default function AuthPage() {
   const { hasSession, isLoading } = useAuth();
   const authSession = authClient.useSession();
   const session = authSession.data;
   const user = session?.user ?? null;
-  const hasSignedInUser = hasSession || Boolean(user);
+  const hasUser = !!user;
+  const hasSignedInUser = user && !user.isAnonymous;
+  const isGuest = user && user.isAnonymous;
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const signIn = useMutation(useSignInMutationOptions());
-  const signUp = useMutation(useSignUpMutationOptions());
-  const signOut = useMutation(useSignOutMutationOptions());
+  const signIn = useSignInMutation();
+  const signUp = useSignUpMutation();
+  const signOut = useSignOutMutation();
+  const anonSignin = useAnonymousSignInMutation();
 
-  const errorMessage =
-    signIn.error?.message ??
-    signUp.error?.message ??
-    signOut.error?.message ??
-    null;
+  const error = signIn.error ?? signUp.error ?? signOut.error ?? anonSignin.error;
+
+  const errorMessage = error?.message;
   const isPending =
-    signIn.isPending || signUp.isPending || signOut.isPending;
+    signIn.isPending || signUp.isPending || signOut.isPending || anonSignin.isPending;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (mode === 'signup') {
       signUp.mutate({
-        email,
-        name,
+        username,
         password,
       });
       return;
     }
 
     signIn.mutate({
-      email,
+      username,
       password,
     });
   }
@@ -65,10 +69,10 @@ export default function AuthPage() {
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">Signed in</p>
           <h1 className="text-3xl font-semibold tracking-tight">
-            {user?.name || user?.email || email}
+            {user?.name || user?.username || username}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {user?.email || email}
+            {user?.username || username}
           </p>
         </div>
         <button
@@ -87,6 +91,14 @@ export default function AuthPage() {
     <main className="mx-auto flex min-h-[60vh] max-w-md flex-col justify-center gap-6 px-6 py-16">
       <div className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">Auth demo</p>
+        {!hasUser
+          ? <Button onClick={() => anonSignin.mutate()}>
+            Continue as guest.
+          </Button>
+          : isGuest
+          ? <p className="text-sm font-medium text-muted-foreground">Guest: {user.username}</p>
+          : null
+        }
         <h1 className="text-3xl font-semibold tracking-tight">
           {mode === 'signup' ? 'Create an account' : 'Sign in'}
         </h1>
@@ -96,25 +108,14 @@ export default function AuthPage() {
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
-        {mode === 'signup' ? (
-          <input
-            autoComplete="name"
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Name"
-            required
-            type="text"
-            value={name}
-          />
-        ) : null}
         <input
-          autoComplete="email"
+          autoComplete="username"
           className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Email"
+          onChange={(event) => setUsername(event.target.value)}
+          placeholder="Username"
           required
-          type="email"
-          value={email}
+          type="username"
+          value={username}
         />
         <input
           autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
@@ -150,7 +151,7 @@ export default function AuthPage() {
       </button>
 
       {errorMessage ? (
-        <p className="text-sm text-destructive">{errorMessage}</p>
+        <p className="text-sm text-destructive">{JSON.stringify(error)+error.message+error.stack}</p>
       ) : null}
     </main>
   );

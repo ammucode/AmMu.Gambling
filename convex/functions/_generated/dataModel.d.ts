@@ -464,10 +464,11 @@ export type DataModel = {
       email: string;
       emailVerified: boolean;
       image?: null | string;
+      isAnonymous?: null | boolean;
       name: string;
       updatedAt: number;
       userId?: null | string;
-      username?: null | string;
+      username: string;
       _id: Id<"user">;
       _creationTime: number;
     };
@@ -479,6 +480,7 @@ export type DataModel = {
       | "email"
       | "emailVerified"
       | "image"
+      | "isAnonymous"
       | "name"
       | "updatedAt"
       | "userId"

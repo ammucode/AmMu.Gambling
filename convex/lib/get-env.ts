@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   DEPLOY_ENV: z.string().default('production'),
-  SITE_URL: z.string().default('http://localhost:3000'),
+  SITE_URL: z.string().default('http://localhost:3001'),
   BETTER_AUTH_SECRET: z.string().optional(),
   JWKS: z.string().optional(),
   CONVEX_SITE_URL: z.string().optional(),

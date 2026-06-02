@@ -23,8 +23,9 @@ export const userTable = convexTable(
     createdAt: timestamp().notNull(),
     updatedAt: timestamp().notNull(),
     userId: text(),
-    username: text().unique(),
+    username: text().unique().notNull(),
     displayUsername: text(),
+    isAnonymous: boolean(),
   },
   (userTable) => [
     index("email_name").on(userTable.email, userTable.name),
