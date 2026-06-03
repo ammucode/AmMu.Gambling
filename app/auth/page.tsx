@@ -32,11 +32,15 @@ export default function AuthPage() {
   const signOut = useSignOutMutation();
   const anonSignin = useAnonymousSignInMutation();
 
-  const error = signIn.error ?? signUp.error ?? signOut.error ?? anonSignin.error;
+  const error =
+    signIn.error ?? signUp.error ?? signOut.error ?? anonSignin.error;
 
   const errorMessage = error?.message;
   const isPending =
-    signIn.isPending || signUp.isPending || signOut.isPending || anonSignin.isPending;
+    signIn.isPending ||
+    signUp.isPending ||
+    signOut.isPending ||
+    anonSignin.isPending;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -91,14 +95,15 @@ export default function AuthPage() {
     <main className="mx-auto flex min-h-[60vh] max-w-md flex-col justify-center gap-6 px-6 py-16">
       <div className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">Auth demo</p>
-        {!hasUser
-          ? <Button onClick={() => anonSignin.mutate()}>
+        {!hasUser ? (
+          <Button onClick={() => anonSignin.mutate()}>
             Continue as guest.
           </Button>
-          : isGuest
-          ? <p className="text-sm font-medium text-muted-foreground">Guest: {user.username}</p>
-          : null
-        }
+        ) : isGuest ? (
+          <p className="text-sm font-medium text-muted-foreground">
+            Guest: {user.username}
+          </p>
+        ) : null}
         <h1 className="text-3xl font-semibold tracking-tight">
           {mode === 'signup' ? 'Create an account' : 'Sign in'}
         </h1>
@@ -151,7 +156,9 @@ export default function AuthPage() {
       </button>
 
       {errorMessage ? (
-        <p className="text-sm text-destructive">{JSON.stringify(error)+error.message+error.stack}</p>
+        <p className="text-sm text-destructive">
+          {JSON.stringify(error) + error.message + error.stack}
+        </p>
       ) : null}
     </main>
   );

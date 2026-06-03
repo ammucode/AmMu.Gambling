@@ -22,10 +22,10 @@ export const list = publicQuery
         createdAt: true,
       },
       orderBy: {
-        createdAt: 'desc'
+        createdAt: 'desc',
       },
       limit: 10,
-    })
+    });
   });
 
 export const create = publicMutation
@@ -35,8 +35,11 @@ export const create = publicMutation
     })
   )
   // .output()
-  .mutation(async ({ ctx, input }) =>
-    await ctx.orm.insert(messagesTable).values(createDoc({
-      body: input.body
-    }))
+  .mutation(
+    async ({ ctx, input }) =>
+      await ctx.orm.insert(messagesTable).values(
+        createDoc({
+          body: input.body,
+        })
+      )
   );

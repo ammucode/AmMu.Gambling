@@ -459,12 +459,13 @@ export type DataModel = {
   };
   user: {
     document: {
+      age?: null | number;
       createdAt: number;
       displayUsername?: null | string;
       email: string;
       emailVerified: boolean;
       image?: null | string;
-      isAnonymous?: null | boolean;
+      isAnonymous: boolean;
       name: string;
       updatedAt: number;
       userId?: null | string;
@@ -475,6 +476,7 @@ export type DataModel = {
     fieldPaths:
       | "_creationTime"
       | "_id"
+      | "age"
       | "createdAt"
       | "displayUsername"
       | "email"

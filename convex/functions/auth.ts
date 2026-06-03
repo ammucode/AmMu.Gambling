@@ -1,15 +1,31 @@
-import { anonymous, username } from "better-auth/plugins"
+import { anonymous, username } from 'better-auth/plugins';
 
 import { convex } from 'kitcn/auth';
 import { getEnv } from '../lib/get-env';
-import authConfig, { validateUsername } from './auth.config';
+import authConfig from './auth.config';
 import { defineAuth, getAuth } from './generated/auth';
+import { createAuthMiddleware } from 'better-auth/api';
+import { usernameSchema } from '../lib/validators';
 
 export default defineAuth(() => ({
   emailAndPassword: {
     enabled: true,
   },
   baseURL: getEnv().SITE_URL,
+  user: {
+    additionalFields: {
+      username: {
+        // make username required
+        type: 'string',
+        required: true,
+      },
+      isAnonymous: {
+        // make isAnonymous required
+        type: 'boolean',
+        required: true,
+      },
+    },
+  },
   plugins: [
     convex({
       authConfig,
@@ -17,30 +33,50 @@ export default defineAuth(() => ({
     }),
     username({
       minUsernameLength: 3,
-      usernameValidator: validateUsername,
+      usernameValidator: usernameSchema.validator,
       schema: {
         user: {
           fields: {
-            username: "username",
-            displayUsername: "displayUsername",
+            username: 'username',
+            displayUsername: 'displayUsername',
           },
         },
       },
     }),
     anonymous({
-      emailDomainName: 'guest.gambling.ammu.com',
-      generateName: async () =>
-        `guest-gambler-${Math.random().toString(36).slice(2, 10)}`,
+      generateRandomEmail: async () =>
+        `gambler-${Math.random().toString(36).slice(2, 10)}@guest.gambling.ammu.com`,
       onLinkAccount: async ({ anonymousUser, newUser, ctx: linkCtx }) => {
         // console.log({anonymousUser,newUser})
-        const updatedUser = Object.assign({...newUser.user}, anonymousUser.user);
-        const omittedKeys = ["id", "isAnonymous", "email", "name", "username"] as const;
+        const updatedUser = Object.assign(
+          { ...newUser.user },
+          anonymousUser.user
+        );
+
+        const omittedKeys = [
+          'id',
+          'name',
+          'email',
+          'emailVerified',
+          'image',
+          'createdAt',
+          'updatedAt',
+          'userId',
+          'username',
+          'displayUsername',
+          'isAnonymous',
+        ] as const;
         for (const key of omittedKeys) {
           delete updatedUser[key];
         }
         // console.log(updatedUser);
-        await linkCtx.context.internalAdapter.updateUser(newUser.user.id, {...newUser.user, ...updatedUser});
-        await linkCtx.context.internalAdapter.deleteSession(anonymousUser.session.token);
+        await linkCtx.context.internalAdapter.updateUser(newUser.user.id, {
+          ...newUser.user,
+          ...updatedUser,
+        });
+        await linkCtx.context.internalAdapter.deleteSession(
+          anonymousUser.session.token
+        );
       },
     }),
   ],
@@ -54,16 +90,30 @@ export default defineAuth(() => ({
     user: {
       create: {
         before: async (user) => {
-          if (user.isAnonymous || !user.username) {
-            return {
-              data: {
-                ...user, 
-                username: user.name,
-              },
-            };
+          const newFields: Record<string, unknown> = {};
+          if (user.isAnonymous === undefined) {
+            newFields.isAnonymous = false;
           }
-        }
-      }
-    }
-  }
+          if (user.isAnonymous) {
+            newFields.username = user.email.split('@')[0];
+            newFields.name = newFields.username;
+            newFields.displayUsername = 'Gambling Guest';
+          } else {
+            newFields.displayUsername = user.username;
+          }
+          return {
+            data: {
+              ...user,
+              ...newFields,
+            },
+          };
+        },
+      },
+    },
+  },
+  // hooks: {
+  //   after: createAuthMiddleware({}, async (ctx) => {
+
+  //   }),
+  // },
 }));

@@ -34,6 +34,7 @@ const ormSchema = schema;
 registerProcedureNameLookup(
   {
   "messages.ts": [{ column: 3, line: 38, name: "messages:create" }, { column: 3, line: 17, name: "messages:list" }],
+  "users.ts": [{ column: 3, line: 19, name: "users:getOwnInfo" }],
 },
   "convex/functions"
 );

@@ -29,6 +29,19 @@ export declare const api: {
       Array<{ body: string; createdAt: any; id: string }>
     >;
   };
+  users: {
+    getOwnInfo: FunctionReference<
+      "query",
+      "public",
+      { username: string },
+      {
+        age?: number;
+        displayUsername?: string;
+        image?: string;
+        username: string;
+      } | null
+    >;
+  };
 };
 
 /**

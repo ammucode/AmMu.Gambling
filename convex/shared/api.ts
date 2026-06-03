@@ -14,6 +14,9 @@ export const api = {
     create: createApiLeaf<"mutation", typeof import("../functions/messages").create>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/messages").create>("messages:create"), { type: "mutation" }),
     list: createApiLeaf<"query", typeof import("../functions/messages").list>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/messages").list>("messages:list"), { type: "query" }),
   },
+  users: {
+    getOwnInfo: createApiLeaf<"query", typeof import("../functions/users").getOwnInfo>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/users").getOwnInfo>("users:getOwnInfo"), { auth: "optional", type: "query" }),
+  },
   http: undefined as unknown as typeof httpRouter,
   _http: {
   },

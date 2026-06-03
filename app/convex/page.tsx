@@ -26,25 +26,28 @@ export default function ConvexMessagesPage() {
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-2xl flex-col gap-6 px-6 py-10 text-sm">
       <header className="space-y-2">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
           kitcn
         </p>
-        <h1 className="font-medium text-2xl tracking-tight">Messages</h1>
-        <p className="max-w-xl text-muted-foreground leading-6">
-          This page is a tiny live query and mutation over kitcn. Start
-          the backend, send a message, and watch the list update.
+        <h1 className="text-2xl font-medium tracking-tight">Messages</h1>
+        <p className="max-w-xl leading-6 text-muted-foreground">
+          This page is a tiny live query and mutation over kitcn. Start the
+          backend, send a message, and watch the list update.
         </p>
       </header>
 
       <form className="flex flex-col gap-3 sm:flex-row" onSubmit={handleSubmit}>
         <input
-          className="min-h-10 flex-1 rounded-md border border-border bg-background px-3 py-2 outline-none transition-colors focus:border-primary"
+          className="min-h-10 flex-1 rounded-md border border-border bg-background px-3 py-2 transition-colors outline-none focus:border-primary"
           maxLength={120}
           onChange={(event) => setDraft(event.target.value)}
           placeholder="Write a message"
           value={draft}
         />
-        <Button disabled={createMessage.isPending || draft.trim().length === 0} type="submit">
+        <Button
+          disabled={createMessage.isPending || draft.trim().length === 0}
+          type="submit"
+        >
           {createMessage.isPending ? 'Saving...' : 'Add message'}
         </Button>
       </form>
@@ -52,7 +55,7 @@ export default function ConvexMessagesPage() {
       {messagesQuery.isPending ? (
         <p className="text-muted-foreground">Loading messages...</p>
       ) : messagesQuery.isError ? (
-        <div className="rounded-md border border-dashed border-border px-4 py-3 text-muted-foreground leading-6">
+        <div className="rounded-md border border-dashed border-border px-4 py-3 leading-6 text-muted-foreground">
           Backend not ready. Start <code>kitcn dev</code> and refresh.
         </div>
       ) : messagesQuery.data.length === 0 ? (

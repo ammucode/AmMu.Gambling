@@ -1,18 +1,33 @@
-import { authClient } from "@/lib/convex/auth-client";
-import { useAuth } from "kitcn/react";
+import { userPrivateInfo } from '@/convex/shared/models';
+import { authClient } from '@/lib/convex/auth-client';
+import { useCRPC } from '@/lib/convex/crpc';
+import { skipToken, useQuery } from '@tanstack/react-query';
+import { useAuth } from 'kitcn/react';
+import { use } from 'react';
 
 export default function useAuthInfo() {
-  const { hasSession, isLoading: authLoading } = useAuth();
-  const {data: sessionData} = authClient.useSession();
-  const user = sessionData?.user;
-  const hasUser = !!user;
-  const hasAccount = hasUser && user.isAnonymous;
-  const isGuest = hasUser && user.isAnonymous;
+  const { hasSession, isLoading: sessionLoading } = useAuth();
+  const { data: sessionData } = authClient.useSession();
+  const sessionUser = sessionData?.user;
+  const hasUser = hasSession && !sessionLoading && !!sessionUser;
+  const hasAccount = hasUser && !sessionUser.isAnonymous;
+  const isGuest = hasUser && sessionUser.isAnonymous!;
+
+  const crpc = useCRPC();
+
+  const { data: userData, isLoading: userLoading } = useQuery(
+    crpc.users.getOwnInfo.queryOptions(
+      hasUser && sessionUser.username ? { username: sessionUser.username } : skipToken,
+    )
+  );
 
   return {
-    hasSession, authLoading,
-    sessionData,
-    user,
-    hasUser, hasAccount, isGuest
+    hasSession,
+    authLoading: sessionLoading || userLoading,
+    // sessionData,
+    user: userData ?? undefined,
+    hasUser,
+    hasAccount,
+    isGuest,
   };
 }
