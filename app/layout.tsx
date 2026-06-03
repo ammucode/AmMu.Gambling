@@ -7,9 +7,6 @@ import { Providers } from '@/components/providers';
 import SidebarRoot from '@/components/blocks/sidebar/root';
 import { UIProviders } from '@/components/ui-providers';
 import { SidebarInset } from '@/components/ui/sidebar';
-import { TanStackDevtools } from '@tanstack/react-devtools';
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
-import { formDevtoolsPlugin } from '@tanstack/react-form-devtools';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
