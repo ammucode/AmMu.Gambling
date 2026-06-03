@@ -156,10 +156,10 @@ export function AuthenticateDialogContent({
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
-                const formErrors = form.state.errors
-                  .filter((err) => err && 'password' in err)
-                  .map((err) => err.password)
-                  .flat();
+                const formErrors = (form.state.errors as any)
+                  .filter((err: any) => err && 'password' in err)
+                  .map((err: any) => err.password)
+                  .flat() as {message: string}[];
                 const errors = [...field.state.meta.errors, ...formErrors];
                 return (
                   <Field data-invalid={isInvalid}>

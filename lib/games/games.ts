@@ -40,11 +40,11 @@ export const GAMES = [
 export function getGameByPath(path: string[]) {
   if (path.length < 1 || path.length > 2) return undefined;
   const rootGame = GAMES.find(game => game.path === path[0]);
-  console.log(rootGame)
+  // console.log(rootGame)
   if (!rootGame) return undefined;
   if (!('subGames' in rootGame)) return [rootGame, undefined] as const;
   const subGame = rootGame.subGames.find(game => game.path === path[1]);
-  console.log(subGame);
+  // console.log(subGame);
   if (!subGame) return undefined;
   return [rootGame, subGame] as const;
 }

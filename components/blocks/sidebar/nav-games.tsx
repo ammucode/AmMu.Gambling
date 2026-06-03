@@ -1,6 +1,6 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/components/ui/sidebar";
-import { GAMES } from "@/lib/games/games";
+import { Game, GAMES, SubGame } from "@/lib/games/games";
 import { ChevronRight, Circle, Dices, Spade, Square } from "lucide-react";
 import Link, { LinkProps } from "next/link";
 import React from "react";
@@ -21,7 +21,7 @@ export function NavGames() {
     <SidebarGroup>
       <SidebarGroupLabel>Games</SidebarGroupLabel>
       <SidebarMenu>
-        {GAMES.map((game) => ('subGames' in game
+        {GAMES.map((game: Game) => ('subGames' in game
           ? <Collapsible
             key={game.title}
             defaultOpen={game.isActive}
@@ -35,7 +35,7 @@ export function NavGames() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <SidebarMenuSub>
-                {game.subGames?.map((subGame) => (
+                {game.subGames?.map((subGame: SubGame) => (
                   <SidebarMenuSubItem key={subGame.title}>
                     <SidebarMenuSubButton render={<GameLink path={[game.path, subGame.path]} />}>
                       {subGame.icon && <subGame.icon />}
