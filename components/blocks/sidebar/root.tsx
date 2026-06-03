@@ -6,12 +6,18 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { AccountFooter } from './account-footer';
+import { LogoHeader } from './logo-header';
+import { NavGames } from './nav-games';
 
 export default function SidebarRoot() {
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>{/* <TeamSwitcher teams={data.teams} /> */}</SidebarHeader>
-      <SidebarContent>hi</SidebarContent>
+      <SidebarHeader>
+        <LogoHeader />
+      </SidebarHeader>
+      <SidebarContent>
+        <NavGames />
+      </SidebarContent>
       <SidebarFooter>
         <AccountFooter />
       </SidebarFooter>
