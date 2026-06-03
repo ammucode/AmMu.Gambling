@@ -22,7 +22,7 @@ type DeepReplaceNullWithUndefined<T> = T extends null | undefined
       ? { [K in keyof T]: DeepReplaceNullWithUndefined<T[K]> }
       : T;
 export function iHateNull<T>(value: T): DeepReplaceNullWithUndefined<T> {
-  const sentinel = Symbol.for("iHateNull");
+  const sentinel = Symbol.for('iHateNull');
   if ((value ?? sentinel) === sentinel) return undefined as any;
   if (Array.isArray(value)) return value.map(iHateNull) as any;
   if (typeof value === 'object') {

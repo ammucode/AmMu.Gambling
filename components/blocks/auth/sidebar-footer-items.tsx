@@ -4,7 +4,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { userPrivateInfo } from '@/convex/shared/models';
-import { useAnonymousSignInMutation, useDeleteAnonymousAccountMutation, useSignOutMutation } from '@/lib/convex/auth-client';
+import {
+  useAnonymousSignInMutation,
+  useDeleteAnonymousAccountMutation,
+  useSignOutMutation,
+} from '@/lib/convex/auth-client';
 import { Sparkles, LogIn, BadgeCheck, BadgeX, LogOut } from 'lucide-react';
 import { authDialogHandle as authenticateDialogHandle } from './authenticate-dialog';
 import { DialogTrigger } from '@/components/ui/dialog';
@@ -66,8 +70,8 @@ export function GuestDropdownItems({ user }: { user: userPrivateInfo }) {
         <DialogTrigger
           handle={destructiveConfirmationDialogHandle}
           payload={{
-            formId: "delete-guest",
-            confirmText: "Delete Guest Account",
+            formId: 'delete-guest',
+            confirmText: 'Delete Guest Account',
             onConfirm: deleteGuest.mutateAsync,
             children: !!user ? <UserAvatar user={user} /> : null,
           }}
@@ -89,8 +93,8 @@ export function AccountDropdownItems({ user }: { user: userPrivateInfo }) {
         <DialogTrigger
           handle={destructiveConfirmationDialogHandle}
           payload={{
-            formId: "logout",
-            confirmText: "Log out",
+            formId: 'logout',
+            confirmText: 'Log out',
             onConfirm: signOut.mutateAsync,
             children: !!user ? <UserAvatar user={user} /> : null,
           }}

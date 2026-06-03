@@ -19,12 +19,16 @@ import { withOrm } from './server';
 import schema from '../schema';
 import * as authDefinitionModule from '../auth';
 
-
-
 export function defineAuth<
-  AuthOptions extends BetterAuthOptionsWithoutDatabase = BetterAuthOptionsWithoutDatabase,
+  AuthOptions extends BetterAuthOptionsWithoutDatabase =
+    BetterAuthOptionsWithoutDatabase,
 >(
-  definition: GenericAuthDefinition<GenericCtx, DataModel, typeof schema, AuthOptions>
+  definition: GenericAuthDefinition<
+    GenericCtx,
+    DataModel,
+    typeof schema,
+    AuthOptions
+  >
 ) {
   return baseDefineAuth(definition);
 }
@@ -33,7 +37,7 @@ type AuthDefinitionFromFile = typeof authDefinitionModule.default;
 
 const authDefinition = resolveGeneratedAuthDefinition<AuthDefinitionFromFile>(
   authDefinitionModule,
-  getInvalidAuthDefinitionExportReason("convex/functions/auth.ts")
+  getInvalidAuthDefinitionExportReason('convex/functions/auth.ts')
 );
 
 const authRuntime: AuthRuntime<
@@ -50,7 +54,7 @@ const authRuntime: AuthRuntime<
   ReturnType<AuthDefinitionFromFile>
 >({
   internal,
-  moduleName: "generated/auth",
+  moduleName: 'generated/auth',
   schema,
   auth: authDefinition,
   context: withOrm,

@@ -14,15 +14,34 @@ import type { ActionCtx, MutationCtx, QueryCtx } from './server';
 import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
-  "create": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../messages").create>("messages:create"), () => (require("../messages") as Record<string, unknown>)["create"])],
-  "list": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../messages").list>("messages:list"), () => (require("../messages") as Record<string, unknown>)["list"])],
+  create: [
+    'mutation',
+    typedProcedureResolver(
+      createGeneratedFunctionReference<
+        'mutation',
+        'public',
+        typeof import('../messages').create
+      >('messages:create'),
+      () => (require('../messages') as Record<string, unknown>)['create']
+    ),
+  ],
+  list: [
+    'query',
+    typedProcedureResolver(
+      createGeneratedFunctionReference<
+        'query',
+        'public',
+        typeof import('../messages').list
+      >('messages:list'),
+      () => (require('../messages') as Record<string, unknown>)['list']
+    ),
+  ],
 } as const;
 
-  const handlerRegistry = procedureRegistry;
+const handlerRegistry = procedureRegistry;
 
 type ProcedureCallerRegistry = typeof procedureRegistry;
 type ProcedureHandlerRegistry = typeof handlerRegistry;
-
 
 const generatedRuntime = createGeneratedRegistryRuntime<
   QueryCtx,
@@ -57,7 +76,6 @@ type GeneratedProcedureHandler<
   MutationCtx
 >;
 
-
 export function createMessagesCaller<TCtx extends ProcedureCallerContext>(
   ctx: TCtx
 ): GeneratedProcedureCaller<TCtx> {
@@ -69,6 +87,7 @@ export function createMessagesCaller<TCtx extends ProcedureCallerContext>(
 export function createMessagesHandler<TCtx extends ProcedureHandlerContext>(
   ctx: TCtx
 ): GeneratedProcedureHandler<TCtx> {
-  return generatedRuntime.getHandlerFactory()(ctx) as GeneratedProcedureHandler<TCtx>;
+  return generatedRuntime.getHandlerFactory()(
+    ctx
+  ) as GeneratedProcedureHandler<TCtx>;
 }
-

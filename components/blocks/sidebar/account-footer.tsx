@@ -42,7 +42,7 @@ import {
 } from '../auth/sidebar-footer-items';
 import { UserAvatar } from '../user/avatar';
 
-export function UserFooter({}) {
+export function AccountFooter({}) {
   const { isMobile } = useSidebar();
 
   const { authLoading, user, hasUser, isGuest } = useAuthInfo();

@@ -5,15 +5,15 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import { UserFooter } from './account-footer';
+import { AccountFooter } from './account-footer';
 
-export default function AppSidebar() {
+export default function SidebarRoot() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>{/* <TeamSwitcher teams={data.teams} /> */}</SidebarHeader>
       <SidebarContent>hi</SidebarContent>
       <SidebarFooter>
-        <UserFooter />
+        <AccountFooter />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

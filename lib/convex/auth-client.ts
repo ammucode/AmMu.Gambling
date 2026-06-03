@@ -42,21 +42,22 @@ type AuthMutationHook<TVariables = void> = (
 ) => UseMutationResult<unknown, DefaultError, TVariables>;
 type UserPass = { username: string; password: string };
 
-export const usernameAvailableQueryOptions = (username: string) => ({
-  queryKey: ["better-auth", "username", "is-username-available", username],
-  queryFn: async (client) => {
-    const res = await authClient.isUsernameAvailable({username});
-    if (res?.error)
-      throw new Error(res.error?.message, {
-        cause: {
-          code: res.error?.code,
-          status: res.error?.status ?? 503,
-          statusText: res.error?.statusText ?? 'INTERNAL ERROR',
-        },
-      });
-    return res.data;
-  },
-} satisfies UseQueryOptions);
+export const usernameAvailableQueryOptions = (username: string) =>
+  ({
+    queryKey: ['better-auth', 'username', 'is-username-available', username],
+    queryFn: async (client) => {
+      const res = await authClient.isUsernameAvailable({ username });
+      if (res?.error)
+        throw new Error(res.error?.message, {
+          cause: {
+            code: res.error?.code,
+            status: res.error?.status ?? 503,
+            statusText: res.error?.statusText ?? 'INTERNAL ERROR',
+          },
+        });
+      return res.data;
+    },
+  }) satisfies UseQueryOptions;
 
 export const useAnonymousSignInMutation: AuthMutationHook = (options) => {
   return useMutation(
@@ -111,13 +112,13 @@ export const useDeleteAnonymousAccountMutation: AuthMutationHook = (
   return useMutation({
     ...options,
     mutationFn: async () => {
-      authStoreApi.set("isAuthenticated", false);
+      authStoreApi.set('isAuthenticated', false);
       convexQueryClient?.unsubscribeAuthQueries();
       const res = await authClient.deleteAnonymousUser();
       if (res?.error) throw toAuthMutationError(res.error);
-      authStoreApi.set("token", null);
-      authStoreApi.set("expiresAt", null);
-      authStoreApi.set("sessionSyncGraceUntil", null);
+      authStoreApi.set('token', null);
+      authStoreApi.set('expiresAt', null);
+      authStoreApi.set('sessionSyncGraceUntil', null);
       clearAuthSessionFallback();
       await convexQueryClient?.resetAuthQueries();
       return res;

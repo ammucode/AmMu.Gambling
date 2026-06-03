@@ -57,15 +57,15 @@ interface DestructiveConfirmationDialogContentProps {
   onConfirm?: () => Awaitable<any>;
 }
 const defaultProps: Omit<DestructiveConfirmationDialogContentProps, 'close'> = {
-  formId: "destructive-confirmation",
-  confirmText: "Confirm",
+  formId: 'destructive-confirmation',
+  confirmText: 'Confirm',
 };
 export function DestructiveConfirmationDialogContent({
   close,
   children,
   formId,
   confirmText,
-  onConfirm
+  onConfirm,
 }: DestructiveConfirmationDialogContentProps) {
   const form = useForm({
     formId: `${formId}-confirmation`,
@@ -81,9 +81,7 @@ export function DestructiveConfirmationDialogContent({
       render={<Card />}
     >
       <CardHeader>
-        <CardTitle>
-          Are you sure?
-        </CardTitle>
+        <CardTitle>Are you sure?</CardTitle>
       </CardHeader>
       <CardContent>
         <form
@@ -94,11 +92,7 @@ export function DestructiveConfirmationDialogContent({
           }}
         >
           <FieldGroup>
-            {!!children ? (
-              <FieldLabel>
-                {children}
-              </FieldLabel>
-            ) : null}
+            {!!children ? <FieldLabel>{children}</FieldLabel> : null}
             <Field orientation="responsive">
               <Button variant="secondary" onClick={() => close()}>
                 Cancel
@@ -118,7 +112,11 @@ export default function DestructiveConfirmationDialog() {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} handle={destructiveConfirmationDialogHandle}>
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+      handle={destructiveConfirmationDialogHandle}
+    >
       {({ payload }) => (
         <DestructiveConfirmationDialogContent
           close={() => setOpen(false)}

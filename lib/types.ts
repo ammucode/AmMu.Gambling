@@ -12,14 +12,14 @@
 //   [E in keyof T]: SimplifyDeepArray<T[E]>;
 // } : Simplify<T>
 
-export type Simplify<T> = T extends | Date
+export type Simplify<T> = T extends Date
   ? T
   : T extends any[]
-  ? { [E in keyof T]: Simplify<T[E]>; }
-  : { [K in keyof T]: T[K] } & {};
+    ? { [E in keyof T]: Simplify<T[E]> }
+    : { [K in keyof T]: T[K] } & {};
 
 export type MarkNonNull<T, K extends keyof T> = Omit<T, K> & {
   [P in K]-?: NonNullable<T[P]>;
 };
 
-export type Awaitable<T=void> = T | Promise<T>;
+export type Awaitable<T = void> = T | Promise<T>;

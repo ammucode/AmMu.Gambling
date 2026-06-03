@@ -28,7 +28,11 @@ import {
   FieldError,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { passwordSchema, usernameSchema, userPassSchema } from '@/convex/lib/validators';
+import {
+  passwordSchema,
+  usernameSchema,
+  userPassSchema,
+} from '@/convex/lib/validators';
 import useAuthInfo from '@/hooks/use-auth-info';
 import useToggle from '@/hooks/use-toggle';
 import {
@@ -68,10 +72,10 @@ export function AuthenticateDialogContent({
 }: AuthenticateDialogContentProps) {
   const signIn = useSignInMutation();
   const signUp = useSignUpMutation();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const form = useForm({
-    formId: "authenticate-form",
+    formId: 'authenticate-form',
     defaultValues: {
       isSignUp: defaultIsSignUp ?? false,
       username: '',
@@ -81,7 +85,7 @@ export function AuthenticateDialogContent({
       onChangeAsyncDebounceMs: 500,
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
+      console.log(value);
       if (value.isSignUp) {
         await signUp.mutateAsync(value);
       } else {
@@ -91,7 +95,7 @@ export function AuthenticateDialogContent({
     },
   });
 
-  const isSignUp = useStore(form.store, (state) => state.values.isSignUp)
+  const isSignUp = useStore(form.store, (state) => state.values.isSignUp);
   const modeText = useMemo(() => isSignUpToText(isSignUp), [isSignUp]);
   const otherModeText = useMemo(() => isSignUpToText(!isSignUp), [isSignUp]);
   const toggleModePrompt = useMemo(
@@ -100,7 +104,10 @@ export function AuthenticateDialogContent({
   );
 
   return (
-    <DialogContent className={cn('flex flex-col gap-6 sm:max-w-sm')} render={<Card />}>
+    <DialogContent
+      className={cn('flex flex-col gap-6 sm:max-w-sm')}
+      render={<Card />}
+    >
       <CardHeader>
         <CardTitle>{modeText}</CardTitle>
       </CardHeader>
@@ -108,8 +115,8 @@ export function AuthenticateDialogContent({
         <form
           id={form.formId}
           onSubmit={(e) => {
-            e.preventDefault()
-            form.handleSubmit()
+            e.preventDefault();
+            form.handleSubmit();
           }}
         >
           <FieldGroup>
@@ -121,25 +128,38 @@ export function AuthenticateDialogContent({
                   if (value.length < 3) return undefined;
                   const isSignUp = fieldApi.form.getFieldValue('isSignUp');
                   if (isSignUp) {
-                    const parsed = formSchema.def.shape.username.safeParse(value);
-                    if (!parsed.success) return parsed.error.issues.map(i=>({message: i.message}));
+                    const parsed =
+                      formSchema.def.shape.username.safeParse(value);
+                    if (!parsed.success)
+                      return parsed.error.issues.map((i) => ({
+                        message: i.message,
+                      }));
                   }
                   try {
-                    const data = await queryClient.fetchQuery(usernameAvailableQueryOptions(value));
+                    const data = await queryClient.fetchQuery(
+                      usernameAvailableQueryOptions(value)
+                    );
                     console.log(value, data.available);
                     if (isSignUp !== data.available) {
-                      return {message: isSignUp ? "Username already taken!" : "Username does not exist!"};
+                      return {
+                        message: isSignUp
+                          ? 'Username already taken!'
+                          : 'Username does not exist!',
+                      };
                     }
                   } catch (error) {
                     // return undefined;
                   }
                   return undefined;
-                }
+                },
               }}
               children={(field) => {
                 const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
-                const formErrors = form.state.errors.filter(err=>err && "password" in err).map(err=>err.password).flat();
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                const formErrors = form.state.errors
+                  .filter((err) => err && 'password' in err)
+                  .map((err) => err.password)
+                  .flat();
                 const errors = [...field.state.meta.errors, ...formErrors];
                 return (
                   <Field data-invalid={isInvalid}>
@@ -155,11 +175,9 @@ export function AuthenticateDialogContent({
                       autoComplete="off"
                       required
                     />
-                    {isInvalid && (
-                      <FieldError errors={errors} />
-                    )}
+                    {isInvalid && <FieldError errors={errors} />}
                   </Field>
-                )
+                );
               }}
             />
             <form.Field
@@ -167,11 +185,15 @@ export function AuthenticateDialogContent({
               validators={{
                 onChangeListenTo: ['isSignUp'],
                 onChangeAsync: async ({ value, fieldApi }) => {
-                  console.log('check',value);
+                  console.log('check', value);
                   const isSignUp = fieldApi.form.getFieldValue('isSignUp');
                   if (isSignUp) {
-                    const parsed = formSchema.def.shape.password.safeParse(value);
-                    if (!parsed.success) return parsed.error.issues.map(i=>({message: i.message}));
+                    const parsed =
+                      formSchema.def.shape.password.safeParse(value);
+                    if (!parsed.success)
+                      return parsed.error.issues.map((i) => ({
+                        message: i.message,
+                      }));
                   }
                   return undefined;
                 },
@@ -179,7 +201,7 @@ export function AuthenticateDialogContent({
               }}
               children={(field) => {
                 const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
+                  field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Password</FieldLabel>
@@ -197,7 +219,7 @@ export function AuthenticateDialogContent({
                       <FieldError errors={field.state.meta.errors} />
                     )}
                   </Field>
-                )
+                );
               }}
             />
           </FieldGroup>
@@ -206,13 +228,23 @@ export function AuthenticateDialogContent({
       <CardFooter>
         <FieldGroup className="gap-2">
           <Field orientation="horizontal">
-            <Button type="button" variant="outline" className="basis-1/2" onClick={() => (form.reset(), close())}>
+            <Button
+              type="button"
+              variant="outline"
+              className="basis-1/2"
+              onClick={() => (form.reset(), close())}
+            >
               Cancel (esc)
             </Button>
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
               children={([canSubmit, isSubmitting]) => (
-                <Button type="submit" className="basis-1/2" form={form.formId} aria-disabled={!canSubmit}>
+                <Button
+                  type="submit"
+                  className="basis-1/2"
+                  form={form.formId}
+                  aria-disabled={!canSubmit}
+                >
                   {isSubmitting ? '...' : modeText}
                 </Button>
               )}
@@ -224,9 +256,11 @@ export function AuthenticateDialogContent({
               return (
                 <FieldDescription className="basis-full text-center">
                   {toggleModePrompt} have an account?{' '}
-                  <a onClick={() => field.setValue(is=>!is)}>{otherModeText}</a>
+                  <a onClick={() => field.setValue((is) => !is)}>
+                    {otherModeText}
+                  </a>
                 </FieldDescription>
-              )
+              );
             }}
           />
         </FieldGroup>
