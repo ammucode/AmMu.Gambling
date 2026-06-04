@@ -10,6 +10,7 @@ import { initCRPC } from '../functions/generated/server';
 import { GenericQueryCtx } from 'convex/server';
 import { DataModel } from '../functions/_generated/dataModel';
 import { MarkNonNull, Simplify } from '../../lib/types';
+import { iHateNull } from './document';
 
 const c = initCRPC
   .meta<{
@@ -19,16 +20,16 @@ const c = initCRPC
 
 const optionalAuthMiddleware = c.middleware(async ({ ctx, next }) => {
   const identity = await getAuthUserIdentity(ctx);
-  if (!identity) return next({ ctx: { ...ctx, user: null } });
-  const user = await ctx.orm.query.user.findFirst({
+  if (!identity) return next({ ctx: { ...ctx, user: null as typeof user} });
+  const user = iHateNull(await ctx.orm.query.user.findFirst({
     where: { id: identity.subject },
-  });
-  if (!user) return next({ ctx: { ...ctx, user: null } });
-  return next({ ctx: { ...ctx, user: user as typeof user | null } });
+  }))??null;
+  if (!user) return next({ ctx: { ...ctx, user: null as typeof user } });
+  return next({ ctx: { ...ctx, user } });
 });
 
 const authMiddleware = optionalAuthMiddleware.pipe(async ({ ctx, next }) => {
-  if (ctx.user == null) throw new CRPCError({ code: 'UNAUTHORIZED' });
+  if (!ctx.user) throw new CRPCError({ code: 'UNAUTHORIZED' });
   return next({ ctx: ctx as MarkNonNull<typeof ctx, 'user'> });
 });
 

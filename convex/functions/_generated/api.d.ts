@@ -30,7 +30,17 @@ export declare const api: {
     >;
   };
   users: {
-    me: FunctionReference<"query", "public", {}, any>;
+    me: FunctionReference<
+      "query",
+      "public",
+      {},
+      {
+        age?: number;
+        displayUsername?: string;
+        image?: string;
+        username: string;
+      } | null
+    >;
   };
 };
 
