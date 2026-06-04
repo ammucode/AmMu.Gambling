@@ -19,7 +19,16 @@ export default defineAuth(() => ({
   //   fallback: "http://localhost:3001",
   //   // fallback: getEnv().SITE_URL,
   // },
-  baseURL: getEnv().SITE_URL,
+  baseURL: {
+    allowedHosts: getSiteURLs().map(origin => origin.split('://')[1]),
+    // allowedHosts: [getEnv().SITE_URL.split("://")[1]],
+    // fallback: "http://10.0.0.84:3001",
+    fallback: getEnv().SITE_URL,
+  },
+  // baseURL: getEnv().SITE_URL,
+  // logger: {
+  //   level: "debug",
+  // },
   user: {
     additionalFields: {
       username: {
@@ -88,14 +97,18 @@ export default defineAuth(() => ({
       },
     }),
   ],
+  disabledPaths: ["/sign-in/email"],
   session: {
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24 * 15,
   },
   telemetry: { enabled: false },
   // trustedOrigins: ["http://localhost:3001","http://10.0.0.84:3001"],
-  // trustedOrigins: getSiteURLs(),
-  trustedOrigins: [getEnv().SITE_URL],
+  trustedOrigins: getSiteURLs(),
+  // trustedOrigins: [getEnv().SITE_URL],
+  // advanced: {
+  //   disableOriginCheck: true,
+  // },
   databaseHooks: {
     user: {
       create: {

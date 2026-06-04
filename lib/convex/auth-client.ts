@@ -23,17 +23,17 @@ import { useCRPC } from './crpc';
 
 const getBackendUrl = () => {
   // // return "http://10.0.0.84:3001";
-  // if (typeof window === "undefined") return process.env.NEXT_PUBLIC_SITE_URL!; // SSR Fallback
+  if (typeof window === "undefined") return process.env.NEXT_PUBLIC_SITE_URL!; // SSR Fallback
 
-  // const allowedURLs = [
-  //   process.env.NEXT_PUBLIC_SITE_URL,
-  //   process.env.NEXT_PUBLIC_DEV_NETWORK_SITE_URL
-  // ].filter(Boolean);
+  const allowedURLs = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.NEXT_PUBLIC_DEV_NETWORK_SITE_URL
+  ].filter(Boolean);
 
-  // // Example: Router maps subdomains dynamically to separate backend targets
-  // if (allowedURLs.includes(window.location.origin)) {
-  //     return window.location.origin;
-  // }
+  // Example: Router maps subdomains dynamically to separate backend targets
+  if (allowedURLs.includes(window.location.origin)) {
+      return window.location.origin;
+  }
   return process.env.NEXT_PUBLIC_SITE_URL;
 };
 

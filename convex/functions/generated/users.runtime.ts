@@ -14,7 +14,6 @@ import type { ActionCtx, MutationCtx, QueryCtx } from './server';
 import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
-  "getOwnInfo": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../users").getOwnInfo>("users:getOwnInfo"), () => (require("../users") as Record<string, unknown>)["getOwnInfo"])],
   "me": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../users").me>("users:me"), () => (require("../users") as Record<string, unknown>)["me"])],
 } as const;
 

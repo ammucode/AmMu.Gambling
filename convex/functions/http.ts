@@ -12,8 +12,8 @@ const app = new Hono();
 app.use(
   '/api/*',
   cors({
-    origin: getEnv().SITE_URL,
-    // origin: getSiteURLs(),
+    // origin: getEnv().SITE_URL,
+    origin: getSiteURLs(),
     allowHeaders: ['Content-Type', 'Authorization', 'Better-Auth-Cookie'],
     exposeHeaders: ['Set-Better-Auth-Cookie'],
     credentials: true,

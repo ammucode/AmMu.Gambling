@@ -30,17 +30,6 @@ export declare const api: {
     >;
   };
   users: {
-    getOwnInfo: FunctionReference<
-      "query",
-      "public",
-      { username: string },
-      {
-        age?: number;
-        displayUsername?: string;
-        image?: string;
-        username: string;
-      } | null
-    >;
     me: FunctionReference<"query", "public", {}, any>;
   };
 };

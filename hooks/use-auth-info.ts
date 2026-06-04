@@ -15,13 +15,7 @@ export default function useAuthInfo() {
 
   const crpc = useCRPC();
 
-  const { data: userData, isLoading: userLoading } = useQuery(
-    crpc.users.getOwnInfo.queryOptions(
-      hasUser && sessionUser.username
-        ? { username: sessionUser.username }
-        : skipToken
-    )
-  );
+  const { data: userData, isLoading: userLoading } = useQuery(crpc.users.me.queryOptions());
 
   return {
     hasSession,
