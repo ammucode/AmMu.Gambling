@@ -41,6 +41,7 @@ export declare const api: {
         username: string;
       } | null
     >;
+    me: FunctionReference<"query", "public", {}, any>;
   };
 };
 

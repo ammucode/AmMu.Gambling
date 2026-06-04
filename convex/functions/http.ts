@@ -1,4 +1,4 @@
-import { getEnv } from '../lib/get-env';
+import { getEnv, getSiteURLs } from '../lib/get-env';
 import { getAuth } from './generated/auth';
 import { cors } from 'hono/cors';
 import { authMiddleware } from 'kitcn/auth/http';
@@ -13,6 +13,7 @@ app.use(
   '/api/*',
   cors({
     origin: getEnv().SITE_URL,
+    // origin: getSiteURLs(),
     allowHeaders: ['Content-Type', 'Authorization', 'Better-Auth-Cookie'],
     exposeHeaders: ['Set-Better-Auth-Cookie'],
     credentials: true,

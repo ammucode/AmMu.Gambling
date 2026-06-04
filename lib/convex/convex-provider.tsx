@@ -45,16 +45,18 @@ export function AppConvexProvider({ children }: { children: ReactNode }) {
           convexQueryClient={convexQueryClient}
         >
           {children}
-          {(process.env.NODE_ENV ?? "development") === "development" ? <TanStackDevtools
-            config={{
-              defaultOpen: true,
-              panelLocation: 'top',
-            }}
-            plugins={[
-              formDevtoolsPlugin(),
-              { name: 'TanStack Query', render: <ReactQueryDevtoolsPanel /> },
-            ]}
-          /> : null}
+          {(process.env.NODE_ENV ?? 'development') === 'development' ? (
+            <TanStackDevtools
+              config={{
+                defaultOpen: false,
+                panelLocation: 'top',
+              }}
+              plugins={[
+                formDevtoolsPlugin(),
+                { name: 'TanStack Query', render: <ReactQueryDevtoolsPanel /> },
+              ]}
+            />
+          ) : null}
         </CRPCProvider>
       </TanstackQueryClientProvider>
     </ConvexAuthProvider>

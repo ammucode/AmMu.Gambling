@@ -21,8 +21,24 @@ import { CRPCClientError } from 'kitcn/crpc';
 import { clearAuthSessionFallback, toAuthMutationError } from './kitcn-mirror';
 import { useCRPC } from './crpc';
 
+const getBackendUrl = () => {
+  // // return "http://10.0.0.84:3001";
+  // if (typeof window === "undefined") return process.env.NEXT_PUBLIC_SITE_URL!; // SSR Fallback
+
+  // const allowedURLs = [
+  //   process.env.NEXT_PUBLIC_SITE_URL,
+  //   process.env.NEXT_PUBLIC_DEV_NETWORK_SITE_URL
+  // ].filter(Boolean);
+
+  // // Example: Router maps subdomains dynamically to separate backend targets
+  // if (allowedURLs.includes(window.location.origin)) {
+  //     return window.location.origin;
+  // }
+  return process.env.NEXT_PUBLIC_SITE_URL;
+};
+
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_SITE_URL!,
+  baseURL: getBackendUrl(),
   plugins: [convexClient(), usernameClient(), anonymousClient()],
 });
 
@@ -64,7 +80,7 @@ export const useAnonymousSignInMutation: AuthMutationHook = (options) => {
     useSignInMutationOptions({
       signInMethod: 'anonymous',
       ...options,
-    }) as AuthMutationOptions
+    }) as AuthMutationOptions,
   );
 };
 
@@ -115,7 +131,10 @@ export const useDeleteAnonymousAccountMutation: AuthMutationHook = (
       authStoreApi.set('isAuthenticated', false);
       convexQueryClient?.unsubscribeAuthQueries();
       const res = await authClient.deleteAnonymousUser();
-      if (res?.error) throw toAuthMutationError(res.error);
+      if (res?.error) {
+        console.error(res);
+        throw toAuthMutationError(res.error)
+      };
       authStoreApi.set('token', null);
       authStoreApi.set('expiresAt', null);
       authStoreApi.set('sessionSyncGraceUntil', null);

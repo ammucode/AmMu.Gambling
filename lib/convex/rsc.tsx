@@ -14,7 +14,7 @@ import { cache } from 'react';
 import { hydrationConfig } from '@/lib/convex/query-client';
 import { createCaller, createContext } from '@/lib/convex/server';
 
-const createRSCContext = cache(async () =>
+export const createRSCContext = cache(async () =>
   createContext({ headers: await headers() })
 );
 

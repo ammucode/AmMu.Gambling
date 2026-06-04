@@ -14,23 +14,15 @@ import type { ActionCtx, MutationCtx, QueryCtx } from './server';
 import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
-  getOwnInfo: [
-    'query',
-    typedProcedureResolver(
-      createGeneratedFunctionReference<
-        'query',
-        'public',
-        typeof import('../users').getOwnInfo
-      >('users:getOwnInfo'),
-      () => (require('../users') as Record<string, unknown>)['getOwnInfo']
-    ),
-  ],
+  "getOwnInfo": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../users").getOwnInfo>("users:getOwnInfo"), () => (require("../users") as Record<string, unknown>)["getOwnInfo"])],
+  "me": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../users").me>("users:me"), () => (require("../users") as Record<string, unknown>)["me"])],
 } as const;
 
-const handlerRegistry = procedureRegistry;
+  const handlerRegistry = procedureRegistry;
 
 type ProcedureCallerRegistry = typeof procedureRegistry;
 type ProcedureHandlerRegistry = typeof handlerRegistry;
+
 
 const generatedRuntime = createGeneratedRegistryRuntime<
   QueryCtx,
@@ -65,6 +57,7 @@ type GeneratedProcedureHandler<
   MutationCtx
 >;
 
+
 export function createUsersCaller<TCtx extends ProcedureCallerContext>(
   ctx: TCtx
 ): GeneratedProcedureCaller<TCtx> {
@@ -76,7 +69,6 @@ export function createUsersCaller<TCtx extends ProcedureCallerContext>(
 export function createUsersHandler<TCtx extends ProcedureHandlerContext>(
   ctx: TCtx
 ): GeneratedProcedureHandler<TCtx> {
-  return generatedRuntime.getHandlerFactory()(
-    ctx
-  ) as GeneratedProcedureHandler<TCtx>;
+  return generatedRuntime.getHandlerFactory()(ctx) as GeneratedProcedureHandler<TCtx>;
 }
+

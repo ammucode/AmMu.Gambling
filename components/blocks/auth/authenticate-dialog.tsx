@@ -43,17 +43,17 @@ import {
   useSignOutMutation,
   useSignUpMutation,
 } from '@/lib/convex/auth-client';
-import { Simplify } from '@/lib/types';
+import { Awaitable, Simplify } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useForm, useStore } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from 'kitcn/react';
 import { LogIn } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import z from 'zod';
 
 export const authDialogHandle =
-  DialogHandle<Simplify<Omit<AuthenticateDialogContentProps, 'close'>>>();
+  DialogHandle<Simplify<Omit<AuthenticateDialogCardProps, 'close'>>>();
 
 const isSignUpToText = (isSignUp: boolean) => (isSignUp ? 'Sign up' : 'Log in');
 
@@ -62,14 +62,22 @@ const formSchema = z.object({
   ...userPassSchema.schema.def.shape,
 });
 
-interface AuthenticateDialogContentProps {
-  close: () => void;
-  defaultIsSignUp: boolean;
+interface AuthenticateDialogCardProps {
+  close?: () => Awaitable<unknown>;
+  defaultIsSignUp?: boolean;
+  onAuth?: () => Awaitable<unknown>;
+  overrides?: {
+    title: string;
+    top?: React.ReactNode;
+    bottom?: React.ReactNode;
+  };
 }
-export function AuthenticateDialogContent({
-  close,
-  defaultIsSignUp,
-}: AuthenticateDialogContentProps) {
+export function AuthenticateFormCard({
+  close = () => undefined,
+  defaultIsSignUp = false,
+  onAuth,
+  overrides,
+}: AuthenticateDialogCardProps) {
   const signIn = useSignInMutation();
   const signUp = useSignUpMutation();
   const queryClient = useQueryClient();
@@ -91,7 +99,8 @@ export function AuthenticateDialogContent({
       } else {
         await signIn.mutateAsync(value);
       }
-      close();
+      await onAuth?.();
+      await close();
     },
   });
 
@@ -104,14 +113,12 @@ export function AuthenticateDialogContent({
   );
 
   return (
-    <DialogContent
-      className={cn('flex flex-col gap-6 sm:max-w-sm')}
-      render={<Card />}
-    >
+    <>
       <CardHeader>
-        <CardTitle>{modeText}</CardTitle>
+        <CardTitle>{overrides?.title ?? modeText}</CardTitle>
       </CardHeader>
       <CardContent>
+        {overrides?.top ?? null}
         <form
           id={form.formId}
           onSubmit={(e) => {
@@ -224,6 +231,7 @@ export function AuthenticateDialogContent({
             />
           </FieldGroup>
         </form>
+        {overrides?.bottom ?? null}
       </CardContent>
       <CardFooter>
         <FieldGroup className="gap-2">
@@ -265,7 +273,7 @@ export function AuthenticateDialogContent({
           />
         </FieldGroup>
       </CardFooter>
-    </DialogContent>
+    </>
   );
 }
 
@@ -275,10 +283,15 @@ export default function AuthenticateDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen} handle={authDialogHandle}>
       {({ payload }) => (
-        <AuthenticateDialogContent
-          close={() => setOpen(false)}
-          defaultIsSignUp={payload?.defaultIsSignUp ?? false}
-        />
+        <DialogContent
+          className={cn('flex flex-col gap-6 sm:max-w-sm')}
+          render={<Card />}
+        >
+          <AuthenticateFormCard
+            close={() => setOpen(false)}
+            defaultIsSignUp={payload?.defaultIsSignUp ?? false}
+          />
+        </DialogContent>
       )}
     </Dialog>
   );

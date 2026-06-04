@@ -1,7 +1,7 @@
 import { anonymous, username } from 'better-auth/plugins';
 
 import { convex } from 'kitcn/auth';
-import { getEnv } from '../lib/get-env';
+import { getEnv, getSiteURLs } from '../lib/get-env';
 import authConfig from './auth.config';
 import { defineAuth, getAuth } from './generated/auth';
 import { createAuthMiddleware } from 'better-auth/api';
@@ -11,6 +11,14 @@ export default defineAuth(() => ({
   emailAndPassword: {
     enabled: true,
   },
+  // baseURL: {
+  //   protocol: "http",
+  //   allowedHosts: ["localhost:3001","10.0.0.84:3001"],
+  //   // allowedHosts: getSiteURLs().map(origin => origin.split('://')[1]),
+  //   // fallback: "http://10.0.0.84:3001",
+  //   fallback: "http://localhost:3001",
+  //   // fallback: getEnv().SITE_URL,
+  // },
   baseURL: getEnv().SITE_URL,
   user: {
     additionalFields: {
@@ -85,6 +93,8 @@ export default defineAuth(() => ({
     updateAge: 60 * 60 * 24 * 15,
   },
   telemetry: { enabled: false },
+  // trustedOrigins: ["http://localhost:3001","http://10.0.0.84:3001"],
+  // trustedOrigins: getSiteURLs(),
   trustedOrigins: [getEnv().SITE_URL],
   databaseHooks: {
     user: {

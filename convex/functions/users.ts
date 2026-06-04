@@ -9,6 +9,8 @@ import {
   userPrivateInfoColumnsFilter,
 } from '../shared/models';
 
+export const me = optionalAuthQuery.query(async ({ ctx }) => ctx.user);
+
 export const getOwnInfo = optionalAuthQuery
   .input(
     z.object({
