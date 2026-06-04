@@ -6,12 +6,16 @@ import {
   RootGameComponent,
   SubGameComponent,
 } from '@/components/games/types';
-import { Dices, Spade } from 'lucide-react';
+import { Dices, LucideIcon, LucideProps, Spade } from 'lucide-react';
+import { IconName } from 'lucide-react/dynamic';
+import { Simplify } from '../types';
 
 export interface BaseGame {
   title: string;
   path: string;
-  icon?: (...args: any[]) => React.ReactNode;
+  icon?: LucideIcon | (LucideProps & {
+    lucideIcon: LucideIcon;
+  });
   // isActive: boolean;
 }
 export interface RootGame extends Required<BaseGame> {
@@ -53,6 +57,26 @@ export const GAMES = [
     component: VideoPoker,
   },
 ] as const satisfies Game[];
+
+type serverOnlyFields = Simplify<Partial<Pick<BaseGame, 'icon'> & Pick<Game, 'component'|'rootComponent'>>>;
+
+type RootContainingSubServerFields = {subGames?: serverOnlyFields[]}
+type GameServerFields = Simplify<serverOnlyFields & RootContainingSubServerFields>;
+
+export type clientifyGame<G extends GameServerFields> = Simplify<Omit<G, keyof GameServerFields> & (G extends Required<RootContainingSubServerFields> ? {subGames: Simplify<Omit<G["subGames"][number], keyof serverOnlyFields>[]>} : {})>;
+export type clientifyGameList<T extends (GameServerFields|undefined)[]> = { [E in keyof T]: T[E] extends undefined ? undefined : clientifyGame<Exclude<T[E], undefined>>};
+export function clientifyGame<G extends GameServerFields>(game: G): clientifyGame<G> {
+  const {icon, component, rootComponent, subGames, ...result} = game;
+  if (!subGames) return result as any;
+  const clientSubs = subGames.map(sub => {
+    const {icon, component, rootComponent, ...subRes} = sub;
+    return subRes;
+  });
+  return {
+    result,
+    subGames: clientSubs,
+  } as any;
+}
 
 export function getGameByPath(path: string[]) {
   if (path.length < 1 || path.length > 2) return undefined;

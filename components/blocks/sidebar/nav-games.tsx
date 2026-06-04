@@ -1,3 +1,4 @@
+import { DynamicIcon } from 'lucide-react/dynamic';
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,26 +19,31 @@ import { Game, GAMES, BaseGame, RootGame, SubGame } from '@/lib/games/games';
 import { ChevronRight, Circle, Dices, Spade, Square } from 'lucide-react';
 import Link, { LinkProps } from 'next/link';
 import React, { useMemo } from 'react';
-import { JSX } from 'react/jsx-runtime';
 
-interface GameLinkProps extends Omit<LinkProps, 'href'> {
-  game: RootGame | SubGame;
-  path: string[];
+interface GameLinkProps<Raw extends boolean> extends Omit<LinkProps, 'href'> {
+  game: BaseGame;
+  path?: Raw extends true ? never : string[];
+  raw?: Raw;
 }
-function GameLink({ game, path, ...props }: GameLinkProps) {
+function GameLink<Raw extends boolean>({ game, path, raw, ...props }: GameLinkProps<Raw>) {
   const { open, setOpen, setOpenMobile } = useSidebar();
   const href = useMemo(
-    () => (open ? ['', 'games', ...path].join('/') : ''),
+    () => (open && !raw ? ['', 'games', ...path!].join('/') : ''),
     [open, path]
   );
+  const icon = game.icon ? ('lucideIcon' in game.icon ? <game.icon.lucideIcon {...game.icon} /> : <game.icon />) : null;
+  const children = <>
+    {icon}
+    <span>{game.title}</span>
+  </>
+  if (raw) return children;
   return (
     <Link
       href={href}
       {...props}
       onClick={() => (open ? setOpenMobile(false) : setOpen(true))}
     >
-      {game.icon && <game.icon />}
-      <span>{game.title}</span>
+      {children}
     </Link>
   );
 }
@@ -58,8 +64,7 @@ export function NavGames() {
               <CollapsibleTrigger
                 render={<SidebarMenuButton tooltip={game.title} />}
               >
-                {game.icon && <game.icon />}
-                <span>{game.title}</span>
+                <GameLink game={game} raw/>
                 <ChevronRight className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />
               </CollapsibleTrigger>
               <CollapsibleContent>

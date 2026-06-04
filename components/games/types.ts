@@ -1,17 +1,18 @@
 import {
   BaseGame,
+  clientifyGame,
   RootGame,
   RootGameWithSubs,
   SubGame,
 } from '@/lib/games/games';
 
 export interface GameProps {
-  game: RootGame | SubGame;
+  game: clientifyGame<RootGame | SubGame>;
 }
 
 export interface RootGameProps {
-  game: RootGameWithSubs;
-  subGame: SubGame;
+  game: clientifyGame<RootGameWithSubs>;
+  subGame: clientifyGame<SubGame>;
   children: React.ReactNode;
 }
 
