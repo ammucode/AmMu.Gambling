@@ -1,48 +1,13 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHandle,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  FieldGroup,
-  Field,
-  FieldLabel,
-  FieldDescription,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { userPrivateInfo } from '@/convex/shared/models';
-import useAuthInfo from '@/hooks/use-auth-info';
-import useToggle from '@/hooks/use-toggle';
-import {
-  authClient,
-  useAnonymousSignInMutation,
-  useSignInMutation,
-  useSignOutMutation,
-  useSignUpMutation,
-} from '@/lib/convex/auth-client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHandle } from '@/components/ui/dialog';
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field';
 import { Awaitable, Simplify } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useAuth } from 'kitcn/react';
-import { LogIn } from 'lucide-react';
 import { useForm } from '@tanstack/react-form';
-import { useMemo, useState } from 'react';
-import { UserAvatar } from '../user/avatar';
+import { useState } from 'react';
 
 export const destructiveConfirmationDialogHandle =
   DialogHandle<
@@ -54,7 +19,7 @@ interface DestructiveConfirmationDialogContentProps {
   children?: React.ReactNode;
   formId: string;
   confirmText: string;
-  onConfirm?: () => Awaitable<any>;
+  onConfirm?: () => Awaitable<unknown>;
 }
 const defaultProps: Omit<DestructiveConfirmationDialogContentProps, 'close'> = {
   formId: 'destructive-confirmation',
@@ -69,7 +34,7 @@ export function DestructiveConfirmationDialogContent({
 }: DestructiveConfirmationDialogContentProps) {
   const form = useForm({
     formId: `${formId}-confirmation`,
-    onSubmit: async (arg) => {
+    onSubmit: async () => {
       if (onConfirm) await onConfirm();
       close();
     },

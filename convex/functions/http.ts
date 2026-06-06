@@ -1,4 +1,4 @@
-import { getEnv, getSiteURLs } from '../lib/get-env';
+import { getSiteURLs } from '../lib/get-env';
 import { getAuth } from './generated/auth';
 import { cors } from 'hono/cors';
 import { authMiddleware } from 'kitcn/auth/http';

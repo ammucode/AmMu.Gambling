@@ -4,22 +4,11 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHandle,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHandle } from '@/components/ui/dialog';
 import {
   FieldGroup,
   Field,
@@ -28,27 +17,16 @@ import {
   FieldError,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { userPassSchema } from '@/convex/lib/validators';
 import {
-  passwordSchema,
-  usernameSchema,
-  userPassSchema,
-} from '@/convex/lib/validators';
-import useAuthInfo from '@/hooks/use-auth-info';
-import useToggle from '@/hooks/use-toggle';
-import {
-  authClient,
-  useAnonymousSignInMutation,
   usernameAvailableQueryOptions,
   useSignInMutation,
-  useSignOutMutation,
   useSignUpMutation,
 } from '@/lib/convex/auth-client';
 import { Awaitable, Simplify } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useForm, useStore } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from 'kitcn/react';
-import { LogIn } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import z from 'zod';
 
@@ -155,18 +133,25 @@ export function AuthenticateFormCard({
                       };
                     }
                   } catch (error) {
+                    console.error(error);
                     // return undefined;
                   }
                   return undefined;
                 },
               }}
-              children={(field) => {
+            >
+              {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
-                const formErrors = (form.state.errors as any)
-                  .filter((err: any) => err && 'password' in err)
-                  .map((err: any) => err.password)
-                  .flat() as {message: string}[];
+                const formErrors = (
+                  form.state.errors as unknown as Record<
+                    string,
+                    { message: string }
+                  >[]
+                )
+                  .filter((err) => err && 'password' in err)
+                  .map((err) => err.password)
+                  .flat();
                 const errors = [...field.state.meta.errors, ...formErrors];
                 return (
                   <Field data-invalid={isInvalid}>
@@ -186,7 +171,7 @@ export function AuthenticateFormCard({
                   </Field>
                 );
               }}
-            />
+            </form.Field>
             <form.Field
               name="password"
               validators={{
@@ -206,7 +191,8 @@ export function AuthenticateFormCard({
                 },
                 onChangeAsyncDebounceMs: 1000,
               }}
-              children={(field) => {
+            >
+              {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
@@ -228,7 +214,7 @@ export function AuthenticateFormCard({
                   </Field>
                 );
               }}
-            />
+            </form.Field>
           </FieldGroup>
         </form>
         {overrides?.bottom ?? null}
@@ -246,7 +232,8 @@ export function AuthenticateFormCard({
             </Button>
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
+            >
+              {([canSubmit, isSubmitting]) => (
                 <Button
                   type="submit"
                   className="basis-1/2"
@@ -256,11 +243,10 @@ export function AuthenticateFormCard({
                   {isSubmitting ? '...' : modeText}
                 </Button>
               )}
-            />
+            </form.Subscribe>
           </Field>
-          <form.Field
-            name="isSignUp"
-            children={(field) => {
+          <form.Field name="isSignUp">
+            {(field) => {
               return (
                 <FieldDescription className="basis-full text-center">
                   {toggleModePrompt} have an account?{' '}
@@ -270,7 +256,7 @@ export function AuthenticateFormCard({
                 </FieldDescription>
               );
             }}
-          />
+          </form.Field>
         </FieldGroup>
       </CardFooter>
     </>

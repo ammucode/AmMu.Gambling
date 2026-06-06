@@ -1,4 +1,3 @@
-import { DynamicIcon } from 'lucide-react/dynamic';
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,27 +14,40 @@ import {
   SidebarMenuSubButton,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Game, GAMES, BaseGame, RootGame, SubGame } from '@/lib/games/games';
-import { ChevronRight, Circle, Dices, Spade, Square } from 'lucide-react';
+import { Game, GAMES, BaseGame, SubGame } from '@/lib/games/games';
+import { ChevronRight } from 'lucide-react';
 import Link, { LinkProps } from 'next/link';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 interface GameLinkProps<Raw extends boolean> extends Omit<LinkProps, 'href'> {
   game: BaseGame;
   path?: Raw extends true ? never : string[];
   raw?: Raw;
 }
-function GameLink<Raw extends boolean>({ game, path, raw, ...props }: GameLinkProps<Raw>) {
+function GameLink<Raw extends boolean>({
+  game,
+  path,
+  raw,
+  ...props
+}: GameLinkProps<Raw>) {
   const { open, setOpen, setOpenMobile } = useSidebar();
   const href = useMemo(
     () => (open && !raw ? ['', 'games', ...path!].join('/') : ''),
-    [open, path]
+    [open, path, raw]
   );
-  const icon = game.icon ? ('lucideIcon' in game.icon ? <game.icon.lucideIcon {...game.icon} /> : <game.icon />) : null;
-  const children = <>
-    {icon}
-    <span>{game.title}</span>
-  </>
+  const icon = game.icon ? (
+    'lucideIcon' in game.icon ? (
+      <game.icon.lucideIcon {...game.icon} />
+    ) : (
+      <game.icon />
+    )
+  ) : null;
+  const children = (
+    <>
+      {icon}
+      <span>{game.title}</span>
+    </>
+  );
   if (raw) return children;
   return (
     <Link
@@ -64,7 +76,7 @@ export function NavGames() {
               <CollapsibleTrigger
                 render={<SidebarMenuButton tooltip={game.title} />}
               >
-                <GameLink game={game} raw/>
+                <GameLink game={game} raw />
                 <ChevronRight className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />
               </CollapsibleTrigger>
               <CollapsibleContent>

@@ -11,13 +11,13 @@ const getSessionStorage = () => {
     return null;
   }
 };
-const readAuthSessionFallbackToken = () => {
-  const storage = getSessionStorage();
-  if (!storage) return null;
-  const token = storage.getItem(SESSION_TOKEN_FALLBACK_KEY);
-  return token && token.length > 0 ? token : null;
-};
-const writeAuthSessionFallbackToken = (token: any) => {
+// const readAuthSessionFallbackToken = () => {
+//   const storage = getSessionStorage();
+//   if (!storage) return null;
+//   const token = storage.getItem(SESSION_TOKEN_FALLBACK_KEY);
+//   return token && token.length > 0 ? token : null;
+// };
+const writeAuthSessionFallbackToken = (token: string | null) => {
   const storage = getSessionStorage();
   if (!storage) return;
   if (token && token.length > 0) {
@@ -26,18 +26,18 @@ const writeAuthSessionFallbackToken = (token: any) => {
   }
   storage.removeItem(SESSION_TOKEN_FALLBACK_KEY);
 };
-const readAuthSessionFallbackData = () => {
-  const storage = getSessionStorage();
-  if (!storage) return null;
-  const value = storage.getItem(SESSION_DATA_FALLBACK_KEY);
-  if (!value) return null;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
-};
-const writeAuthSessionFallbackData = (data: any) => {
+// const readAuthSessionFallbackData = () => {
+//   const storage = getSessionStorage();
+//   if (!storage) return null;
+//   const value = storage.getItem(SESSION_DATA_FALLBACK_KEY);
+//   if (!value) return null;
+//   try {
+//     return JSON.parse(value);
+//   } catch {
+//     return null;
+//   }
+// };
+const writeAuthSessionFallbackData = (data: object | null) => {
   const storage = getSessionStorage();
   if (!storage) return;
   if (data === null || data === void 0) {

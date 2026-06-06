@@ -7,7 +7,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { userPrivateInfo } from '@/convex/shared/models';
 import {
-  useAnonymousSignInMutation,
   useDeleteAnonymousAccountMutation,
   useSignOutMutation,
 } from '@/lib/convex/auth-client';
@@ -15,7 +14,6 @@ import { Sparkles, LogIn, BadgeCheck, BadgeX, LogOut } from 'lucide-react';
 import { authDialogHandle } from './authenticate-dialog';
 import { DialogTrigger } from '@/components/ui/dialog';
 import { destructiveConfirmationDialogHandle } from '../dialogs/destructive-confirmation';
-import { FieldLabel } from '@/components/ui/field';
 import { UserAvatar } from '../user/avatar';
 import useSignInAsGuest from '@/hooks/use-signin-as-guest';
 import { useRouter } from 'next/navigation';
@@ -34,7 +32,10 @@ export function LoadingDropdownItems() {
 }
 
 export function NoUserDropdownItems() {
-  const signInAsGuestAsync = useSignInAsGuest({async: true, asyncRefresh: true});
+  const signInAsGuestAsync = useSignInAsGuest({
+    async: true,
+    asyncRefresh: true,
+  });
   const router = useRouter();
   return (
     <DropdownMenuGroup>
@@ -83,7 +84,10 @@ export function GuestDropdownItems({ user }: { user: userPrivateInfo }) {
           payload={{
             formId: 'delete-guest',
             confirmText: 'Delete Guest Account',
-            onConfirm: async () => (await deleteGuest.mutateAsync(), router.refresh()),
+            onConfirm: async () => (
+              await deleteGuest.mutateAsync(),
+              router.refresh()
+            ),
             children: !!user ? <UserAvatar user={user} /> : null,
           }}
           className={'flex items-center gap-2.5'}
@@ -108,7 +112,10 @@ export function AccountDropdownItems({ user }: { user: userPrivateInfo }) {
           payload={{
             formId: 'logout',
             confirmText: 'Log out',
-            onConfirm: async () => (await signOut.mutateAsync(), router.refresh()),
+            onConfirm: async () => (
+              await signOut.mutateAsync(),
+              router.refresh()
+            ),
             children: !!user ? <UserAvatar user={user} /> : null,
           }}
           className={'flex items-center gap-2.5'}

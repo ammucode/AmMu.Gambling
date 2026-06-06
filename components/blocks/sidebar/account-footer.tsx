@@ -1,23 +1,11 @@
 'use client';
 
-import {
-  BadgeCheck,
-  BadgeX,
-  Bell,
-  ChevronsUpDown,
-  CircleQuestionMark,
-  CreditCard,
-  LogIn,
-  LogOut,
-  Sparkles,
-} from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -29,11 +17,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import useAuthInfo from '@/hooks/use-auth-info';
-import { userPrivateInfo } from '@/convex/shared/models';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useAnonymousSignInMutation } from '@/lib/convex/auth-client';
-import { DialogTrigger } from '@/components/ui/dialog';
-import { authDialogHandle } from '../auth/authenticate-dialog';
 import {
   AccountDropdownItems,
   GuestDropdownItems,

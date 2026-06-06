@@ -1,5 +1,4 @@
 import {
-  BaseGame,
   clientifyGame,
   RootGame,
   RootGameWithSubs,

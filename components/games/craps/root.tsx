@@ -1,12 +1,14 @@
-"use client";
+'use client';
 
-import { GameProps, RootGameProps } from '../types';
+import { RootGameProps } from '../types';
 
-export function Craps({ game, subGame, children }: RootGameProps) {
+export function Craps({ subGame, children }: RootGameProps) {
   return (
-    <div className='bg-green-900 w-full h-full rounded-lg p-4 flex flex-col items-center gap-6'>
-      <h1 className='text-[3.5rem] font-extrabold italic text-yellow-600 drop-shadow-amber-500'>{subGame.title}</h1>
-      <div className='w-full h-full p-2 pt-0'>
+    <div className="@container flex h-full w-full flex-col items-center gap-6 rounded-lg bg-green-900 p-4">
+      <h1 className="text-[3.5rem] font-extrabold text-yellow-600 italic drop-shadow-amber-500">
+        {subGame.title}
+      </h1>
+      <div className="relative m-2 mt-0 grid h-full w-full place-items-center">
         {children}
       </div>
     </div>

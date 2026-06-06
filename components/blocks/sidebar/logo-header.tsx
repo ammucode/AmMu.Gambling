@@ -1,21 +1,12 @@
 'use client';
 
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-  DropdownMenuShortcut,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { ChevronsUpDown, HandCoins, Plus } from 'lucide-react';
+import { HandCoins } from 'lucide-react';
 import Link from 'next/link';
 
 export function LogoHeader() {

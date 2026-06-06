@@ -3,8 +3,7 @@ import { anonymous, username } from 'better-auth/plugins';
 import { convex } from 'kitcn/auth';
 import { getEnv, getSiteURLs } from '../lib/get-env';
 import authConfig from './auth.config';
-import { defineAuth, getAuth } from './generated/auth';
-import { createAuthMiddleware } from 'better-auth/api';
+import { defineAuth } from './generated/auth';
 import { usernameSchema } from '../lib/validators';
 
 export default defineAuth(() => ({
@@ -20,7 +19,7 @@ export default defineAuth(() => ({
   //   // fallback: getEnv().SITE_URL,
   // },
   baseURL: {
-    allowedHosts: getSiteURLs().map(origin => origin.split('://')[1]),
+    allowedHosts: getSiteURLs().map((origin) => origin.split('://')[1]),
     // allowedHosts: [getEnv().SITE_URL.split("://")[1]],
     // fallback: "http://10.0.0.84:3001",
     fallback: getEnv().SITE_URL,
@@ -97,7 +96,7 @@ export default defineAuth(() => ({
       },
     }),
   ],
-  disabledPaths: ["/sign-in/email"],
+  disabledPaths: ['/sign-in/email'],
   session: {
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24 * 15,

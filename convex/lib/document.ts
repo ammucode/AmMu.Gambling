@@ -23,15 +23,17 @@ type DeepReplaceNullWithUndefined<T> = T extends null | undefined
       : T;
 export function iHateNull<T>(value: T): DeepReplaceNullWithUndefined<T> {
   const sentinel = Symbol.for('iHateNull');
-  if ((value ?? sentinel) === sentinel) return undefined as any;
-  if (Array.isArray(value)) return value.map(iHateNull) as any;
+  if ((value ?? sentinel) === sentinel)
+    return undefined as DeepReplaceNullWithUndefined<T>;
+  if (value === null) return undefined as DeepReplaceNullWithUndefined<T>;
+  if (value === undefined) return undefined as DeepReplaceNullWithUndefined<T>;
+  if (Array.isArray(value))
+    return value.map(iHateNull) as DeepReplaceNullWithUndefined<T>;
   if (typeof value === 'object') {
-    const result = {} as any;
-    for (const key in value) {
-      result[key] = iHateNull(value[key]);
-    }
-    return result;
+    return Object.fromEntries(
+      Object.entries(value).map(([key, val]) => [key, iHateNull(val)])
+    ) as DeepReplaceNullWithUndefined<T>;
   }
 
-  return value as any;
+  return value as DeepReplaceNullWithUndefined<T>;
 }

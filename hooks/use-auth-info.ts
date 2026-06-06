@@ -1,9 +1,7 @@
-import { userPrivateInfo } from '@/convex/shared/models';
 import { authClient } from '@/lib/convex/auth-client';
 import { useCRPC } from '@/lib/convex/crpc';
-import { skipToken, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from 'kitcn/react';
-import { use } from 'react';
 
 export default function useAuthInfo() {
   const { hasSession, isLoading: sessionLoading } = useAuth();
@@ -15,7 +13,9 @@ export default function useAuthInfo() {
 
   const crpc = useCRPC();
 
-  const { data: userData, isLoading: userLoading } = useQuery(crpc.users.me.queryOptions());
+  const { data: userData, isLoading: userLoading } = useQuery(
+    crpc.users.me.queryOptions()
+  );
 
   return {
     hasSession,

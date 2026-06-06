@@ -2,7 +2,7 @@ import { useAnonymousSignInMutation } from '@/lib/convex/auth-client';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
-export default function useSignInAsGuest<Async extends boolean=false>({
+export default function useSignInAsGuest<Async extends boolean = false>({
   async,
   asyncRefresh,
 }: {
@@ -16,7 +16,9 @@ export default function useSignInAsGuest<Async extends boolean=false>({
   const async_ = useCallback(async () => {
     await signInAsGuest.mutateAsync();
     if (asyncRefresh) router.refresh();
-  }, [signInAsGuest, async]);
+  }, [signInAsGuest, asyncRefresh, router]);
 
-  return (async ? async_ : sync) as () => Async extends true ? Promise<void> : void;
+  return (async ? async_ : sync) as () => Async extends true
+    ? Promise<void>
+    : void;
 }

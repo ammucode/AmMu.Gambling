@@ -1,8 +1,6 @@
-
-
 export type Simplify<T> = T extends Date
   ? T
-  : T extends any[]
+  : T extends any[] // eslint-disable-line @typescript-eslint/no-explicit-any
     ? { [E in keyof T]: Simplify<T[E]> }
     : { [K in keyof T]: T[K] } & {};
 

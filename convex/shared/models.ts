@@ -4,8 +4,7 @@ import { ConvexTableWithColumns, TableConfig } from 'kitcn/orm';
 
 function getColumnsAndFilter<
   Table extends ConvexTableWithColumns<TableConfig>,
-  ZObj extends z.ZodObject &
-    z.ZodType<Partial<Record<keyof Table['$inferSelect'], any>>>,
+  ZObj extends z.ZodObject & z.ZodType<Partial<Table['$inferSelect']>>,
 >(_table: Table, schema: ZObj) {
   return {
     schema,

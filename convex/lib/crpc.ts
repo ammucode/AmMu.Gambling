@@ -1,15 +1,8 @@
 import { getAuthUserIdentity } from 'kitcn/auth';
 import { CRPCError } from 'kitcn/server';
 
-import type {
-  ActionCtx,
-  MutationCtx,
-  QueryCtx,
-} from '../functions/generated/server';
 import { initCRPC } from '../functions/generated/server';
-import { GenericQueryCtx } from 'convex/server';
-import { DataModel } from '../functions/_generated/dataModel';
-import { MarkNonNull, Simplify } from '../../lib/types';
+import { MarkNonNull } from '../../lib/types';
 import { iHateNull } from './document';
 
 const c = initCRPC
@@ -20,10 +13,13 @@ const c = initCRPC
 
 const optionalAuthMiddleware = c.middleware(async ({ ctx, next }) => {
   const identity = await getAuthUserIdentity(ctx);
-  if (!identity) return next({ ctx: { ...ctx, user: null as typeof user} });
-  const user = iHateNull(await ctx.orm.query.user.findFirst({
-    where: { id: identity.subject },
-  }))??null;
+  if (!identity) return next({ ctx: { ...ctx, user: null as typeof user } });
+  const user =
+    iHateNull(
+      await ctx.orm.query.user.findFirst({
+        where: { id: identity.subject },
+      })
+    ) ?? null;
   if (!user) return next({ ctx: { ...ctx, user: null as typeof user } });
   return next({ ctx: { ...ctx, user } });
 });

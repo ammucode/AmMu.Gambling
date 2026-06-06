@@ -1,8 +1,8 @@
-import { z } from 'zod';
-
 import { optionalAuthQuery } from '../lib/crpc';
 import { userPrivateInfo } from '../shared/models';
 
 export const me = optionalAuthQuery
   .output(userPrivateInfo.nullable())
-  .query(async ({ ctx }) => await userPrivateInfo.nullable().parseAsync(ctx.user));
+  .query(
+    async ({ ctx }) => await userPrivateInfo.nullable().parseAsync(ctx.user)
+  );

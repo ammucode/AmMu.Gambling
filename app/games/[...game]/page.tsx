@@ -14,9 +14,12 @@ export default async function Page({ params }: PageProps<'/games/[...game]'>) {
 
   const user = await caller.users.me();
 
-  if (!user) return <div className='flex flex-col items-center w-full h-max'>
-    <NoAccountBlock />
-  </div>;
+  if (!user)
+    return (
+      <div className="flex h-max w-full flex-col items-center">
+        <NoAccountBlock />
+      </div>
+    );
 
   return <GameRoot games={games} />;
 }

@@ -1,4 +1,9 @@
-import { clientifyGame, getGameByPath, RootGame, SubGame } from '@/lib/games/games';
+import {
+  clientifyGame,
+  getGameByPath,
+  RootGame,
+  SubGame,
+} from '@/lib/games/games';
 
 export interface GameWrapperProps {
   games: Exclude<ReturnType<typeof getGameByPath>, undefined>;
@@ -11,7 +16,10 @@ export function GameRoot({ games }: GameWrapperProps) {
 
   if (subGame && rootGame.rootComponent) {
     return (
-      <rootGame.rootComponent game={clientifyGame(rootGame)} subGame={clientifyGame(subGame)}>
+      <rootGame.rootComponent
+        game={clientifyGame(rootGame)}
+        subGame={clientifyGame(subGame)}
+      >
         {renderedGame}
       </rootGame.rootComponent>
     );
