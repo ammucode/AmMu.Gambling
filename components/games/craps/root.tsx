@@ -8,7 +8,7 @@ export function Craps({ subGame, children }: RootGameProps) {
       <h1 className="text-[3.5rem] font-extrabold text-yellow-600 italic drop-shadow-amber-500">
         {subGame.title}
       </h1>
-      <div className="relative m-2 mt-0 grid h-full w-full place-items-center resize">
+      <div className="relative m-2 mt-0 grid h-full w-full resize place-items-center">
         {children}
       </div>
     </div>

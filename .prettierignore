@@ -5,3 +5,7 @@ node_modules/
 coverage/
 pnpm-lock.yaml
 .pnpm-store/
+convex/functions/generated
+convex/functions/_generated
+convex/functions/plugins.lock.json
+convex/shared/api.ts
