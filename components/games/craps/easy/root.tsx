@@ -25,7 +25,7 @@ export function EasyCraps({}: EasyCrapsProps) {
           lastResult={{ bet: 10, win: 50 }}
         />
       </div>
-      <div className="absolute bottom-0 hidden aspect-2/1 max-h-[calc(100%-72px)] max-w-full min-w-[80%] grid-cols-14 grid-rows-22 bg-gray-800/30 md:grid">
+      <div className="absolute bottom-0 hidden aspect-2/1 max-h-[calc(100%-72px)] /max-w-full min-w-full @5xl:min-w-[90%] @6xl:min-w-[80%] transition-[min-width] duration-300 ease-in-out grid-cols-14 grid-rows-22 bg-gray-800/30 @md:grid">
         <div className="col-span-4 col-start-1 row-span-19 row-start-1 grid bg-gray-800/30">
           hard
         </div>

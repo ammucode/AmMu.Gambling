@@ -4,7 +4,7 @@ import { DialogRoots } from './dialog-roots';
 
 export function UIProviders({ children }: { children: ReactNode }) {
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       {children}
       <DialogRoots />
     </SidebarProvider>
