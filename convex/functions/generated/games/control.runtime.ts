@@ -10,12 +10,11 @@ import {
   type GeneratedRegistryCallerForContext,
   type GeneratedRegistryHandlerForContext,
 } from 'kitcn/server';
-import type { ActionCtx, MutationCtx, QueryCtx } from './server';
+import type { ActionCtx, MutationCtx, QueryCtx } from '../server';
 import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
-  "create": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../messages").create>("messages:create"), () => (require("../messages") as Record<string, unknown>)["create"])],
-  "list": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../messages").list>("messages:list"), () => (require("../messages") as Record<string, unknown>)["list"])],
+  "start": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").start>("games/control:start"), () => (require("../../games/control") as Record<string, unknown>)["start"])],
 } as const;
 
   const handlerRegistry = procedureRegistry;
@@ -58,7 +57,7 @@ type GeneratedProcedureHandler<
 >;
 
 
-export function createMessagesCaller<TCtx extends ProcedureCallerContext>(
+export function createGamesControlCaller<TCtx extends ProcedureCallerContext>(
   ctx: TCtx
 ): GeneratedProcedureCaller<TCtx> {
   return generatedRuntime.getCallerFactory()(
@@ -66,7 +65,7 @@ export function createMessagesCaller<TCtx extends ProcedureCallerContext>(
   ) as GeneratedProcedureCaller<TCtx>;
 }
 
-export function createMessagesHandler<TCtx extends ProcedureHandlerContext>(
+export function createGamesControlHandler<TCtx extends ProcedureHandlerContext>(
   ctx: TCtx
 ): GeneratedProcedureHandler<TCtx> {
   return generatedRuntime.getHandlerFactory()(ctx) as GeneratedProcedureHandler<TCtx>;

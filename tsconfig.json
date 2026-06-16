@@ -28,6 +28,12 @@
       ],
       "@convex/*": [
         "./convex/shared/*"
+      ],
+      "@convex-lib/*": [
+        "./convex/lib/*"
+      ],
+      "~schema": [
+        "./convex/functions/schema"
       ]
     },
     "strictFunctionTypes": false

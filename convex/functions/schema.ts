@@ -1,18 +1,39 @@
+import { makeGameSlug } from '@convex-lib/games';
 import {
+  arrayOf,
   boolean,
   convexTable,
   defineSchema,
   index,
+  InferInsertModel,
+  InferSelectModel,
   integer,
   text,
   timestamp,
 } from 'kitcn/orm';
 
-export const messagesTable = convexTable('messages', {
-  body: text().notNull(),
-  createdAt: timestamp().notNull(),
-  updatedAt: timestamp().notNull(),
-});
+export const gameSessionTable = convexTable(
+  'gameSession',
+  {
+    path: arrayOf(text().notNull()).notNull(),
+    userId: text()
+      .notNull()
+      .references(() => userTable.id),
+    userPathSlug: text()
+      .notNull()
+      .unique()
+      .$type<ReturnType<typeof makeGameSlug>>(),
+    active: boolean().notNull().default(true),
+    invested: integer().notNull().default(0),
+    createdAt: timestamp().defaultNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
+  },
+  (gameSessionTable) => [
+    index('path').on(gameSessionTable.path),
+    index('userId').on(gameSessionTable.userId),
+    index('path_userId').on(gameSessionTable.path, gameSessionTable.userId),
+  ]
+);
 
 export const userTable = convexTable(
   'user',
@@ -21,13 +42,12 @@ export const userTable = convexTable(
     email: text().notNull().unique(),
     emailVerified: boolean().notNull(),
     image: text(),
-    createdAt: timestamp().notNull(),
-    updatedAt: timestamp().notNull(),
+    createdAt: timestamp().defaultNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
     userId: text(),
     username: text().unique().notNull(),
     displayUsername: text(),
     isAnonymous: boolean().notNull(),
-    age: integer(),
   },
   (userTable) => [
     index('email_name').on(userTable.email, userTable.name),
@@ -40,8 +60,8 @@ export const sessionTable = convexTable(
   {
     expiresAt: timestamp().notNull(),
     token: text().notNull().unique(),
-    createdAt: timestamp().notNull(),
-    updatedAt: timestamp().notNull(),
+    createdAt: timestamp().defaultNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
     ipAddress: text(),
     userAgent: text(),
     userId: text()
@@ -70,8 +90,8 @@ export const accountTable = convexTable(
     refreshTokenExpiresAt: timestamp(),
     scope: text(),
     password: text(),
-    createdAt: timestamp().notNull(),
-    updatedAt: timestamp().notNull(),
+    createdAt: timestamp().defaultNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
   },
   (accountTable) => [
     index('accountId').on(accountTable.accountId),
@@ -84,36 +104,40 @@ export const accountTable = convexTable(
   ]
 );
 
-export const verificationTable = convexTable(
-  'verification',
-  {
-    identifier: text().notNull(),
-    value: text().notNull(),
-    expiresAt: timestamp().notNull(),
-    createdAt: timestamp().notNull(),
-    updatedAt: timestamp().notNull(),
-  },
-  (verificationTable) => [
-    index('expiresAt').on(verificationTable.expiresAt),
-    index('identifier').on(verificationTable.identifier),
-  ]
-);
+// export const verificationTable = convexTable(
+//   'verification',
+//   {
+//     identifier: text().notNull(),
+//     value: text().notNull(),
+//     expiresAt: timestamp().notNull(),
+//     createdAt: timestamp().defaultNow(),
+//     updatedAt: timestamp().$onUpdate(() => new Date()),
+//   },
+//   (verificationTable) => [
+//     index('expiresAt').on(verificationTable.expiresAt),
+//     index('identifier').on(verificationTable.identifier),
+//   ]
+// );
 
 export const jwksTable = convexTable('jwks', {
   publicKey: text().notNull(),
   privateKey: text().notNull(),
-  createdAt: timestamp().notNull(),
+  createdAt: timestamp().defaultNow(),
+  updatedAt: timestamp().$onUpdate(() => new Date()),
   expiresAt: timestamp(),
 });
 
 export const tables = {
-  messages: messagesTable,
+  gameSession: gameSessionTable,
   user: userTable,
   session: sessionTable,
   account: accountTable,
-  verification: verificationTable,
+  // verification: verificationTable,
   jwks: jwksTable,
 };
+export type TableName = keyof typeof tables;
+export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
+export type Insert<T extends TableName> = InferInsertModel<(typeof tables)[T]>;
 
 export default defineSchema(tables).relations((r) => ({
   user: {

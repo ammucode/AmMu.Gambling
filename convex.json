@@ -1,7 +1,11 @@
 {
+  "$schema": "node_modules/convex/schemas/convex.schema.json",
   "functions": "convex/functions",
   "codegen": {
     "staticApi": true,
     "staticDataModel": true
+  },
+  "aiFiles": {
+    "enabled": false
   }
 }

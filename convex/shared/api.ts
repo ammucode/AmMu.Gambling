@@ -10,9 +10,10 @@ import type { httpRouter } from "../functions/http";
 import type { tables } from "../functions/schema";
 
 export const api = {
-  messages: {
-    create: createApiLeaf<"mutation", typeof import("../functions/messages").create>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/messages").create>("messages:create"), { type: "mutation" }),
-    list: createApiLeaf<"query", typeof import("../functions/messages").list>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/messages").list>("messages:list"), { type: "query" }),
+  games: {
+    control: {
+      start: createApiLeaf<"mutation", typeof import("../functions/games/control").start>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").start>("games/control:start"), { auth: "required", type: "mutation" }),
+    },
   },
   users: {
     me: createApiLeaf<"query", typeof import("../functions/users").me>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/users").me>("users:me"), { auth: "optional", type: "query" }),

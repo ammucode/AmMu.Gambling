@@ -32,14 +32,14 @@ export type DataModel = {
       accessToken?: null | string;
       accessTokenExpiresAt?: null | number;
       accountId: string;
-      createdAt: number;
+      createdAt?: null | number;
       idToken?: null | string;
       password?: null | string;
       providerId: string;
       refreshToken?: null | string;
       refreshTokenExpiresAt?: null | number;
       scope?: null | string;
-      updatedAt: number;
+      updatedAt?: null | number;
       userId: string;
       _id: Id<"account">;
       _creationTime: number;
@@ -301,12 +301,46 @@ export type DataModel = {
     searchIndexes: {};
     vectorIndexes: {};
   };
+  gameSession: {
+    document: {
+      active: boolean;
+      createdAt?: null | number;
+      invested: number;
+      path: Array<string>;
+      updatedAt?: null | number;
+      userId: string;
+      userPathSlug: string;
+      _id: Id<"gameSession">;
+      _creationTime: number;
+    };
+    fieldPaths:
+      | "_creationTime"
+      | "_id"
+      | "active"
+      | "createdAt"
+      | "invested"
+      | "path"
+      | "updatedAt"
+      | "userId"
+      | "userPathSlug";
+    indexes: {
+      by_id: ["_id"];
+      by_creation_time: ["_creationTime"];
+      gameSession_userPathSlug_unique: ["userPathSlug", "_creationTime"];
+      path: ["path", "_creationTime"];
+      path_userId: ["path", "userId", "_creationTime"];
+      userId: ["userId", "_creationTime"];
+    };
+    searchIndexes: {};
+    vectorIndexes: {};
+  };
   jwks: {
     document: {
-      createdAt: number;
+      createdAt?: null | number;
       expiresAt?: null | number;
       privateKey: string;
       publicKey: string;
+      updatedAt?: null | number;
       _id: Id<"jwks">;
       _creationTime: number;
     };
@@ -316,23 +350,8 @@ export type DataModel = {
       | "createdAt"
       | "expiresAt"
       | "privateKey"
-      | "publicKey";
-    indexes: {
-      by_id: ["_id"];
-      by_creation_time: ["_creationTime"];
-    };
-    searchIndexes: {};
-    vectorIndexes: {};
-  };
-  messages: {
-    document: {
-      body: string;
-      createdAt: number;
-      updatedAt: number;
-      _id: Id<"messages">;
-      _creationTime: number;
-    };
-    fieldPaths: "_creationTime" | "_id" | "body" | "createdAt" | "updatedAt";
+      | "publicKey"
+      | "updatedAt";
     indexes: {
       by_id: ["_id"];
       by_creation_time: ["_creationTime"];
@@ -426,11 +445,11 @@ export type DataModel = {
   };
   session: {
     document: {
-      createdAt: number;
+      createdAt?: null | number;
       expiresAt: number;
       ipAddress?: null | string;
       token: string;
-      updatedAt: number;
+      updatedAt?: null | number;
       userAgent?: null | string;
       userId: string;
       _id: Id<"session">;
@@ -459,15 +478,14 @@ export type DataModel = {
   };
   user: {
     document: {
-      age?: null | number;
-      createdAt: number;
+      createdAt?: null | number;
       displayUsername?: null | string;
       email: string;
       emailVerified: boolean;
       image?: null | string;
       isAnonymous: boolean;
       name: string;
-      updatedAt: number;
+      updatedAt?: null | number;
       userId?: null | string;
       username: string;
       _id: Id<"user">;
@@ -476,7 +494,6 @@ export type DataModel = {
     fieldPaths:
       | "_creationTime"
       | "_id"
-      | "age"
       | "createdAt"
       | "displayUsername"
       | "email"
@@ -494,33 +511,6 @@ export type DataModel = {
       name: ["name", "_creationTime"];
       user_email_unique: ["email", "_creationTime"];
       user_username_unique: ["username", "_creationTime"];
-    };
-    searchIndexes: {};
-    vectorIndexes: {};
-  };
-  verification: {
-    document: {
-      createdAt: number;
-      expiresAt: number;
-      identifier: string;
-      updatedAt: number;
-      value: string;
-      _id: Id<"verification">;
-      _creationTime: number;
-    };
-    fieldPaths:
-      | "_creationTime"
-      | "_id"
-      | "createdAt"
-      | "expiresAt"
-      | "identifier"
-      | "updatedAt"
-      | "value";
-    indexes: {
-      by_id: ["_id"];
-      by_creation_time: ["_creationTime"];
-      expiresAt: ["expiresAt", "_creationTime"];
-      identifier: ["identifier", "_creationTime"];
     };
     searchIndexes: {};
     vectorIndexes: {};

@@ -1,12 +1,7 @@
-import {
-  clientifyGame,
-  getGameByPath,
-  RootGame,
-  SubGame,
-} from '@/lib/games/games';
+import { clientifyGame, GamePair, RootGame, SubGame } from '@/lib/games/games';
 
 export interface GameWrapperProps {
-  games: Exclude<ReturnType<typeof getGameByPath>, undefined>;
+  games: GamePair;
 }
 export function GameRoot({ games }: GameWrapperProps) {
   const [rootGame, subGame] = games;

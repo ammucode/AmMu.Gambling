@@ -7,7 +7,7 @@ import {
   SubGameComponent,
 } from '@/components/games/types';
 import { Dices, LucideIcon, LucideProps, Spade } from 'lucide-react';
-import { Simplify } from '../types';
+import { FlattenOnce, Join, Simplify } from '../types';
 
 export interface BaseGame {
   title: string;
@@ -17,7 +17,6 @@ export interface BaseGame {
     | (LucideProps & {
         lucideIcon: LucideIcon;
       });
-  // isActive: boolean;
 }
 export interface RootGame extends Required<BaseGame> {
   component: GameComponent;
@@ -28,7 +27,6 @@ export interface SubGame extends BaseGame {
   component: SubGameComponent;
 }
 export interface RootGameWithSubs extends Required<BaseGame> {
-  // isActive: false;
   component?: never;
   rootComponent?: RootGameComponent;
   subGames: SubGame[];
@@ -39,13 +37,11 @@ export const GAMES = [
     title: 'Craps',
     path: 'craps',
     icon: Dices,
-    // isActive: false,
     rootComponent: Craps,
     subGames: [
       {
         title: 'Easy Craps',
         path: 'easy',
-        // isActive: false as boolean,
         component: EasyCraps,
       },
     ],
@@ -54,10 +50,10 @@ export const GAMES = [
     title: 'Video Poker',
     path: 'video-poker',
     icon: Spade,
-    // isActive: false,
     component: VideoPoker,
   },
 ] as const satisfies Game[];
+type GAMES = typeof GAMES;
 
 type serverOnlyFields = Simplify<
   Partial<Pick<BaseGame, 'icon'> & Pick<Game, 'component' | 'rootComponent'>>
@@ -98,6 +94,33 @@ export function clientifyGame<G extends GameServerFields>(
   } as unknown as clientifyGame<G>;
 }
 
+type subGamePaths<Path extends string, Gs extends SubGame[]> = {
+  [K in keyof Gs]: [Path, Gs[K]['path']];
+};
+type gamePaths<G extends Game> = G extends RootGameWithSubs
+  ? subGamePaths<G['path'], G['subGames']>
+  : [[G['path']]];
+function gamePaths<G extends Game>(game: G): gamePaths<G> {
+  return (
+    'subGames' in game && game.subGames
+      ? game.subGames.map((sub) => [game.path, sub.path])
+      : [[game.path]]
+  ) as gamePaths<G>;
+}
+type allGamePaths<Gs extends Game[] = GAMES> = {
+  [K in keyof Gs]: gamePaths<Gs[K]>;
+};
+
+export const GAME_PATHS = GAMES.flatMap(
+  (game) => gamePaths(game) as unknown
+) as unknown as FlattenOnce<allGamePaths<GAMES>>;
+export type GAME_PATHS = typeof GAME_PATHS;
+export type GamePath = GAME_PATHS[keyof GAME_PATHS & number];
+export type GamePathString = Join<GamePath, '/'>;
+
+export type GamePair = [RootGame, undefined] | [RootGameWithSubs, SubGame];
+export function getGameByPath(path: GamePath): GamePair;
+export function getGameByPath(path: string[]): GamePair | undefined;
 export function getGameByPath(path: string[]) {
   if (path.length < 1 || path.length > 2) return undefined;
   const rootGame = GAMES.find((game) => game.path === path[0]);

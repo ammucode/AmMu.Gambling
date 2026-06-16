@@ -20,14 +20,19 @@ import type { GenericId as Id } from "convex/values";
  * ```
  */
 export declare const api: {
-  messages: {
-    create: FunctionReference<"mutation", "public", { body: string }, any>;
-    list: FunctionReference<
-      "query",
-      "public",
-      {},
-      Array<{ body: string; createdAt: any; id: string }>
-    >;
+  games: {
+    control: {
+      start: FunctionReference<
+        "mutation",
+        "public",
+        { gamePath: "craps" | "easy" | "video-poker" },
+        {
+          active: boolean;
+          invested: number;
+          path: "craps" | "easy" | "video-poker";
+        }
+      >;
+    };
   };
   users: {
     me: FunctionReference<

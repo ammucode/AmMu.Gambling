@@ -23,7 +23,21 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "allowJs": true
+    "allowJs": true,
+    "paths": {
+      "@/*": [
+        "../../*"
+      ],
+      "@convex/*": [
+        "../shared/*"
+      ],
+      "@convex-lib/*": [
+        "../lib/*"
+      ],
+      "~schema": [
+        "./schema"
+      ],
+    },
   },
   "include": [
     "./**/*",

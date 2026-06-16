@@ -1,11 +1,13 @@
 import { z } from 'zod';
-import { userTable } from '../functions/schema';
+import { gameSessionTable, userTable } from '~schema';
 import { ConvexTableWithColumns, TableConfig } from 'kitcn/orm';
+import { GAME_PATHS } from '@/lib/games/games';
+import { createUnionSchema } from '@/lib/zod';
 
 function getColumnsAndFilter<
   Table extends ConvexTableWithColumns<TableConfig>,
   ZObj extends z.ZodObject & z.ZodType<Partial<Table['$inferSelect']>>,
->(_table: Table, schema: ZObj) {
+>(table: Table, schema: ZObj) {
   return {
     schema,
     cols: schema.keyof().def.entries as ReturnType<
@@ -14,6 +16,9 @@ function getColumnsAndFilter<
     filter: Object.fromEntries(
       schema.keyof().options.map((field) => [field, true])
     ) as { [K in keyof ZObj['shape']]: true },
+    returning: Object.fromEntries(
+      schema.keyof().options.map((field) => [field, table[field]])
+    ) as { [K in keyof ZObj['shape']]: Table[K] },
   };
 }
 
@@ -41,5 +46,20 @@ export const {
   z.object({
     ...userPublicInfo.def.shape,
     age: z.number().optional(),
+  })
+);
+
+export type gameSessionInfo = z.infer<typeof gameSessionInfo>;
+export const {
+  schema: gameSessionInfo,
+  cols: gameSessionInfoColumns,
+  filter: gameSessionInfoColumnsFilter,
+  returning: gameSessionInfoReturning,
+} = getColumnsAndFilter(
+  gameSessionTable,
+  z.object({
+    path: createUnionSchema(GAME_PATHS),
+    active: z.boolean(),
+    invested: z.number(),
   })
 );

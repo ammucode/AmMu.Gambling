@@ -1,4 +1,4 @@
-import { optionalAuthQuery } from '../lib/crpc';
+import { optionalAuthQuery } from '@convex-lib/crpc';
 import { userPrivateInfo } from '../shared/models';
 
 export const me = optionalAuthQuery

@@ -4,7 +4,7 @@ import { cors } from 'hono/cors';
 import { authMiddleware } from 'kitcn/auth/http';
 import { createHttpRouter } from 'kitcn/server';
 import { Hono } from 'hono';
-import { router } from '../lib/crpc';
+import { router } from '@convex-lib/crpc';
 // __KITCN_HTTP_IMPORTS__
 
 const app = new Hono();
