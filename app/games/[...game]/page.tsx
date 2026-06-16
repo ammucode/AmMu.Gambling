@@ -1,4 +1,5 @@
 import { NoAccountBlock } from '@/components/blocks/auth/no-account';
+import { BalanceManager } from '@/components/games/balance-manager';
 import { GameRoot } from '@/components/games/root';
 import { caller } from '@/lib/convex/rsc';
 import { GamePath, getGameByPath } from '@/lib/games/games';
@@ -23,9 +24,14 @@ export default async function Page({ params }: PageProps<'/games/[...game]'>) {
     );
   }
 
-  void (await caller.games.control.getOrStartSession({
+  const session = await caller.games.control.getOrStartSession({
     gamePath: verifiedPath,
-  }));
+  });
 
-  return <GameRoot games={games} fullPath={verifiedPath} />;
+  return (
+    <div className="relative flex h-full w-full flex-col items-center">
+      <BalanceManager session={session} />
+      <GameRoot games={games} fullPath={verifiedPath} />;
+    </div>
+  );
 }
