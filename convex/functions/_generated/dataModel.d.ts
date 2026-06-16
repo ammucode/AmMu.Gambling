@@ -303,30 +303,28 @@ export type DataModel = {
   };
   gameSession: {
     document: {
-      active: boolean;
       createdAt?: null | number;
-      invested: number;
+      money: number;
       path: Array<string>;
+      sessionKey: string;
       updatedAt?: null | number;
       userId: string;
-      userPathSlug: string;
       _id: Id<"gameSession">;
       _creationTime: number;
     };
     fieldPaths:
       | "_creationTime"
       | "_id"
-      | "active"
       | "createdAt"
-      | "invested"
+      | "money"
       | "path"
+      | "sessionKey"
       | "updatedAt"
-      | "userId"
-      | "userPathSlug";
+      | "userId";
     indexes: {
       by_id: ["_id"];
       by_creation_time: ["_creationTime"];
-      gameSession_userPathSlug_unique: ["userPathSlug", "_creationTime"];
+      gameSession_sessionKey_unique: ["sessionKey", "_creationTime"];
       path: ["path", "_creationTime"];
       path_userId: ["path", "userId", "_creationTime"];
       userId: ["userId", "_creationTime"];
@@ -478,6 +476,7 @@ export type DataModel = {
   };
   user: {
     document: {
+      balance: number;
       createdAt?: null | number;
       displayUsername?: null | string;
       email: string;
@@ -494,6 +493,7 @@ export type DataModel = {
     fieldPaths:
       | "_creationTime"
       | "_id"
+      | "balance"
       | "createdAt"
       | "displayUsername"
       | "email"

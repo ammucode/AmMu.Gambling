@@ -12,7 +12,9 @@ import type { tables } from "../functions/schema";
 export const api = {
   games: {
     control: {
-      start: createApiLeaf<"mutation", typeof import("../functions/games/control").start>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").start>("games/control:start"), { auth: "required", type: "mutation" }),
+      cashout: createApiLeaf<"mutation", typeof import("../functions/games/control").cashout>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").cashout>("games/control:cashout"), { auth: "required", type: "mutation" }),
+      getOrStartSession: createApiLeaf<"mutation", typeof import("../functions/games/control").getOrStartSession>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").getOrStartSession>("games/control:getOrStartSession"), { auth: "required", type: "mutation" }),
+      invest: createApiLeaf<"mutation", typeof import("../functions/games/control").invest>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").invest>("games/control:invest"), { auth: "required", type: "mutation" }),
     },
   },
   users: {

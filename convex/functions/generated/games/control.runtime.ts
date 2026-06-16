@@ -14,7 +14,9 @@ import type { ActionCtx, MutationCtx, QueryCtx } from '../server';
 import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
-  "start": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").start>("games/control:start"), () => (require("../../games/control") as Record<string, unknown>)["start"])],
+  "cashout": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").cashout>("games/control:cashout"), () => (require("../../games/control") as Record<string, unknown>)["cashout"])],
+  "getOrStartSession": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").getOrStartSession>("games/control:getOrStartSession"), () => (require("../../games/control") as Record<string, unknown>)["getOrStartSession"])],
+  "invest": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").invest>("games/control:invest"), () => (require("../../games/control") as Record<string, unknown>)["invest"])],
 } as const;
 
   const handlerRegistry = procedureRegistry;

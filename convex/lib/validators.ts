@@ -14,7 +14,7 @@ export const usernameSchema = generateHelpers(
     .string()
     .min(3)
     .max(20)
-    .regex(/^[a-z][a-z1-9-]+[a-z1-9]$/, 'Must only contain a-z, 1-9, -')
+    .regex(/^[a-z][a-z0-9-]*[a-z0-9]$/, 'Must only contain a-z, 0-9, -')
 );
 
 export const passwordSchema = generateHelpers(z.string().min(6));

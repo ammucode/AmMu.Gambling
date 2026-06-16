@@ -7,7 +7,9 @@ import {
   SubGameComponent,
 } from '@/components/games/types';
 import { Dices, LucideIcon, LucideProps, Spade } from 'lucide-react';
-import { FlattenOnce, Join, Simplify } from '../types';
+import { FlattenOnce } from '../types';
+import { Join, SimplifyDeep } from 'type-fest';
+import z from 'zod';
 
 export interface BaseGame {
   title: string;
@@ -55,20 +57,20 @@ export const GAMES = [
 ] as const satisfies Game[];
 type GAMES = typeof GAMES;
 
-type serverOnlyFields = Simplify<
+type serverOnlyFields = SimplifyDeep<
   Partial<Pick<BaseGame, 'icon'> & Pick<Game, 'component' | 'rootComponent'>>
 >;
 
 type RootContainingSubServerFields = { subGames?: serverOnlyFields[] };
-type GameServerFields = Simplify<
+type GameServerFields = SimplifyDeep<
   serverOnlyFields & RootContainingSubServerFields
 >;
 
-export type clientifyGame<G extends GameServerFields> = Simplify<
+export type clientifyGame<G extends GameServerFields> = SimplifyDeep<
   Omit<G, keyof GameServerFields> &
     (G extends Required<RootContainingSubServerFields>
       ? {
-          subGames: Simplify<
+          subGames: SimplifyDeep<
             Omit<G['subGames'][number], keyof serverOnlyFields>[]
           >;
         }
@@ -115,8 +117,26 @@ export const GAME_PATHS = GAMES.flatMap(
   (game) => gamePaths(game) as unknown
 ) as unknown as FlattenOnce<allGamePaths<GAMES>>;
 export type GAME_PATHS = typeof GAME_PATHS;
-export type GamePath = GAME_PATHS[keyof GAME_PATHS & number];
-export type GamePathString = Join<GamePath, '/'>;
+export type GamePath = GAME_PATHS[number];
+export const GAME_PATH_SCHEMA = z.custom<GamePath>(
+  (val) => getGameByPath(val as GamePath) !== undefined
+);
+//(GAME_PATHS.map(path => z.array(path.map(el => z.literal(el)))));
+
+type GamePathsToStrings<GPs extends string[][]> = GPs extends []
+  ? []
+  : GPs extends [infer Head extends string[]]
+    ? [Join<Head, '/'>]
+    : GPs extends [
+          infer Head extends string[],
+          ...infer Tail extends string[][],
+        ]
+      ? [Join<Head, '/'>, ...GamePathsToStrings<Tail>]
+      : never;
+export const GamePathStrings = GAME_PATHS.map((path) =>
+  path.join('/')
+) as GamePathsToStrings<GAME_PATHS>;
+export type GamePathString = (typeof GamePathStrings)[number];
 
 export type GamePair = [RootGame, undefined] | [RootGameWithSubs, SubGame];
 export function getGameByPath(path: GamePath): GamePair;
@@ -133,3 +153,9 @@ export function getGameByPath(path: string[]) {
   if (!subGame) return undefined;
   return [rootGame, subGame] as [RootGameWithSubs, SubGame];
 }
+
+export const GAME_SESSION_KEY_DELIM = '-._.-';
+export function makeGameSessionKey(username: string, gamePath: GamePath) {
+  return `${username}${GAME_SESSION_KEY_DELIM}${gamePath.join('/') as GamePathString}` as const;
+}
+export type GameSlug = ReturnType<typeof makeGameSessionKey>;

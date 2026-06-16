@@ -1,5 +1,6 @@
 import {
   clientifyGame,
+  GamePath,
   RootGame,
   RootGameWithSubs,
   SubGame,
@@ -7,6 +8,7 @@ import {
 
 export interface GameProps {
   game: clientifyGame<RootGame | SubGame>;
+  fullPath: GamePath;
 }
 
 export interface RootGameProps {

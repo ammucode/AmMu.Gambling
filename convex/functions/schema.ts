@@ -1,39 +1,29 @@
-import { makeGameSlug } from '@convex-lib/games';
+import { GAME_PATH_SCHEMA, GameSlug } from '@/lib/games/games';
 import {
+  AnyColumn,
   arrayOf,
   boolean,
+  ConvexForeignKeyConfig,
   convexTable,
   defineSchema,
+  foreignKey,
   index,
   InferInsertModel,
   InferSelectModel,
   integer,
   text,
   timestamp,
+  uniqueIndex,
 } from 'kitcn/orm';
+import z from 'zod';
 
-export const gameSessionTable = convexTable(
-  'gameSession',
-  {
-    path: arrayOf(text().notNull()).notNull(),
-    userId: text()
-      .notNull()
-      .references(() => userTable.id),
-    userPathSlug: text()
-      .notNull()
-      .unique()
-      .$type<ReturnType<typeof makeGameSlug>>(),
-    active: boolean().notNull().default(true),
-    invested: integer().notNull().default(0),
-    createdAt: timestamp().defaultNow(),
-    updatedAt: timestamp().$onUpdate(() => new Date()),
-  },
-  (gameSessionTable) => [
-    index('path').on(gameSessionTable.path),
-    index('userId').on(gameSessionTable.userId),
-    index('path_userId').on(gameSessionTable.path, gameSessionTable.userId),
-  ]
-);
+const userIdFK = (
+  col: AnyColumn,
+  onDelete: ConvexForeignKeyConfig['onDelete'] = 'cascade'
+) =>
+  foreignKey({ columns: [col], foreignColumns: [userTable.id] }).onDelete(
+    onDelete
+  );
 
 export const userTable = convexTable(
   'user',
@@ -48,6 +38,7 @@ export const userTable = convexTable(
     username: text().unique().notNull(),
     displayUsername: text(),
     isAnonymous: boolean().notNull(),
+    balance: integer().notNull().default(0),
   },
   (userTable) => [
     index('email_name').on(userTable.email, userTable.name),
@@ -72,6 +63,7 @@ export const sessionTable = convexTable(
     index('expiresAt').on(sessionTable.expiresAt),
     index('expiresAt_userId').on(sessionTable.expiresAt, sessionTable.userId),
     index('userId').on(sessionTable.userId),
+    userIdFK(sessionTable.userId),
   ]
 );
 
@@ -101,23 +93,9 @@ export const accountTable = convexTable(
     ),
     index('providerId_userId').on(accountTable.providerId, accountTable.userId),
     index('userId').on(accountTable.userId),
+    userIdFK(accountTable.userId),
   ]
 );
-
-// export const verificationTable = convexTable(
-//   'verification',
-//   {
-//     identifier: text().notNull(),
-//     value: text().notNull(),
-//     expiresAt: timestamp().notNull(),
-//     createdAt: timestamp().defaultNow(),
-//     updatedAt: timestamp().$onUpdate(() => new Date()),
-//   },
-//   (verificationTable) => [
-//     index('expiresAt').on(verificationTable.expiresAt),
-//     index('identifier').on(verificationTable.identifier),
-//   ]
-// );
 
 export const jwksTable = convexTable('jwks', {
   publicKey: text().notNull(),
@@ -127,13 +105,64 @@ export const jwksTable = convexTable('jwks', {
   expiresAt: timestamp(),
 });
 
+export const gameSessionTable = convexTable(
+  'gameSession',
+  {
+    path: arrayOf(text().notNull())
+      .notNull()
+      .$type<z.infer<typeof GAME_PATH_SCHEMA>>(),
+    userId: text()
+      .notNull()
+      .references(() => userTable.id),
+    sessionKey: text().notNull().unique().$type<GameSlug>(),
+    money: integer().notNull().default(0),
+    createdAt: timestamp().defaultNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
+  },
+  (gameSessionTable) => [
+    index('path').on(gameSessionTable.path),
+    index('userId').on(gameSessionTable.userId),
+    uniqueIndex('path_userId').on(
+      gameSessionTable.path,
+      gameSessionTable.userId
+    ),
+    userIdFK(gameSessionTable.userId),
+  ]
+);
+
+const genericGameColumns = {
+  sessionKey: text()
+    .notNull()
+    .unique()
+    .$type<GameSlug>()
+    .references(() => gameSessionTable.sessionKey),
+} as const satisfies Parameters<typeof convexTable>[1];
+function genericGameExtras<Table extends typeof genericGameColumns>(
+  table: Table
+) {
+  return [
+    foreignKey({
+      columns: [table.sessionKey],
+      foreignColumns: [gameSessionTable.sessionKey],
+    }).onDelete('cascade'),
+  ] as const;
+}
+
+export const easyCrapsSessionTable = convexTable(
+  'easyCrapsSession',
+  {
+    ...genericGameColumns,
+  },
+  (easyCrapsSessionTable) => [...genericGameExtras(easyCrapsSessionTable)]
+);
+
 export const tables = {
-  gameSession: gameSessionTable,
   user: userTable,
   session: sessionTable,
   account: accountTable,
-  // verification: verificationTable,
   jwks: jwksTable,
+
+  gameSession: gameSessionTable,
 };
 export type TableName = keyof typeof tables;
 export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
@@ -149,6 +178,10 @@ export default defineSchema(tables).relations((r) => ({
       from: r.user.id,
       to: r.account.userId,
     }),
+    gameSessions: r.many.gameSession({
+      from: r.user.id,
+      to: r.gameSession.userId,
+    }),
   },
   session: {
     user: r.one.user({
@@ -159,6 +192,12 @@ export default defineSchema(tables).relations((r) => ({
   account: {
     user: r.one.user({
       from: r.account.userId,
+      to: r.user.id,
+    }),
+  },
+  gameSession: {
+    user: r.one.user({
+      from: r.gameSession.userId,
       to: r.user.id,
     }),
   },

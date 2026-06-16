@@ -22,15 +22,18 @@ import type { GenericId as Id } from "convex/values";
 export declare const api: {
   games: {
     control: {
-      start: FunctionReference<
+      cashout: FunctionReference<"mutation", "public", { gamePath: any }, any>;
+      getOrStartSession: FunctionReference<
         "mutation",
         "public",
-        { gamePath: "craps" | "easy" | "video-poker" },
-        {
-          active: boolean;
-          invested: number;
-          path: "craps" | "easy" | "video-poker";
-        }
+        { gamePath: any },
+        { money: number; path: any; sessionKey: string }
+      >;
+      invest: FunctionReference<
+        "mutation",
+        "public",
+        { amount: number; gamePath: any },
+        any
       >;
     };
   };
@@ -40,7 +43,7 @@ export declare const api: {
       "public",
       {},
       {
-        age?: number;
+        balance: number;
         displayUsername?: string;
         image?: string;
         username: string;

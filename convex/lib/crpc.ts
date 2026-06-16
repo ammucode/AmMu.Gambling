@@ -5,7 +5,7 @@ import { initCRPC } from '../functions/generated/server';
 import { MarkNonNull } from '../../lib/types';
 import { iHateNull } from './document';
 
-const c = initCRPC
+export const c = initCRPC
   .meta<{
     auth?: 'optional' | 'required';
   }>()
@@ -14,20 +14,22 @@ const c = initCRPC
 const optionalAuthMiddleware = c.middleware(async ({ ctx, next }) => {
   const identity = await getAuthUserIdentity(ctx);
   if (!identity) return next({ ctx: { ...ctx, user: null as typeof user } });
-  const user =
-    iHateNull(
-      await ctx.orm.query.user.findFirst({
-        where: { id: identity.subject },
-      })
-    ) ?? null;
+  const user = iHateNull(
+    await ctx.orm.query.user.findFirst({
+      where: { id: identity.subject },
+    }),
+    true
+  );
   if (!user) return next({ ctx: { ...ctx, user: null as typeof user } });
   return next({ ctx: { ...ctx, user } });
 });
 
-const authMiddleware = optionalAuthMiddleware.pipe(async ({ ctx, next }) => {
-  if (!ctx.user) throw new CRPCError({ code: 'UNAUTHORIZED' });
-  return next({ ctx: ctx as MarkNonNull<typeof ctx, 'user'> });
-});
+export const authMiddleware = optionalAuthMiddleware.pipe(
+  async ({ ctx, next }) => {
+    if (!ctx.user) throw new CRPCError({ code: 'UNAUTHORIZED' });
+    return next({ ctx: ctx as MarkNonNull<typeof ctx, 'user'> });
+  }
+);
 
 export const publicQuery = c.query;
 export const publicAction = c.action;

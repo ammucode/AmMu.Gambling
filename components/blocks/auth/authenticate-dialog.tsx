@@ -23,15 +23,15 @@ import {
   useSignInMutation,
   useSignUpMutation,
 } from '@/lib/convex/auth-client';
-import { Awaitable, Simplify } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useForm, useStore } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
+import { Promisable, SimplifyDeep } from 'type-fest';
 import z from 'zod';
 
 export const authDialogHandle =
-  DialogHandle<Simplify<Omit<AuthenticateDialogCardProps, 'close'>>>();
+  DialogHandle<SimplifyDeep<Omit<AuthenticateDialogCardProps, 'close'>>>();
 
 const isSignUpToText = (isSignUp: boolean) => (isSignUp ? 'Sign up' : 'Log in');
 
@@ -41,9 +41,9 @@ const formSchema = z.object({
 });
 
 interface AuthenticateDialogCardProps {
-  close?: () => Awaitable<unknown>;
+  close?: () => Promisable<unknown>;
   defaultIsSignUp?: boolean;
-  onAuth?: () => Awaitable<unknown>;
+  onAuth?: () => Promisable<unknown>;
   overrides?: {
     title: string;
     top?: React.ReactNode;

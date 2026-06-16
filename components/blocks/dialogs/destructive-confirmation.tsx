@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHandle } from '@/components/ui/dialog';
 import { FieldGroup, Field, FieldLabel } from '@/components/ui/field';
-import { Awaitable, Simplify } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';
+import { Promisable, SimplifyDeep } from 'type-fest';
 
 export const destructiveConfirmationDialogHandle =
   DialogHandle<
-    Simplify<Omit<DestructiveConfirmationDialogContentProps, 'close'>>
+    SimplifyDeep<Omit<DestructiveConfirmationDialogContentProps, 'close'>>
   >();
 
 interface DestructiveConfirmationDialogContentProps {
@@ -19,7 +19,7 @@ interface DestructiveConfirmationDialogContentProps {
   children?: React.ReactNode;
   formId: string;
   confirmText: string;
-  onConfirm?: () => Awaitable<unknown>;
+  onConfirm?: () => Promisable<unknown>;
 }
 const defaultProps: Omit<DestructiveConfirmationDialogContentProps, 'close'> = {
   formId: 'destructive-confirmation',

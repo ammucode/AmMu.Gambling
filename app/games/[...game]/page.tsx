@@ -1,7 +1,7 @@
 import { NoAccountBlock } from '@/components/blocks/auth/no-account';
 import { GameRoot } from '@/components/games/root';
 import { caller } from '@/lib/convex/rsc';
-import { getGameByPath } from '@/lib/games/games';
+import { GamePath, getGameByPath } from '@/lib/games/games';
 import { notFound } from 'next/navigation';
 
 export default async function Page({ params }: PageProps<'/games/[...game]'>) {
@@ -11,15 +11,21 @@ export default async function Page({ params }: PageProps<'/games/[...game]'>) {
   if (!games) {
     notFound();
   }
+  const verifiedPath = gamePath as GamePath;
 
   const user = await caller.users.me();
 
-  if (!user)
+  if (!user) {
     return (
       <div className="flex h-max w-full flex-col items-center">
         <NoAccountBlock />
       </div>
     );
+  }
 
-  return <GameRoot games={games} />;
+  void (await caller.games.control.getOrStartSession({
+    gamePath: verifiedPath,
+  }));
+
+  return <GameRoot games={games} fullPath={verifiedPath} />;
 }
