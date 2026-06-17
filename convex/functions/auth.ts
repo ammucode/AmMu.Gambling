@@ -5,13 +5,8 @@ import { getEnv, getSiteURLs } from '../lib/get-env';
 import authConfig from './auth.config';
 import { defineAuth } from './generated/auth';
 import { usernameSchema } from '../lib/validators';
-import { createGamesControlCaller } from './generated/games/control.runtime';
-import { createUsersCaller } from './generated/users.runtime';
-import { isMutationCtx } from 'kitcn/server';
-import { gameSessionTable, userTable } from '~schema';
-import { eq } from 'kitcn/orm';
 
-export default defineAuth((ctx) => ({
+export default defineAuth(() => ({
   emailAndPassword: {
     enabled: true,
   },

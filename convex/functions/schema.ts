@@ -1,27 +1,18 @@
 import { GAME_PATH_SCHEMA, GameSlug } from '@/lib/games/games';
 import {
-  AnyColumn,
   arrayOf,
   boolean,
-  ConvexForeignKeyConfig,
-  ConvexTable,
   convexTable,
-  ConvexTableWithColumns,
   defineSchema,
-  eq,
-  foreignKey,
   index,
   InferInsertModel,
   InferSelectModel,
   integer,
-  TableConfig,
   text,
   timestamp,
   uniqueIndex,
 } from 'kitcn/orm';
-import { isMutationCtx } from 'kitcn/server';
 import z from 'zod';
-import { createUsersCaller } from './generated/users.runtime';
 
 export const userTable = convexTable(
   'user',

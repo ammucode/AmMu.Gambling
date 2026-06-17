@@ -33,7 +33,6 @@ export function LoadingDropdownItems() {
 
 export function NoUserDropdownItems() {
   const signInAsGuestAsync = useSignInAsGuest({
-    async: true,
     refresh: true,
   });
   const router = useRouter();

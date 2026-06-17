@@ -7,7 +7,8 @@ import { useEffect } from 'react';
 
 export default function useAuthInfo() {
   const { hasSession, isLoading: sessionLoading } = useAuth();
-  const { data: sessionData, refetch: refetchSession } = authClient.useSession();
+  const { data: sessionData, refetch: refetchSession } =
+    authClient.useSession();
   const sessionUser = sessionData?.user;
   const hasUser = hasSession && !sessionLoading && !!sessionUser;
   const hasAccount = hasUser && !sessionUser.isAnonymous;
@@ -16,15 +17,14 @@ export default function useAuthInfo() {
   const crpc = useCRPC();
 
   const { data: userData, isLoading: userLoading } = useQuery(
-    crpc.users.me.queryOptions(hasUser ? 
-      { id: sessionUser.id }
-      // undefined
-       : skipToken)
+    crpc.users.me.queryOptions(hasUser ? undefined : skipToken)
   );
 
   useEffect(() => {
-    refetchSession({query: {disableCookieCache: true, disableRefresh: true}});
-  }, [hasSession]);
+    refetchSession({
+      query: { disableCookieCache: true, disableRefresh: true },
+    });
+  }, [hasSession, refetchSession]);
 
   // console.log({
   //   hasSession,

@@ -11,5 +11,9 @@ export function useGameSession(gamePath: GamePath) {
     crpc.games.control.getSession.queryOptions(user ? { gamePath } : skipToken)
   );
   const session = iHateNull(data);
-  return { user, session, gameSessionLoading: authLoading || gameSessionLoading };
+  return {
+    user,
+    session,
+    gameSessionLoading: authLoading || gameSessionLoading,
+  };
 }

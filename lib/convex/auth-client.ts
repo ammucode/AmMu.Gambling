@@ -8,15 +8,12 @@ import {
 import { anonymousClient, usernameClient } from 'better-auth/client/plugins';
 import {
   DefaultError,
-  QueryClient,
   useMutation,
   UseMutationOptions,
   UseMutationResult,
-  useQueryClient,
   UseQueryOptions,
 } from '@tanstack/react-query';
 import { clearAuthSessionFallback, toAuthMutationError } from './kitcn-mirror';
-import { useCRPC, useCRPCResult } from './crpc';
 
 const getBackendUrl = () => {
   // // return "http://10.0.0.84:3001";
@@ -76,12 +73,12 @@ export const usernameAvailableQueryOptions = (username: string) =>
     },
   }) satisfies UseQueryOptions;
 
-function makeExtraOptions<TVariables = void>(
+function useExtraOptions<TVariables = void>(
   options?: ProvidableAuthMutationOptions<TVariables>
 ): ProvidableAuthMutationOptions<TVariables> {
-  const qc = useQueryClient();
+  // const qc = useQueryClient();
   const convexQC = useConvexQueryClient();
-  const authStore = useAuthStore();
+  // const authStore = useAuthStore();
 
   return {
     onSettled: async (data, error, variables, onMutateResult, context) => {
@@ -115,7 +112,7 @@ export const useAnonymousSignInMutation: AuthMutationHook = (options) => {
     useSignInMutationOptions({
       signInMethod: 'anonymous',
       ...options,
-      ...makeExtraOptions(options),
+      ...useExtraOptions(options),
     }) as AuthMutationOptions
   );
 };
@@ -123,7 +120,7 @@ export const useAnonymousSignInMutation: AuthMutationHook = (options) => {
 export const useSignUpMutation: AuthMutationHook<UserPass> = (options) => {
   const mutationOpts = useSignUpMutationOptions({
     ...options,
-    ...makeExtraOptions(options),
+    ...useExtraOptions(options),
   }) as AuthMutationOptions<UserPass>;
   const mutationVariableAdaptor = ({ username, password }: UserPass) => ({
     email: `${username}@player.gambling.ammu.com`,
@@ -147,7 +144,7 @@ export const useSignInMutation: AuthMutationHook<UserPass> = (options) => {
     useSignInMutationOptions({
       signInMethod: 'username',
       ...options,
-      ...makeExtraOptions(options),
+      ...useExtraOptions(options),
     }) as AuthMutationOptions<UserPass>
   );
 };
@@ -156,7 +153,7 @@ export const useSignOutMutation: AuthMutationHook = (options) => {
   return useMutation(
     useSignOutMutationOptions({
       ...options,
-      ...makeExtraOptions(options),
+      ...useExtraOptions(options),
     }) as AuthMutationOptions
   );
 };
@@ -168,7 +165,7 @@ export const useDeleteAnonymousAccountMutation: AuthMutationHook = (
   const convexQueryClient = useConvexQueryClient();
   return useMutation({
     ...options,
-    ...makeExtraOptions(options),
+    ...useExtraOptions(options),
     mutationFn: async () => {
       authStoreApi.set('isAuthenticated', false);
       convexQueryClient?.unsubscribeAuthQueries();

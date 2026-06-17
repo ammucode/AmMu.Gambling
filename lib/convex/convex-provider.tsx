@@ -7,7 +7,6 @@ import {
   getConvexQueryClientSingleton,
   getQueryClientSingleton,
 } from 'kitcn/react';
-import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { authClient } from '@/lib/convex/auth-client';
@@ -20,7 +19,6 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export function AppConvexProvider({ children }: { children: ReactNode }) {
-  const router = useRouter();
   const queryClient = getQueryClientSingleton(createQueryClient);
   const convexQueryClient = getConvexQueryClientSingleton({
     convex,

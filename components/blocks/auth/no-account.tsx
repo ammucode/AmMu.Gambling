@@ -5,7 +5,6 @@ import { AuthenticateFormCard } from './authenticate-dialog';
 import useSignInAsGuest from '@hooks/use-signin-as-guest';
 import { Button } from '@ui/button';
 import { Card } from '@ui/card';
-import { useRouter } from 'next/navigation';
 import { Promisable } from 'type-fest';
 
 export interface NoAccountBlockProps {
@@ -13,8 +12,7 @@ export interface NoAccountBlockProps {
 }
 export function NoAccountBlock({ onAuth }: NoAccountBlockProps) {
   const signInAsGuestAsync = useSignInAsGuest({
-    // refresh: true,
-    onAuth
+    onAuth,
   });
   // const router = useRouter();
 

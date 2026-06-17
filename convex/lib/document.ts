@@ -8,7 +8,7 @@
 // }
 
 import { IsLiteralDeep, MaybeUntagArray, StripNoInfer } from '@/lib/types';
-import { If, Primitive } from 'type-fest';
+import { If } from 'type-fest';
 
 type DeepReplaceNullWithUndefined<
   t,

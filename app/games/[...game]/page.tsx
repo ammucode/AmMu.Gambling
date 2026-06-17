@@ -1,7 +1,5 @@
-import { NoAccountBlock } from '@/components/blocks/auth/no-account';
-import { BalanceManager } from '@/components/games/balance-manager';
 import { GameRoot } from '@/components/games/root';
-import { caller, crpc, prefetch, preloadQuery } from '@/lib/convex/rsc';
+import { caller, crpc, prefetch } from '@/lib/convex/rsc';
 import { GamePath, getGameByPath } from '@/lib/games/games';
 import { notFound } from 'next/navigation';
 

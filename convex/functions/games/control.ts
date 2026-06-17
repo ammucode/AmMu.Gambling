@@ -1,10 +1,6 @@
 import { z } from 'zod';
 
-import {
-  authMiddleware,
-  authMutation,
-  optionalAuthQuery,
-} from '@convex-lib/crpc';
+import { authMutation, optionalAuthQuery } from '@convex-lib/crpc';
 import { gameSessionTable, userTable } from '~schema';
 import {
   GAME_PATH_SCHEMA,

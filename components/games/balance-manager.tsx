@@ -40,7 +40,7 @@ export function BalanceManager({ balance, session }: BalanceManagerProps) {
           <CollapsibleContent className="flex flex-col items-start gap-2 p-2.5 pt-0 text-sm">
             <div>Add more money?</div>
             <Button size="sm">
-              Cash out! <BanknoteArrowUpIcon />
+              Cash out (${session.money})! <BanknoteArrowUpIcon />
             </Button>
           </CollapsibleContent>
         </Collapsible>

@@ -47,7 +47,7 @@ export declare const api: {
     me: FunctionReference<
       "query",
       "public",
-      { id?: string },
+      {},
       {
         balance: number;
         displayUsername?: string;

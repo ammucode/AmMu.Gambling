@@ -16,10 +16,10 @@ export default function useSignInAsGuest({
   return useCallback(async () => {
     await signInAsGuest.mutateAsync(undefined, {
       onSettled: async (_, error) => {
-        console.log()
+        console.log();
         if (error === null) await onAuth?.();
-      }
+      },
     });
     if (refresh) router.refresh();
-  }, [signInAsGuest, refresh, router]);
+  }, [signInAsGuest, refresh, router, onAuth]);
 }
