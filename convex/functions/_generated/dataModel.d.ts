@@ -304,9 +304,12 @@ export type DataModel = {
   gameSession: {
     document: {
       createdAt?: null | number;
-      money: number;
+      lastResultBet: number;
+      lastResultWon: number;
       path: Array<string>;
+      playable: number;
       sessionKey: string;
+      totalBet: number;
       updatedAt?: null | number;
       userId: string;
       _id: Id<"gameSession">;
@@ -316,9 +319,12 @@ export type DataModel = {
       | "_creationTime"
       | "_id"
       | "createdAt"
-      | "money"
+      | "lastResultBet"
+      | "lastResultWon"
       | "path"
+      | "playable"
       | "sessionKey"
+      | "totalBet"
       | "updatedAt"
       | "userId";
     indexes: {

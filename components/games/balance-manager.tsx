@@ -1,39 +1,31 @@
 'use client';
 
-import { gameSessionInfo } from '@/convex/shared/models';
-import { Card, CardContent } from '@ui/card';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { BanknoteArrowDownIcon, BanknoteArrowUpIcon } from 'lucide-react';
 import { Button } from '@ui/button';
-import { MoneyStats } from '../blocks/games/money-stats';
 import { FadingBar } from '../blocks/games/fading-bar';
-import { useGameSession } from '@hooks/games/use-game-session';
 import { useGameBalance } from '@hooks/games/use-game-balance';
 
-export interface BalanceManagerProps {
-  balance: number;
-  session: gameSessionInfo;
-}
-export function BalanceManager({ balance, session }: BalanceManagerProps) {
-  const {} = useGameBalance();
+// export interface BalanceManagerProps {
+//   // balance: number;
+//   // session: gameSessionInfo;
+// }
+export function BalanceManager() {
+  const { accountBalance, invest, cashOut, playable } = useGameBalance();
   return (
-    <FadingBar className='bg-linear-to-l mr-auto'>
+    <FadingBar className="mr-auto bg-linear-to-l">
       <Button
         variant="outline"
         className="flex w-50 flex-row justify-between"
+        onClick={() => invest(100)}
       >
         <span>Add Balance</span>
         <span className="flex flex-row items-center">
-          ${balance}
+          ${accountBalance}
           <BanknoteArrowDownIcon className="ml-3" />
         </span>
       </Button>
-      <Button size="sm">
-        Cash out (${session.money})! <BanknoteArrowUpIcon />
+      <Button size="sm" onClick={() => cashOut()}>
+        Cash out (${playable})! <BanknoteArrowUpIcon />
       </Button>
     </FadingBar>
   );

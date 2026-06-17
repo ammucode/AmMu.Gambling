@@ -1,14 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { GameProps } from '../../types';
-import { MoneyStats } from '@/components/blocks/games/money-stats';
 
 // export interface EasyCrapsProps extends GameProps {}
 export type EasyCrapsProps = GameProps;
 export function EasyCraps({}: EasyCrapsProps) {
-  const [money, setMoney] = useState(100);
-
   /*
   22 rows: 8 - point area, 1 gap, 10 - field/passline, 1 gap, 2 - roll history
      rows: 19 hardways/hops
@@ -37,7 +33,7 @@ export function EasyCraps({}: EasyCrapsProps) {
         </div>
         <div
           className="col-span-7 col-start-8 row-span-10 row-start-10 grid bg-gray-800/30"
-          onClick={() => setMoney((m) => m - 1)}
+          // onClick={() => setMoney((m) => m - 1)}
         >
           field/passline
         </div>

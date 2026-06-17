@@ -11,11 +11,13 @@ import type { tables } from "../functions/schema";
 
 export const api = {
   games: {
-    control: {
-      cashout: createApiLeaf<"mutation", typeof import("../functions/games/control").cashout>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").cashout>("games/control:cashout"), { auth: "required", type: "mutation" }),
-      getSession: createApiLeaf<"query", typeof import("../functions/games/control").getSession>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/control").getSession>("games/control:getSession"), { auth: "optional", type: "query" }),
-      invest: createApiLeaf<"mutation", typeof import("../functions/games/control").invest>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").invest>("games/control:invest"), { auth: "required", type: "mutation" }),
-      maybeStartSession: createApiLeaf<"mutation", typeof import("../functions/games/control").maybeStartSession>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").maybeStartSession>("games/control:maybeStartSession"), { auth: "required", type: "mutation" }),
+    balance: {
+      cashOut: createApiLeaf<"mutation", typeof import("../functions/games/balance").cashOut>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/balance").cashOut>("games/balance:cashOut"), { auth: "required", type: "mutation" }),
+      invest: createApiLeaf<"mutation", typeof import("../functions/games/balance").invest>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/balance").invest>("games/balance:invest"), { auth: "required", type: "mutation" }),
+    },
+    session: {
+      getSession: createApiLeaf<"query", typeof import("../functions/games/session").getSession>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/session").getSession>("games/session:getSession"), { auth: "optional", type: "query" }),
+      maybeStartSession: createApiLeaf<"mutation", typeof import("../functions/games/session").maybeStartSession>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/session").maybeStartSession>("games/session:maybeStartSession"), { auth: "required", type: "mutation" }),
     },
   },
   users: {

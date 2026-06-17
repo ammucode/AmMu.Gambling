@@ -1,11 +1,7 @@
 import { z } from 'zod';
 import { gameSessionTable, userTable } from '~schema';
 import { ConvexTableWithColumns, TableConfig } from 'kitcn/orm';
-import {
-  GAME_PATH_SCHEMA,
-  GAME_SESSION_KEY_DELIM,
-  GamePathStrings,
-} from '@/lib/games/games';
+import { GAME_PATH_SCHEMA, GameSlugSchema } from '@/lib/games/games';
 import { StrictPartial } from '@/lib/types';
 import { usernameSchema } from '@convex-lib/validators';
 
@@ -68,11 +64,10 @@ export const {
   gameSessionTable,
   z.object({
     path: GAME_PATH_SCHEMA,
-    sessionKey: z.templateLiteral([
-      z.string(),
-      GAME_SESSION_KEY_DELIM,
-      z.enum(GamePathStrings),
-    ]),
-    money: z.number(),
+    sessionKey: GameSlugSchema,
+    playable: z.number(),
+    totalBet: z.number(),
+    lastResultBet: z.number(),
+    lastResultWon: z.number(),
   })
 );

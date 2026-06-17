@@ -1,11 +1,3 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Separator } from '@ui/separator';
 import { SidebarTrigger } from '@ui/sidebar';
 import { getGameByPath } from '@/lib/games/games';
 import { notFound } from 'next/navigation';
@@ -49,7 +41,7 @@ export default async function Layout({
             </BreadcrumbList>
           </Breadcrumb> */}
         </div>
-        <h1 className="absolute left-[50%] translate-x-[-50%] text-5xl font-extrabold text-yellow-600 italic drop-shadow-amber-500 w-max max-w-[90%] max-xs:hidden">
+        <h1 className="max-xs:hidden absolute left-[50%] w-max max-w-[90%] translate-x-[-50%] text-5xl font-extrabold text-yellow-600 italic drop-shadow-amber-500">
           {activeGame.title}
         </h1>
       </header>

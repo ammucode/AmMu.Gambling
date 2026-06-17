@@ -8,7 +8,7 @@ export function useGameSession(gamePath: GamePath) {
   const crpc = useCRPC();
   const { user, authLoading: userLoading } = useAuthInfo();
   const { data, isLoading: gameSessionLoading } = useQuery(
-    crpc.games.control.getSession.queryOptions(user ? { gamePath } : skipToken)
+    crpc.games.session.getSession.queryOptions(user ? { gamePath } : skipToken)
   );
   const gameSession = iHateNull(data);
   return {

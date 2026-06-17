@@ -104,7 +104,10 @@ export const gameSessionTable = convexTable(
       .notNull()
       .references(() => userTable.id, { onDelete: 'cascade' }),
     sessionKey: text().notNull().unique().$type<GameSlug>(),
-    money: integer().notNull().default(0),
+    playable: integer().notNull().default(0),
+    totalBet: integer().notNull().default(0),
+    lastResultBet: integer().notNull().default(0),
+    lastResultWon: integer().notNull().default(0),
     createdAt: timestamp().defaultNow(),
     updatedAt: timestamp().$onUpdate(() => new Date()),
   },

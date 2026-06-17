@@ -22,10 +22,10 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
   const { user, userLoading, gameSession, gameSessionLoading } =
     useGameSession(gamePath);
   const maybeStartSessionMutation = useMutation(
-    crpc.games.control.maybeStartSession.mutationOptions({
+    crpc.games.session.maybeStartSession.mutationOptions({
       onSettled: async () => {
         await queryClient.invalidateQueries(
-          crpc.games.control.getSession.staticQueryOptions({ gamePath })
+          crpc.games.session.getSession.staticQueryOptions({ gamePath })
         );
       },
     })
@@ -41,7 +41,7 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
     }
   }, [needsSession, maybeStartSession]);
 
-  if (!gameSession || !user && userLoading) {
+  if (user ? !gameSession : userLoading) {
     return <Skeleton className="m-4 h-full w-full bg-accent" />;
   }
 
@@ -69,12 +69,12 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
 
   return (
     <>
-      <div className='flex w-full flex-col md:flex-row flex-wrap gap-4 md:gap-0 md:justify-between'>
-        <BalanceManager balance={user.balance} session={gameSession} />
+      <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row md:justify-between md:gap-0">
+        <BalanceManager />
         <MoneyStats
-          playable={gameSession.money}
-          bet={0}
-          lastResult={{ bet: 10, win: 50 }}
+        // playable={gameSession.money}
+        // bet={0}
+        // lastResult={{ bet: 10, win: 50 }}
         />
       </div>
       {renderedGame}

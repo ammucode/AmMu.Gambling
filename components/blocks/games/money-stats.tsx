@@ -1,5 +1,5 @@
-import { Separator } from "@ui/separator";
-import { FadingBar } from "./fading-bar";
+import { FadingBar } from './fading-bar';
+import { useGameBalance } from '@/hooks/games/use-game-balance';
 
 interface IndicatorProps {
   title: string;
@@ -43,21 +43,23 @@ function BigMoneyIndicator({ title, amount }: IndicatorProps) {
   );
 }
 
-export interface MoneyStatsProps {
-  playable: number;
-  bet: number;
-  lastResult?: LastResultIndicatorProps;
-}
-export function MoneyStats({
-  playable,
-  bet,
-  lastResult = { bet: 0, win: 0 },
-}: MoneyStatsProps) {
+// export interface MoneyStatsProps {
+//   // playable: number;
+//   // bet: number;
+//   // lastResult?: LastResultIndicatorProps;
+// }
+export function MoneyStats() {
+// {
+//   // playable,
+//   // bet,
+//   // lastResult = { bet: 0, win: 0 },
+// }: MoneyStatsProps
+  const { playable, totalBet, lastResultBet, lastResultWon } = useGameBalance();
   return (
     <FadingBar className="ml-auto">
-      <LastResultIndicator {...lastResult} />
+      <LastResultIndicator bet={lastResultBet} win={lastResultWon} />
       <BigMoneyIndicator title="playable" amount={playable} />
-      <BigMoneyIndicator title="bet" amount={bet} />
+      <BigMoneyIndicator title="bet" amount={totalBet} />
     </FadingBar>
   );
   // return (

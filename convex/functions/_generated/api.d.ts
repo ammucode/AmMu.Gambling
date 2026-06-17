@@ -21,25 +21,46 @@ import type { GenericId as Id } from "convex/values";
  */
 export declare const api: {
   games: {
-    control: {
-      cashout: FunctionReference<"mutation", "public", { gamePath: any }, any>;
-      getSession: FunctionReference<
-        "query",
+    balance: {
+      cashOut: FunctionReference<
+        "mutation",
         "public",
-        { gamePath: any },
-        { money: number; path: any; sessionKey: string } | null
+        { gamePath?: any; sessionKey?: string },
+        any
       >;
       invest: FunctionReference<
         "mutation",
         "public",
-        { amount: number; gamePath: any },
+        { amount: number; gamePath?: any; sessionKey?: string },
         any
+      >;
+    };
+    session: {
+      getSession: FunctionReference<
+        "query",
+        "public",
+        { gamePath?: any; sessionKey?: string },
+        {
+          lastResultBet: number;
+          lastResultWon: number;
+          path: any;
+          playable: number;
+          sessionKey: string;
+          totalBet: number;
+        } | null
       >;
       maybeStartSession: FunctionReference<
         "mutation",
         "public",
-        { gamePath: any },
-        { money: number; path: any; sessionKey: string }
+        { gamePath?: any; sessionKey?: string },
+        {
+          lastResultBet: number;
+          lastResultWon: number;
+          path: any;
+          playable: number;
+          sessionKey: string;
+          totalBet: number;
+        }
       >;
     };
   };

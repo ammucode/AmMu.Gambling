@@ -8,6 +8,7 @@ import { iHateNull } from './document';
 export const c = initCRPC
   .meta<{
     auth?: 'optional' | 'required';
+    game?: 'optional' | 'required';
   }>()
   .create();
 

@@ -159,3 +159,11 @@ export function makeGameSessionKey(username: string, gamePath: GamePath) {
   return `${username}${GAME_SESSION_KEY_DELIM}${gamePath.join('/') as GamePathString}` as const;
 }
 export type GameSlug = ReturnType<typeof makeGameSessionKey>;
+export const GameSlugSchema = z.templateLiteral([
+  z.string(),
+  GAME_SESSION_KEY_DELIM,
+  z.enum(GamePathStrings),
+]);
+export function pathFromGameSessionKey(sessionKey: GameSlug) {
+  return sessionKey.split(GAME_SESSION_KEY_DELIM)[1].split('/') as GamePath;
+}

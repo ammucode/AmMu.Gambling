@@ -14,10 +14,8 @@ import type { ActionCtx, MutationCtx, QueryCtx } from '../server';
 import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
-  "cashout": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").cashout>("games/control:cashout"), () => (require("../../games/control") as Record<string, unknown>)["cashout"])],
-  "getSession": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../../games/control").getSession>("games/control:getSession"), () => (require("../../games/control") as Record<string, unknown>)["getSession"])],
-  "invest": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").invest>("games/control:invest"), () => (require("../../games/control") as Record<string, unknown>)["invest"])],
-  "maybeStartSession": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").maybeStartSession>("games/control:maybeStartSession"), () => (require("../../games/control") as Record<string, unknown>)["maybeStartSession"])],
+  "cashOut": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/balance").cashOut>("games/balance:cashOut"), () => (require("../../games/balance") as Record<string, unknown>)["cashOut"])],
+  "invest": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/balance").invest>("games/balance:invest"), () => (require("../../games/balance") as Record<string, unknown>)["invest"])],
 } as const;
 
   const handlerRegistry = procedureRegistry;
@@ -60,7 +58,7 @@ type GeneratedProcedureHandler<
 >;
 
 
-export function createGamesControlCaller<TCtx extends ProcedureCallerContext>(
+export function createGamesBalanceCaller<TCtx extends ProcedureCallerContext>(
   ctx: TCtx
 ): GeneratedProcedureCaller<TCtx> {
   return generatedRuntime.getCallerFactory()(
@@ -68,7 +66,7 @@ export function createGamesControlCaller<TCtx extends ProcedureCallerContext>(
   ) as GeneratedProcedureCaller<TCtx>;
 }
 
-export function createGamesControlHandler<TCtx extends ProcedureHandlerContext>(
+export function createGamesBalanceHandler<TCtx extends ProcedureHandlerContext>(
   ctx: TCtx
 ): GeneratedProcedureHandler<TCtx> {
   return generatedRuntime.getHandlerFactory()(ctx) as GeneratedProcedureHandler<TCtx>;
