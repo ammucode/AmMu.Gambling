@@ -7,29 +7,25 @@
 //   };
 // }
 
-import { IsLiteralDeep, MaybeUntagArray } from '@/lib/types';
-import { If } from 'type-fest';
+import { IsLiteralDeep, MaybeUntagArray, StripNoInfer } from '@/lib/types';
+import { If, Primitive } from 'type-fest';
 
-// export function updateDoc<T>(doc: T) {
-//   return {
-//     ...doc,
-//     updatedAt: new Date(),
-//   };
-// }
-
-type DeepReplaceNullWithUndefined<T> = T extends unknown
+type DeepReplaceNullWithUndefined<
+  t,
+  T extends StripNoInfer<t> = StripNoInfer<t>,
+> = T extends unknown
   ? IsLiteralDeep<MaybeUntagArray<T>> extends true
     ? T
-    : T extends null | undefined
+    : T extends undefined
       ? undefined
-      : // : T extends [] ? []
-        // : T extends [infer Head] ? [DeepReplaceNullWithUndefined<Head>]
-        // : T extends [infer Head, ...infer Tail] ? [DeepReplaceNullWithUndefined<Head>, ...DeepReplaceNullWithUndefined<Tail>]
-        T extends (infer U)[]
-        ? DeepReplaceNullWithUndefined<U>[]
-        : T extends object
-          ? { [K in keyof T]: DeepReplaceNullWithUndefined<T[K]> }
-          : T
+      : T extends null
+        ? undefined
+        : // : T extends NoInfer<infer N>|infer Rest ? DeepReplaceNullWithUndefined<Exclude<Rest, undefined|null>>
+          T extends (infer U)[]
+          ? DeepReplaceNullWithUndefined<U>[]
+          : T extends object
+            ? { [K in keyof T]: DeepReplaceNullWithUndefined<T[K]> }
+            : T
   : never;
 export function iHateNull<
   T,

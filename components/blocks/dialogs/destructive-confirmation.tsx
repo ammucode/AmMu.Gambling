@@ -1,9 +1,9 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHandle } from '@/components/ui/dialog';
-import { FieldGroup, Field, FieldLabel } from '@/components/ui/field';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
+import { Dialog, DialogContent, DialogHandle } from '@ui/dialog';
+import { FieldGroup, Field, FieldLabel } from '@ui/field';
 import { cn } from '@/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';

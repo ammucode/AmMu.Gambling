@@ -33,10 +33,12 @@ export function AppConvexProvider({ children }: { children: ReactNode }) {
       client={convex}
       convexQueryClient={convexQueryClient}
       onMutationUnauthorized={() => {
-        router.push('/auth');
+        console.warn('unauthorized mutation!');
+        // router.push('/auth');
       }}
-      onQueryUnauthorized={() => {
-        router.push('/auth');
+      onQueryUnauthorized={(info) => {
+        console.warn('unauthorized query! -- ', info.queryName);
+        // router.push('/auth');
       }}
     >
       <TanstackQueryClientProvider client={queryClient}>

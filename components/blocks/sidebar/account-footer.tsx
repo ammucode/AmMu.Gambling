@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import useAuthInfo from '@/hooks/use-auth-info';
+import useAuthInfo from '@hooks/use-auth-info';
 import {
   AccountDropdownItems,
   GuestDropdownItems,

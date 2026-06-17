@@ -15,8 +15,9 @@ import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
   "cashout": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").cashout>("games/control:cashout"), () => (require("../../games/control") as Record<string, unknown>)["cashout"])],
-  "getOrStartSession": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").getOrStartSession>("games/control:getOrStartSession"), () => (require("../../games/control") as Record<string, unknown>)["getOrStartSession"])],
+  "getSession": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../../games/control").getSession>("games/control:getSession"), () => (require("../../games/control") as Record<string, unknown>)["getSession"])],
   "invest": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").invest>("games/control:invest"), () => (require("../../games/control") as Record<string, unknown>)["invest"])],
+  "maybeStartSession": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/control").maybeStartSession>("games/control:maybeStartSession"), () => (require("../../games/control") as Record<string, unknown>)["maybeStartSession"])],
 } as const;
 
   const handlerRegistry = procedureRegistry;

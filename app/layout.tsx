@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { Providers } from '@/components/providers';
 import SidebarRoot from '@/components/blocks/sidebar/root';
 import { UIProviders } from '@/components/ui-providers';
-import { SidebarInset } from '@/components/ui/sidebar';
+import { SidebarInset } from '@ui/sidebar';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -36,7 +36,7 @@ export default function RootLayout({
           <Providers>
             <UIProviders>
               <SidebarRoot />
-              <SidebarInset>{children}</SidebarInset>
+              <SidebarInset className="bg-green-900">{children}</SidebarInset>
             </UIProviders>
           </Providers>
         </ThemeProvider>

@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { authMutation } from '@convex-lib/crpc';
+import {
+  authMiddleware,
+  authMutation,
+  optionalAuthQuery,
+} from '@convex-lib/crpc';
 import { gameSessionTable, userTable } from '~schema';
 import {
   GAME_PATH_SCHEMA,
@@ -54,9 +58,48 @@ export const gameMutation = maybeGameMutation.use(async ({ ctx, next }) => {
   });
 });
 
-export const getOrStartSession = maybeGameMutation
+export const maybeGameQuery = optionalAuthQuery
+  .input(z.object({ gamePath: GAME_PATH_SCHEMA }))
+  .use(async ({ ctx, next, input }) => {
+    const gamePair = getGameByPath(input.gamePath);
+    const activeGame = gamePair[1] ?? gamePair[0];
+    const gameSession =
+      ctx.user &&
+      iHateNull(
+        await ctx.orm.query.gameSession.findFirst({
+          where: {
+            sessionKey: makeGameSessionKey(ctx.user.username, input.gamePath),
+          },
+          columns: gameSessionInfoColumnsFilter,
+        }),
+        true
+      );
+
+    return next({
+      ctx: {
+        ...ctx,
+        game: { pair: gamePair, data: activeGame, session: gameSession },
+      },
+    });
+  });
+
+export const gameQuery = maybeGameQuery.use(async ({ ctx, next }) => {
+  if (!ctx.game.session) {
+    throw new CRPCError({
+      code: 'PRECONDITION_FAILED',
+      message: `Requires active game session for ${ctx.game.data.title}`,
+    });
+  }
+
+  return next({
+    ctx: { ...ctx, game: ctx.game as MarkNonNull<typeof ctx.game, 'session'> },
+  });
+});
+
+export const maybeStartSession = maybeGameMutation
   .output(gameSessionInfo)
   .mutation(async ({ ctx, input }) => {
+    console.log('start session! -- ', ctx.game.session);
     if (ctx.game.session) {
       return ctx.game.session;
     }
@@ -71,6 +114,12 @@ export const getOrStartSession = maybeGameMutation
         })
         .returning(gameSessionInfoReturning)
     )[0];
+  });
+
+export const getSession = maybeGameQuery
+  .output(gameSessionInfo.nullable())
+  .query(async ({ ctx }) => {
+    return iHateNull(ctx.game.session, true);
   });
 
 export const invest = gameMutation

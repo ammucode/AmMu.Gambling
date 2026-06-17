@@ -8,12 +8,15 @@ import {
 import { anonymousClient, usernameClient } from 'better-auth/client/plugins';
 import {
   DefaultError,
+  QueryClient,
   useMutation,
   UseMutationOptions,
   UseMutationResult,
+  useQueryClient,
   UseQueryOptions,
 } from '@tanstack/react-query';
 import { clearAuthSessionFallback, toAuthMutationError } from './kitcn-mirror';
+import { useCRPC, useCRPCResult } from './crpc';
 
 const getBackendUrl = () => {
   // // return "http://10.0.0.84:3001";
@@ -47,8 +50,12 @@ type AuthMutationOptions<TVariables = void> = UseMutationOptions<
   DefaultError,
   TVariables
 >;
+type ProvidableAuthMutationOptions<TVariables = void> = Omit<
+  AuthMutationOptions<TVariables>,
+  'mutationFn'
+>;
 type AuthMutationHook<TVariables = void> = (
-  options?: Omit<AuthMutationOptions<TVariables>, 'mutationFn'>
+  options?: ProvidableAuthMutationOptions<TVariables>
 ) => UseMutationResult<unknown, DefaultError, TVariables>;
 type UserPass = { username: string; password: string };
 
@@ -69,11 +76,46 @@ export const usernameAvailableQueryOptions = (username: string) =>
     },
   }) satisfies UseQueryOptions;
 
+function makeExtraOptions<TVariables = void>(
+  options?: ProvidableAuthMutationOptions<TVariables>
+): ProvidableAuthMutationOptions<TVariables> {
+  const qc = useQueryClient();
+  const convexQC = useConvexQueryClient();
+  const authStore = useAuthStore();
+
+  return {
+    onSettled: async (data, error, variables, onMutateResult, context) => {
+      // await qc.invalidateQueries({predicate: (query) => {
+      //   const auth = query.meta?.authType ?? '';
+      //   const isAuthQuery = auth === 'optional' || auth === 'required';
+      //   // if (isAuthQuery)
+      //   //   console.log(`invalidate auth query: ${JSON.stringify(query.queryKey)}`);
+      //   return isAuthQuery;
+      // }});
+      // console.log('convexQC', convexQC);
+      // console.log('authStore', authStore);
+      await convexQC?.resetAuthQueries();
+      // if (!authStore.getIsAuthenticated()) {
+      //   console.log("CLEAR OLD SESSIONS")
+      //   void await authClient.revokeSessions();
+      // }
+      return await options?.onSettled?.(
+        data,
+        error,
+        variables,
+        onMutateResult,
+        context
+      );
+    },
+  };
+}
+
 export const useAnonymousSignInMutation: AuthMutationHook = (options) => {
   return useMutation(
     useSignInMutationOptions({
       signInMethod: 'anonymous',
       ...options,
+      ...makeExtraOptions(options),
     }) as AuthMutationOptions
   );
 };
@@ -81,6 +123,7 @@ export const useAnonymousSignInMutation: AuthMutationHook = (options) => {
 export const useSignUpMutation: AuthMutationHook<UserPass> = (options) => {
   const mutationOpts = useSignUpMutationOptions({
     ...options,
+    ...makeExtraOptions(options),
   }) as AuthMutationOptions<UserPass>;
   const mutationVariableAdaptor = ({ username, password }: UserPass) => ({
     email: `${username}@player.gambling.ammu.com`,
@@ -104,13 +147,17 @@ export const useSignInMutation: AuthMutationHook<UserPass> = (options) => {
     useSignInMutationOptions({
       signInMethod: 'username',
       ...options,
+      ...makeExtraOptions(options),
     }) as AuthMutationOptions<UserPass>
   );
 };
 
 export const useSignOutMutation: AuthMutationHook = (options) => {
   return useMutation(
-    useSignOutMutationOptions({ ...options }) as AuthMutationOptions
+    useSignOutMutationOptions({
+      ...options,
+      ...makeExtraOptions(options),
+    }) as AuthMutationOptions
   );
 };
 
@@ -121,6 +168,7 @@ export const useDeleteAnonymousAccountMutation: AuthMutationHook = (
   const convexQueryClient = useConvexQueryClient();
   return useMutation({
     ...options,
+    ...makeExtraOptions(options),
     mutationFn: async () => {
       authStoreApi.set('isAuthenticated', false);
       convexQueryClient?.unsubscribeAuthQueries();
@@ -133,7 +181,6 @@ export const useDeleteAnonymousAccountMutation: AuthMutationHook = (
       authStoreApi.set('expiresAt', null);
       authStoreApi.set('sessionSyncGraceUntil', null);
       clearAuthSessionFallback();
-      await convexQueryClient?.resetAuthQueries();
       return res;
     },
   });

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHandle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHandle } from '@ui/dialog';
 import {
   FieldGroup,
   Field,
@@ -16,7 +16,7 @@ import {
   FieldDescription,
   FieldError,
 } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Input } from '@ui/input';
 import { userPassSchema } from '@/convex/lib/validators';
 import {
   usernameAvailableQueryOptions,

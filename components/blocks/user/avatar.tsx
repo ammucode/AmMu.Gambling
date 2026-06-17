@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
+import { Skeleton } from '@ui/skeleton';
 import { userPrivateInfo } from '@/convex/shared/models';
 
 type UserAvatarProps =

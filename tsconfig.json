@@ -32,6 +32,12 @@
       "@convex-lib/*": [
         "./convex/lib/*"
       ],
+      "@ui/*": [
+        "./components/ui/*"
+      ],
+      "@hooks/*": [
+        "./hooks/*"
+      ],
       "~schema": [
         "./convex/functions/schema"
       ]

@@ -12,15 +12,20 @@ export const c = initCRPC
   .create();
 
 const optionalAuthMiddleware = c.middleware(async ({ ctx, next }) => {
+  // console.log('check optional auth!')
   const identity = await getAuthUserIdentity(ctx);
+  // console.log('check optional auth! identity=', identity)
   if (!identity) return next({ ctx: { ...ctx, user: null as typeof user } });
+  // console.log('check optional auth! find user')
   const user = iHateNull(
     await ctx.orm.query.user.findFirst({
       where: { id: identity.subject },
     }),
     true
   );
+  // console.log(`check optional auth! identity=${identity.name ?? "none"} user=${user?.username ?? "none"}`)
   if (!user) return next({ ctx: { ...ctx, user: null as typeof user } });
+  // console.log('check optional auth! forward user')
   return next({ ctx: { ...ctx, user } });
 });
 

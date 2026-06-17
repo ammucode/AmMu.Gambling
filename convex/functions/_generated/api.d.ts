@@ -23,11 +23,11 @@ export declare const api: {
   games: {
     control: {
       cashout: FunctionReference<"mutation", "public", { gamePath: any }, any>;
-      getOrStartSession: FunctionReference<
-        "mutation",
+      getSession: FunctionReference<
+        "query",
         "public",
         { gamePath: any },
-        { money: number; path: any; sessionKey: string }
+        { money: number; path: any; sessionKey: string } | null
       >;
       invest: FunctionReference<
         "mutation",
@@ -35,13 +35,19 @@ export declare const api: {
         { amount: number; gamePath: any },
         any
       >;
+      maybeStartSession: FunctionReference<
+        "mutation",
+        "public",
+        { gamePath: any },
+        { money: number; path: any; sessionKey: string }
+      >;
     };
   };
   users: {
     me: FunctionReference<
       "query",
       "public",
-      {},
+      { id?: string },
       {
         balance: number;
         displayUsername?: string;

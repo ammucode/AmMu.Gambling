@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { If, IsEqual, IsLiteral, IsNever, Primitive } from 'type-fest';
+import {
+  If,
+  IsEqual,
+  IsLiteral,
+  IsNever,
+  Primitive,
+  SimplifyDeep,
+} from 'type-fest';
 
 export type StrictPartial<T, U extends Partial<T>> = U & {
   [K in keyof U]: K extends keyof T ? U[K] : never;
@@ -62,3 +69,7 @@ export type UntagArray<T, P extends Primitive = Primitive> = P extends unknown
   ? Untag<T, P[]>
   : never;
 export type MaybeUntagArray<T> = If<IsNever<UntagArray<T>>, T, UntagArray<T>>;
+
+export type StripNoInfer<T> = T extends NoInfer<infer _> | infer Rest
+  ? Rest
+  : T;

@@ -5,8 +5,13 @@ import { getEnv, getSiteURLs } from '../lib/get-env';
 import authConfig from './auth.config';
 import { defineAuth } from './generated/auth';
 import { usernameSchema } from '../lib/validators';
+import { createGamesControlCaller } from './generated/games/control.runtime';
+import { createUsersCaller } from './generated/users.runtime';
+import { isMutationCtx } from 'kitcn/server';
+import { gameSessionTable, userTable } from '~schema';
+import { eq } from 'kitcn/orm';
 
-export default defineAuth(() => ({
+export default defineAuth((ctx) => ({
   emailAndPassword: {
     enabled: true,
   },
@@ -131,6 +136,15 @@ export default defineAuth(() => ({
           };
         },
       },
+      // delete: {
+      //   before: async (user) => {
+      //     console.log("before delete from auth -- ", user);
+      //     if (isMutationCtx(ctx)) {
+      //       await ctx.orm.delete(gameSessionTable).where(eq(gameSessionTable.userId, user.id));
+      //       // ctx.runMutation(createUsersCaller(ctx).predelete());
+      //     }
+      //   },
+      // },
     },
   },
   // hooks: {

@@ -1,4 +1,4 @@
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger } from '@ui/sidebar';
 
 export default function Page() {
   return (

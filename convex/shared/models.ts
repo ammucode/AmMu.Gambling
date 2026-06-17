@@ -18,7 +18,7 @@ function getColumnsAndFilter<
   schema: ZObj & z.ZodType<StrictPartial<Table['$inferSelect'], Cols>>
 ) {
   return {
-    schema,
+    schema: schema as ZObj,
     cols: schema.keyof().def.entries as ReturnType<
       ZObj['keyof']
     >['def']['entries'],

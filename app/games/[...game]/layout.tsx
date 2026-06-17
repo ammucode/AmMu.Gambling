@@ -5,8 +5,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Separator } from '@ui/separator';
+import { SidebarTrigger } from '@ui/sidebar';
 import { getGameByPath } from '@/lib/games/games';
 import { notFound } from 'next/navigation';
 
@@ -22,10 +22,11 @@ export default async function Layout({
   }
 
   const [rootGame, subGame] = games;
+  const activeGame = subGame ?? rootGame;
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <header className="relative flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator
@@ -48,6 +49,9 @@ export default async function Layout({
             </BreadcrumbList>
           </Breadcrumb>
         </div>
+        <h1 className="absolute left-[50%] translate-x-[-50%] text-5xl font-extrabold text-yellow-600 italic drop-shadow-amber-500 max-sm:hidden">
+          {activeGame.title}
+        </h1>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
     </>

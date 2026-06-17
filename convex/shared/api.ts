@@ -13,8 +13,9 @@ export const api = {
   games: {
     control: {
       cashout: createApiLeaf<"mutation", typeof import("../functions/games/control").cashout>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").cashout>("games/control:cashout"), { auth: "required", type: "mutation" }),
-      getOrStartSession: createApiLeaf<"mutation", typeof import("../functions/games/control").getOrStartSession>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").getOrStartSession>("games/control:getOrStartSession"), { auth: "required", type: "mutation" }),
+      getSession: createApiLeaf<"query", typeof import("../functions/games/control").getSession>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/control").getSession>("games/control:getSession"), { auth: "optional", type: "query" }),
       invest: createApiLeaf<"mutation", typeof import("../functions/games/control").invest>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").invest>("games/control:invest"), { auth: "required", type: "mutation" }),
+      maybeStartSession: createApiLeaf<"mutation", typeof import("../functions/games/control").maybeStartSession>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/control").maybeStartSession>("games/control:maybeStartSession"), { auth: "required", type: "mutation" }),
     },
   },
   users: {

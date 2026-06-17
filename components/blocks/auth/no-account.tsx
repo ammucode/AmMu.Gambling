@@ -2,22 +2,27 @@
 
 import { Sparkles } from 'lucide-react';
 import { AuthenticateFormCard } from './authenticate-dialog';
-import useSignInAsGuest from '@/hooks/use-signin-as-guest';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import useSignInAsGuest from '@hooks/use-signin-as-guest';
+import { Button } from '@ui/button';
+import { Card } from '@ui/card';
 import { useRouter } from 'next/navigation';
+import { Promisable } from 'type-fest';
 
-export function NoAccountBlock() {
+export interface NoAccountBlockProps {
+  onAuth?: () => Promisable<unknown>;
+}
+export function NoAccountBlock({ onAuth }: NoAccountBlockProps) {
   const signInAsGuestAsync = useSignInAsGuest({
-    async: true,
-    asyncRefresh: true,
+    // refresh: true,
+    onAuth
   });
-  const router = useRouter();
+  // const router = useRouter();
 
   return (
     <Card className="flex min-w-72 flex-col gap-6 sm:min-w-sm md:max-w-md">
       <AuthenticateFormCard
-        onAuth={() => router.refresh()}
+        // onAuth={() => router.refresh()}
+        onAuth={onAuth}
         overrides={{
           title: 'You must have an account to play!',
           top: (

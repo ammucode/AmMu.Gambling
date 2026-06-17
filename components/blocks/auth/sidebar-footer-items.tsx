@@ -4,7 +4,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@ui/skeleton';
 import { userPrivateInfo } from '@/convex/shared/models';
 import {
   useDeleteAnonymousAccountMutation,
@@ -12,10 +12,10 @@ import {
 } from '@/lib/convex/auth-client';
 import { Sparkles, LogIn, BadgeCheck, BadgeX, LogOut } from 'lucide-react';
 import { authDialogHandle } from './authenticate-dialog';
-import { DialogTrigger } from '@/components/ui/dialog';
+import { DialogTrigger } from '@ui/dialog';
 import { destructiveConfirmationDialogHandle } from '../dialogs/destructive-confirmation';
 import { UserAvatar } from '../user/avatar';
-import useSignInAsGuest from '@/hooks/use-signin-as-guest';
+import useSignInAsGuest from '@hooks/use-signin-as-guest';
 import { useRouter } from 'next/navigation';
 
 export function LoadingDropdownItems() {
@@ -34,7 +34,7 @@ export function LoadingDropdownItems() {
 export function NoUserDropdownItems() {
   const signInAsGuestAsync = useSignInAsGuest({
     async: true,
-    asyncRefresh: true,
+    refresh: true,
   });
   const router = useRouter();
   return (
