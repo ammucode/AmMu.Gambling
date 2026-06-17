@@ -1,3 +1,6 @@
+import { Separator } from "@ui/separator";
+import { FadingBar } from "./fading-bar";
+
 interface IndicatorProps {
   title: string;
   amount: number;
@@ -51,10 +54,19 @@ export function MoneyStats({
   lastResult = { bet: 0, win: 0 },
 }: MoneyStatsProps) {
   return (
-    <div className="flex flex-row items-center gap-2 bg-linear-to-r from-green-900/0 via-green-900/60 via-30% to-green-950 inset-shadow-sm inset-shadow-green-900/50">
+    <FadingBar className="ml-auto">
       <LastResultIndicator {...lastResult} />
       <BigMoneyIndicator title="playable" amount={playable} />
       <BigMoneyIndicator title="bet" amount={bet} />
-    </div>
+    </FadingBar>
   );
+  // return (
+  //   <div className="flex flex-row items-center gap-2 bg-linear-to-r from-green-900/0 via-green-900/60 via-30% to-green-950 inset-shadow-sm inset-shadow-green-900/50">
+  //     <LastResultIndicator {...lastResult} />
+  //     <Separator orientation="vertical" />
+  //     <BigMoneyIndicator title="playable" amount={playable} />
+  //     <Separator orientation="vertical" />
+  //     <BigMoneyIndicator title="bet" amount={bet} />
+  //   </div>
+  // );
 }

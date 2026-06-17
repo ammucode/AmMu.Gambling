@@ -18,13 +18,13 @@ export function EasyCraps({}: EasyCrapsProps) {
 
   return (
     <>
-      <div className="absolute top-0 right-0 h-16">
+      {/* <div className="absolute top-0 right-0 h-16">
         <MoneyStats
           playable={money}
           bet={0}
           lastResult={{ bet: 10, win: 50 }}
         />
-      </div>
+      </div> */}
       <div className="absolute bottom-0 grid aspect-2/1 max-h-[calc(100%-72px)] max-w-full min-w-full grid-cols-14 grid-rows-22 bg-gray-800/30 transition-[min-width] duration-300 ease-in-out @max-md:hidden @5xl:min-w-[90%] @6xl:min-w-[80%]">
         <div className="col-span-4 col-start-1 row-span-19 row-start-1 grid bg-gray-800/30">
           hard

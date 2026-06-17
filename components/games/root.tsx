@@ -8,6 +8,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useGameSession } from '@/hooks/games/use-game-session';
 import { Skeleton } from '@ui/skeleton';
 import { BalanceManager } from './balance-manager';
+import { MoneyStats } from '../blocks/games/money-stats';
 
 export interface GameWrapperProps {
   gamePath: GamePath;
@@ -40,7 +41,7 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
     }
   }, [needsSession, maybeStartSession]);
 
-  if (user ? !gameSession : userLoading) {
+  if (!gameSession || !user && userLoading) {
     return <Skeleton className="m-4 h-full w-full bg-accent" />;
   }
 
@@ -68,7 +69,14 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
 
   return (
     <>
-      <BalanceManager balance={user.balance} session={gameSession} />
+      <div className='flex w-full flex-col md:flex-row flex-wrap gap-4 md:gap-0 md:justify-between'>
+        <BalanceManager balance={user.balance} session={gameSession} />
+        <MoneyStats
+          playable={gameSession.money}
+          bet={0}
+          lastResult={{ bet: 10, win: 50 }}
+        />
+      </div>
       {renderedGame}
     </>
   );

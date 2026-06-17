@@ -49,7 +49,7 @@ export default async function Layout({
             </BreadcrumbList>
           </Breadcrumb> */}
         </div>
-        <h1 className="absolute left-[50%] translate-x-[-50%] text-5xl font-extrabold text-yellow-600 italic drop-shadow-amber-500 max-sm:hidden">
+        <h1 className="absolute left-[50%] translate-x-[-50%] text-5xl font-extrabold text-yellow-600 italic drop-shadow-amber-500 w-max max-w-[90%] max-xs:hidden">
           {activeGame.title}
         </h1>
       </header>
