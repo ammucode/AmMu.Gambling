@@ -95,7 +95,6 @@ export const gameQuery = maybeGameQuery.use(async ({ ctx, next }) => {
 export const maybeStartSession = maybeGameMutation
   .output(gameSessionInfo)
   .mutation(async ({ ctx, input }) => {
-    console.log('start session! -- ', ctx.game.session);
     if (ctx.game.session) {
       return ctx.game.session;
     }

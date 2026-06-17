@@ -16,13 +16,13 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
   const crpc = useCRPC();
   const queryClient = useQueryClient();
   const [rootGame, subGame] = getGameByPath(gamePath);
-  const game = subGame ?? rootGame;
+  const activeGame = subGame ?? rootGame;
 
-  const { user, session, gameSessionLoading } = useGameSession(gamePath);
+  const { user, userLoading, gameSession, gameSessionLoading } =
+    useGameSession(gamePath);
   const maybeStartSessionMutation = useMutation(
     crpc.games.control.maybeStartSession.mutationOptions({
-      onSettled: async (data) => {
-        console.log('maybestart finished!', data);
+      onSettled: async () => {
         await queryClient.invalidateQueries(
           crpc.games.control.getSession.staticQueryOptions({ gamePath })
         );
@@ -33,42 +33,26 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
     maybeStartSessionMutation.mutate({ gamePath });
   }, [maybeStartSessionMutation, gamePath]);
 
-  const needsSession = user && !session && !gameSessionLoading;
+  const needsSession = user && !gameSession && !gameSessionLoading;
   useEffect(() => {
     if (needsSession) {
       maybeStartSession();
     }
   }, [needsSession, maybeStartSession]);
 
-  const thing = JSON.stringify({
-    user: user?.username ?? 'no user',
-    session: session?.sessionKey ?? 'no session',
-  });
-  console.log(thing);
-
-  if (!user) {
-    return (
-      <div className="flex h-max w-full flex-col items-center">
-        {thing}
-        <NoAccountBlock onAuth={maybeStartSession} />
-      </div>
-    );
+  if (user ? !gameSession : userLoading) {
+    return <Skeleton className="m-4 h-full w-full bg-accent" />;
   }
 
-  if (!session) {
-    // if (!gameSessionLoading) {
-    //   maybeStartSession();
-    // }
-    return (
-      <div className="flex h-max w-full flex-col items-center">
-        {thing}
-        <Skeleton className="" />
-      </div>
-    );
+  if (!user) {
+    return <NoAccountBlock onAuth={maybeStartSession} />;
   }
 
   let renderedGame: React.ReactNode = (
-    <game.component game={clientifyGame(game)} fullPath={gamePath} />
+    <activeGame.component
+      game={clientifyGame(activeGame)}
+      fullPath={gamePath}
+    />
   );
 
   if (subGame && rootGame.rootComponent) {
@@ -83,9 +67,9 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
   }
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center">
-      <BalanceManager balance={user.balance} session={session} />
-      {renderedGame};
-    </div>
+    <>
+      <BalanceManager balance={user.balance} session={gameSession} />
+      {renderedGame}
+    </>
   );
 }
