@@ -99,22 +99,22 @@ export function clientifyGame<G extends GameServerFields>(
 type subGamePaths<Path extends string, Gs extends SubGame[]> = {
   [K in keyof Gs]: [Path, Gs[K]['path']];
 };
-type gamePaths<G extends Game> = G extends RootGameWithSubs
+type paths<G extends Game> = G extends RootGameWithSubs
   ? subGamePaths<G['path'], G['subGames']>
   : [[G['path']]];
-function gamePaths<G extends Game>(game: G): gamePaths<G> {
+function paths<G extends Game>(game: G): paths<G> {
   return (
     'subGames' in game && game.subGames
       ? game.subGames.map((sub) => [game.path, sub.path])
       : [[game.path]]
-  ) as gamePaths<G>;
+  ) as paths<G>;
 }
 type allGamePaths<Gs extends Game[] = GAMES> = {
-  [K in keyof Gs]: gamePaths<Gs[K]>;
+  [K in keyof Gs]: paths<Gs[K]>;
 };
 
 export const GAME_PATHS = GAMES.flatMap(
-  (game) => gamePaths(game) as unknown
+  (game) => paths(game) as unknown
 ) as unknown as FlattenOnce<allGamePaths<GAMES>>;
 export type GAME_PATHS = typeof GAME_PATHS;
 export type GamePath = GAME_PATHS[number];
@@ -155,8 +155,8 @@ export function getGameByPath(path: string[]) {
 }
 
 export const GAME_SESSION_KEY_DELIM = '-._.-';
-export function makeGameSessionKey(username: string, gamePath: GamePath) {
-  return `${username}${GAME_SESSION_KEY_DELIM}${gamePath.join('/') as GamePathString}` as const;
+export function makeGameSessionKey(username: string, path: GamePath) {
+  return `${username}${GAME_SESSION_KEY_DELIM}${path.join('/') as GamePathString}` as const;
 }
 export type GameSlug = ReturnType<typeof makeGameSessionKey>;
 export const GameSlugSchema = z.templateLiteral([

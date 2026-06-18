@@ -9,10 +9,10 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit && bun run typecheck:convex",
+    "typecheck": "tsgo --noEmit && bun run typecheck:convex",
     "codegen": "kitcn codegen",
     "convex:dev": "kitcn dev",
-    "typecheck:convex": "tsc --noEmit --project convex/functions/tsconfig.json"
+    "typecheck:convex": "tsgo --noEmit --project convex/functions/tsconfig.json"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -46,6 +46,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript/native-preview": "^7.0.0-dev.20260618.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "prettier": "^3.8.3",

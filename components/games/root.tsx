@@ -11,28 +11,28 @@ import { BalanceManager } from './balance-manager';
 import { MoneyStats } from '../blocks/games/money-stats';
 
 export interface GameWrapperProps {
-  gamePath: GamePath;
+  path: GamePath;
 }
-export function GameRoot({ gamePath }: GameWrapperProps) {
+export function GameRoot({ path }: GameWrapperProps) {
   const crpc = useCRPC();
   const queryClient = useQueryClient();
-  const [rootGame, subGame] = getGameByPath(gamePath);
+  const [rootGame, subGame] = getGameByPath(path);
   const activeGame = subGame ?? rootGame;
 
   const { user, userLoading, gameSession, gameSessionLoading } =
-    useGameSession(gamePath);
+    useGameSession(path);
   const maybeStartSessionMutation = useMutation(
     crpc.games.session.maybeStartSession.mutationOptions({
       onSettled: async () => {
         await queryClient.invalidateQueries(
-          crpc.games.session.getSession.staticQueryOptions({ gamePath })
+          crpc.games.session.getSession.staticQueryOptions({ path })
         );
       },
     })
   );
   const maybeStartSession = useCallback(() => {
-    maybeStartSessionMutation.mutate({ gamePath });
-  }, [maybeStartSessionMutation, gamePath]);
+    maybeStartSessionMutation.mutate({ path });
+  }, [maybeStartSessionMutation, path]);
 
   const needsSession = user && !gameSession && !gameSessionLoading;
   useEffect(() => {
@@ -50,10 +50,7 @@ export function GameRoot({ gamePath }: GameWrapperProps) {
   }
 
   let renderedGame: React.ReactNode = (
-    <activeGame.component
-      game={clientifyGame(activeGame)}
-      fullPath={gamePath}
-    />
+    <activeGame.component game={clientifyGame(activeGame)} fullPath={path} />
   );
 
   if (subGame && rootGame.rootComponent) {

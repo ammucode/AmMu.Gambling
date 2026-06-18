@@ -5,10 +5,10 @@ import { notFound } from 'next/navigation';
 export default async function Layout({
   children,
   params,
-}: LayoutProps<'/games/[...gamePath]'>) {
-  const { gamePath } = await params;
+}: LayoutProps<'/games/[...path]'>) {
+  const { path } = await params;
 
-  const games = getGameByPath(gamePath);
+  const games = getGameByPath(path);
   if (!games) {
     notFound();
   }

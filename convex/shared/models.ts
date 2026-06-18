@@ -138,7 +138,7 @@ function makeRelationalModel<
 ) {
   const selector = (out: Out) => iHateNull(select(out));
   return {
-    schema: schema as ZObj,
+    schema: schema as unknown as ZObj,
     query,
     select: selector,
     selectNullish: nullOptXfmr(selector, undefined),

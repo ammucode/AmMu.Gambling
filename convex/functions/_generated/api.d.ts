@@ -25,13 +25,13 @@ export declare const api: {
       cashOut: FunctionReference<
         "mutation",
         "public",
-        { gamePath?: any; sessionKey?: string },
+        { path?: any; sessionKey?: string },
         any
       >;
       info: FunctionReference<
         "query",
         "public",
-        { gamePath?: any; sessionKey?: string },
+        { path?: any; sessionKey?: string },
         {
           lastResultBet: number;
           lastResultWon: number;
@@ -43,7 +43,7 @@ export declare const api: {
       invest: FunctionReference<
         "mutation",
         "public",
-        { amount: number; gamePath?: any; sessionKey?: string },
+        { amount: number; path?: any; sessionKey?: string },
         any
       >;
     };
@@ -51,13 +51,13 @@ export declare const api: {
       getSession: FunctionReference<
         "query",
         "public",
-        { gamePath?: any; sessionKey?: string },
+        { path?: any; sessionKey?: string },
         { path: any; sessionKey: string } | null
       >;
       maybeStartSession: FunctionReference<
         "mutation",
         "public",
-        { gamePath?: any; sessionKey?: string },
+        { path?: any; sessionKey?: string },
         { path: any; sessionKey: string }
       >;
     };

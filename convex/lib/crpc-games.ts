@@ -13,19 +13,19 @@ import { iHateNull } from './document';
 
 const gameInputSchema = z
   .object({
-    gamePath: GAME_PATH_SCHEMA.optional(),
+    path: GAME_PATH_SCHEMA.optional(),
     sessionKey: GameSlugSchema.optional(),
   })
-  .refine((data) => data.gamePath || data.sessionKey, {
-    message: 'Either gamePath or sessionKey must be provided',
-    path: ['gamePath'],
+  .refine((data) => data.path || data.sessionKey, {
+    message: 'Either path or sessionKey must be provided',
+    path: ['path'],
   });
 
 // type maybeGameMiddlewareParams = Parameters<Exclude<Parameters<typeof authMutation.use|typeof optionalAuthQuery.use>[0], AnyMiddlewareBuilder>>[0];
 // const maybeGameMiddleware = async ({ctx, next, input}: maybeGameMiddlewareParams&{input: z.infer<typeof gameInputSchema>}) => {
-//   const gamePath = input.gamePath ?? pathFromGameSessionKey(input.sessionKey!);
-//   const sessionKey = input.sessionKey ?? (ctx.user && makeGameSessionKey(ctx.user.username, input.gamePath!));
-//   const gamePair = getGameByPath(gamePath);
+//   const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
+//   const sessionKey = input.sessionKey ?? (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
+//   const gamePair = getGameByPath(path);
 //   const activeGame = gamePair[1] ?? gamePair[0];
 //   const gameSession = sessionKey ? iHateNull(
 //     await ctx.orm.query.gameSession.findFirst({
@@ -37,7 +37,7 @@ const gameInputSchema = z
 //   return next({
 //     ctx: {
 //       ...ctx,
-//       game: { path: gamePath, sessionKey, pair: gamePair, data: activeGame, session: gameSession },
+//       game: { path: path, sessionKey, pair: gamePair, data: activeGame, session: gameSession },
 //     },
 //   });
 // };
@@ -75,12 +75,11 @@ const gameInputSchema = z
 export const maybeGameMutation = authMutation
   .input(gameInputSchema)
   .use(async ({ ctx, next, input }) => {
-    const gamePath =
-      input.gamePath ?? pathFromGameSessionKey(input.sessionKey!);
+    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
     const sessionKey =
       input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.gamePath!));
-    const gamePair = getGameByPath(gamePath);
+      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
+    const gamePair = getGameByPath(path);
     const activeGame = gamePair[1] ?? gamePair[0];
     const gameSession = sessionKey
       ? iHateNull(
@@ -95,7 +94,7 @@ export const maybeGameMutation = authMutation
       ctx: {
         ...ctx,
         game: {
-          path: gamePath,
+          path: path,
           sessionKey,
           pair: gamePair,
           data: activeGame,
@@ -121,12 +120,11 @@ export const gameMutation = maybeGameMutation.use(async ({ ctx, next }) => {
 export const maybeGameQuery = optionalAuthQuery
   .input(gameInputSchema)
   .use(async ({ ctx, next, input }) => {
-    const gamePath =
-      input.gamePath ?? pathFromGameSessionKey(input.sessionKey!);
+    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
     const sessionKey =
       input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.gamePath!));
-    const gamePair = getGameByPath(gamePath);
+      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
+    const gamePair = getGameByPath(path);
     const activeGame = gamePair[1] ?? gamePair[0];
     const gameSession = sessionKey
       ? iHateNull(
@@ -141,7 +139,7 @@ export const maybeGameQuery = optionalAuthQuery
       ctx: {
         ...ctx,
         game: {
-          path: gamePath,
+          path: path,
           sessionKey,
           pair: gamePair,
           data: activeGame,

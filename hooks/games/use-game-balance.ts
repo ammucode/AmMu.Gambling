@@ -7,14 +7,12 @@ import { gameBalanceSelectNullish } from '@/convex/shared/models';
 
 export function useGameBalance() {
   const crpc = useCRPC();
-  const gamePath = useGamePath();
+  const path = useGamePath();
   const { user, userLoading, gameSession, gameSessionLoading } =
-    useGameSession(gamePath);
+    useGameSession(path);
 
   const { data: gameBalance, isLoading: gameBalanceLoading } = useQuery({
-    ...crpc.games.balance.info.queryOptions(
-      gameSession ? { sessionKey: gameSession.sessionKey } : skipToken
-    ),
+    ...crpc.games.balance.info.queryOptions(gameSession ?? skipToken),
     select: gameBalanceSelectNullish,
   });
 
@@ -23,17 +21,17 @@ export function useGameBalance() {
   );
   const invest = useCallback(
     async (amount: number) => {
-      await investMutation.mutateAsync({ gamePath, amount });
+      await investMutation.mutateAsync({ path, amount });
     },
-    [investMutation, gamePath]
+    [investMutation, path]
   );
 
   const cashOutMutation = useMutation(
     crpc.games.balance.cashOut.mutationOptions()
   );
   const cashOut = useCallback(async () => {
-    await cashOutMutation.mutateAsync({ gamePath });
-  }, [cashOutMutation, gamePath]);
+    await cashOutMutation.mutateAsync({ path });
+  }, [cashOutMutation, path]);
 
   if (!user || userLoading || !gameSession || gameSessionLoading)
     throw new Error(`useGameBalance must be called from existing game session`);
