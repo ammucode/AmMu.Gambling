@@ -1,7 +1,6 @@
 import { GameRoot } from '@/components/games/root';
 import { caller, crpc, prefetch } from '@/lib/convex/rsc';
 import { GamePath } from '@/lib/games/games';
-// import { notFound } from 'next/navigation';
 
 export default async function Page({
   params,

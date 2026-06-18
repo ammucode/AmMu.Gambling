@@ -5,10 +5,7 @@ import { Button } from '@ui/button';
 import { FadingBar } from '../blocks/games/fading-bar';
 import { useGameBalance } from '@hooks/games/use-game-balance';
 
-// export interface BalanceManagerProps {
-//   // balance: number;
-//   // session: gameSessionInfo;
-// }
+
 export function BalanceManager() {
   const { accountBalance, invest, cashOut, playable } = useGameBalance();
   return (

@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { If, IsEqual, IsLiteral, IsNever, Primitive } from 'type-fest';
+import { If, IsEqual, IsLiteral, IsNever, PartialDeep, Primitive } from 'type-fest';
 
 export type StrictPartial<T, U extends Partial<T>> = U & {
   [K in keyof U]: K extends keyof T ? U[K] : never;
+};
+export type StrictPartialDeep<T, U extends PartialDeep<T>> = U & {
+  [K in keyof U]: K extends keyof T ?
+    U[K] extends PartialDeep<T[K]> ? StrictPartialDeep<T[K], U[K]>
+    : U[K]
+  : never;
 };
 // <T, U> = Partial<T> & {
 //   [K in keyof U]: K extends keyof T ? U[K] : never;

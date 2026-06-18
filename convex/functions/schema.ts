@@ -1,9 +1,11 @@
-import { GAME_PATH_SCHEMA, GameSlug } from '@/lib/games/games';
+import { GAME_PATH_SCHEMA, GamePathString, GameSlug } from '@/lib/games/games';
+import { TableDefinition } from 'convex/server';
 import {
   arrayOf,
   boolean,
   convexTable,
   defineSchema,
+  GenericSchema,
   index,
   InferInsertModel,
   InferSelectModel,
@@ -132,7 +134,7 @@ const genericGameColumns = {
 function genericGameExtras<Table extends typeof genericGameColumns>(
   table: Table
 ) {
-  return [index('sessionKey').on(table.sessionKey)] as const;
+  return [] as const;
 }
 
 export const easyCrapsSessionTable = convexTable(
@@ -143,6 +145,15 @@ export const easyCrapsSessionTable = convexTable(
   (easyCrapsSessionTable) => [...genericGameExtras(easyCrapsSessionTable)]
 );
 
+const gameTables = {
+  "craps/easy": easyCrapsSessionTable
+} as const satisfies Partial<Record<GamePathString, TableDefinition>>;
+export type GameTable = typeof gameTables[keyof typeof gameTables];
+
+function perGameTableObj<K extends PropertyKey, V>(functor: (tbl: GameTable, name: GameTable["tableName"]) => [K,V]): Record<K, V> {
+  return Object.fromEntries(Object.values(gameTables).map(tbl => functor(tbl, tbl.tableName))) as Record<K, V>;
+}
+
 export const tables = {
   user: userTable,
   session: sessionTable,
@@ -150,12 +161,13 @@ export const tables = {
   jwks: jwksTable,
 
   gameSession: gameSessionTable,
+  ...perGameTableObj(tbl => [tbl.tableName, tbl]),
 };
 export type TableName = keyof typeof tables;
 export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
 export type Insert<T extends TableName> = InferInsertModel<(typeof tables)[T]>;
 
-export default defineSchema(tables)
+export const schema = defineSchema(tables)
   .relations((r) => ({
     user: {
       sessions: r.many.session({
@@ -190,26 +202,28 @@ export default defineSchema(tables)
         to: r.user.id,
         optional: false,
       }),
+      ...perGameTableObj((_, name) => [
+        name,
+        r.many[name]({
+          from: r.gameSession.sessionKey,
+          to: r[name].sessionKey,
+        }),
+      ]),
     },
-  }))
-  .triggers({
-    // user: {
-    //   delete: {
-    //     before: async (user, ctx) => {
-    //       // const userCaller = createUsersCaller(ctx);
-    //       console.log(`check predelete -- ${user.id}`)
-    //       for (const table of Object.values(tables)) {
-    //         console.log(`check ${table.tableName} -- ${user.id}`)
-    //         if ("userId" in table) {
-    //           console.log(`relations ${table.tableName} -- ${user.id}`)
-    //           // const relations = ctx.orm.query[table.tableName]._.tableConfig.relations;
-    //           // if ("user" in relations && relations.user.relationType === "one") {
-    //             console.log(`clear ${table.tableName} -- ${user.id}`)
-    //             // ctx.orm.delete(table).where(eq(table.userId, user.id));
-    //           // }
-    //         }
-    //       }
-    //     },
-    //   },
-    // },
-  });
+    ...perGameTableObj((_, name) => [
+      name,
+      {
+        gameSession: r.one.gameSession({
+          from: r[name].sessionKey,
+          to: r.gameSession.sessionKey,
+          optional: false,
+        }),
+        user: r.one.user({
+          from: r[name].sessionKey.through(r.gameSession.userId),
+          to: r.user.userId.through(r.gameSession.sessionKey),
+          optional: false,
+        }),
+      }
+    ]),
+  }));
+export default schema;

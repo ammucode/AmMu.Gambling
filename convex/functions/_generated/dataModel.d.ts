@@ -301,6 +301,21 @@ export type DataModel = {
     searchIndexes: {};
     vectorIndexes: {};
   };
+  easyCrapsSession: {
+    document: {
+      sessionKey: string;
+      _id: Id<"easyCrapsSession">;
+      _creationTime: number;
+    };
+    fieldPaths: "_creationTime" | "_id" | "sessionKey";
+    indexes: {
+      by_id: ["_id"];
+      by_creation_time: ["_creationTime"];
+      easyCrapsSession_sessionKey_unique: ["sessionKey", "_creationTime"];
+    };
+    searchIndexes: {};
+    vectorIndexes: {};
+  };
   gameSession: {
     document: {
       createdAt?: null | number;

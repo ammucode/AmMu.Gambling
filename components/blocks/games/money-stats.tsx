@@ -43,17 +43,7 @@ function BigMoneyIndicator({ title, amount }: IndicatorProps) {
   );
 }
 
-// export interface MoneyStatsProps {
-//   // playable: number;
-//   // bet: number;
-//   // lastResult?: LastResultIndicatorProps;
-// }
 export function MoneyStats() {
-// {
-//   // playable,
-//   // bet,
-//   // lastResult = { bet: 0, win: 0 },
-// }: MoneyStatsProps
   const { playable, totalBet, lastResultBet, lastResultWon } = useGameBalance();
   return (
     <FadingBar className="ml-auto">
@@ -62,13 +52,4 @@ export function MoneyStats() {
       <BigMoneyIndicator title="bet" amount={totalBet} />
     </FadingBar>
   );
-  // return (
-  //   <div className="flex flex-row items-center gap-2 bg-linear-to-r from-green-900/0 via-green-900/60 via-30% to-green-950 inset-shadow-sm inset-shadow-green-900/50">
-  //     <LastResultIndicator {...lastResult} />
-  //     <Separator orientation="vertical" />
-  //     <BigMoneyIndicator title="playable" amount={playable} />
-  //     <Separator orientation="vertical" />
-  //     <BigMoneyIndicator title="bet" amount={bet} />
-  //   </div>
-  // );
 }

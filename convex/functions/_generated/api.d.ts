@@ -40,27 +40,13 @@ export declare const api: {
         "query",
         "public",
         { gamePath?: any; sessionKey?: string },
-        {
-          lastResultBet: number;
-          lastResultWon: number;
-          path: any;
-          playable: number;
-          sessionKey: string;
-          totalBet: number;
-        } | null
+        { path: any; sessionKey: string } | null
       >;
       maybeStartSession: FunctionReference<
         "mutation",
         "public",
         { gamePath?: any; sessionKey?: string },
-        {
-          lastResultBet: number;
-          lastResultWon: number;
-          path: any;
-          playable: number;
-          sessionKey: string;
-          totalBet: number;
-        }
+        { path: any; sessionKey: string }
       >;
     };
   };
