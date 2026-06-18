@@ -10,7 +10,7 @@
 import { IsLiteralDeep, MaybeUntagArray, StripNoInfer } from '@/lib/types';
 import { If } from 'type-fest';
 
-type DeepReplaceNullWithUndefined<
+export type DeepReplaceNullWithUndefined<
   t,
   T extends StripNoInfer<t> = StripNoInfer<t>,
 > = T extends unknown
@@ -38,11 +38,8 @@ export function iHateNull<
     Resolved
   > = If<TopLevelNull, Resolved extends undefined ? null : Resolved, Resolved>,
 >(value: T, topLevelNull: TopLevelNull = false as TopLevelNull): Result {
-  const sentinel = Symbol.for('iHateNull');
-  if ((value ?? sentinel) === sentinel)
+  if (value === null || value === undefined)
     return (topLevelNull ? null : undefined) as Result;
-  if (value === null) return undefined as Result;
-  if (value === undefined) return undefined as Result;
   if (Array.isArray(value)) return value.map((v) => iHateNull(v)) as Result;
   if (typeof value === 'object') {
     return Object.fromEntries(

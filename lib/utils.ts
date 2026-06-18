@@ -11,3 +11,10 @@ export function dropField<Obj extends object, K extends keyof Obj>(o: Obj, key: 
     key: undefined
   } as Omit<Obj, K>;
 }
+
+export function nullOptXfmr<In, Out, Fallback extends null|undefined>(xfmr: (input: In) => Out, fallback: Fallback) {
+  return (input: In|null|undefined) => {
+    if (input === null || input === undefined) return fallback;
+    return xfmr(input);
+  }
+}

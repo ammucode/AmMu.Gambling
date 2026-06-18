@@ -1,8 +1,9 @@
 import { useCRPC } from '@/lib/convex/crpc';
 import { useGamePath } from './use-game-path';
 import { useGameSession } from './use-game-session';
-import { useMutation } from '@tanstack/react-query';
+import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
+import { gameBalanceSelectNullish } from '@/convex/shared/models';
 
 export function useGameBalance() {
   const crpc = useCRPC();
@@ -10,9 +11,10 @@ export function useGameBalance() {
   const { user, userLoading, gameSession, gameSessionLoading } =
     useGameSession(gamePath);
 
-  const { data: gameBalance, gameBalanceLoading } = useQuery(
-    
-  )
+  const { data: gameBalance, isLoading: gameBalanceLoading } = useQuery({
+    ...crpc.games.balance.info.queryOptions(gameSession ? {sessionKey: gameSession.sessionKey} : skipToken),
+    select: gameBalanceSelectNullish
+  })
 
   const investMutation = useMutation(
     crpc.games.balance.invest.mutationOptions()
@@ -35,12 +37,9 @@ export function useGameBalance() {
     throw new Error(`useGameBalance must be called from existing game session`);
 
   return {
-    accountBalance: user.balance,
-    playable: gameSession.playable,
-    totalBet: gameSession.totalBet,
-    lastResultBet: gameSession.lastResultBet,
-    lastResultWon: gameSession.lastResultWon,
-    invest,
-    cashOut,
+    gameBalance,
+    gameBalanceLoading,
+    invest: gameBalanceLoading ? invest : undefined,
+    cashOut: gameBalanceLoading ? cashOut : undefined,
   };
 }

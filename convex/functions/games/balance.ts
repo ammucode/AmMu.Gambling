@@ -9,8 +9,10 @@ import { userTable, gameSessionTable } from '~schema';
 export const info = gameQuery
   .output(gameBalanceSchema.nullable())
   .query(async ({ ctx }) => {
-    // return await gameBalancePerformQuery(ctx.orm);
-    return await ctx.orm.query.gameSession.findFirst(gameBalanceQuery);
+    return await ctx.orm.query.gameSession.findFirst({
+      ...gameBalanceQuery,
+      where: { id: ctx.game.session.id },
+    });
   });
 
 export const invest = gameMutation
