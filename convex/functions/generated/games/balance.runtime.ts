@@ -15,6 +15,7 @@ import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
   "cashOut": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/balance").cashOut>("games/balance:cashOut"), () => (require("../../games/balance") as Record<string, unknown>)["cashOut"])],
+  "info": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../../games/balance").info>("games/balance:info"), () => (require("../../games/balance") as Record<string, unknown>)["info"])],
   "invest": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/balance").invest>("games/balance:invest"), () => (require("../../games/balance") as Record<string, unknown>)["invest"])],
 } as const;
 

@@ -167,7 +167,7 @@ export type TableName = keyof typeof tables;
 export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
 export type Insert<T extends TableName> = InferInsertModel<(typeof tables)[T]>;
 
-export const schema = defineSchema(tables)
+export const Schema = defineSchema(tables)
   .relations((r) => ({
     user: {
       sessions: r.many.session({
@@ -226,4 +226,4 @@ export const schema = defineSchema(tables)
       }
     ]),
   }));
-export default schema;
+export default Schema;

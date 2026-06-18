@@ -1,9 +1,17 @@
-import { gameMutation } from '@convex-lib/crpc-games';
+import { gameMutation, gameQuery } from '@convex-lib/crpc-games';
+import {  gameBalanceQuery, gameBalanceSchema } from '@convex/models';
 import { eq } from 'kitcn/orm';
 import { CRPCError } from 'kitcn/server';
 import { Simplify } from 'type-fest';
 import z from 'zod';
 import { userTable, gameSessionTable } from '~schema';
+
+export const info = gameQuery
+  .output(gameBalanceSchema.nullable())
+  .query(async ({ ctx }) => {
+    // return await gameBalancePerformQuery(ctx.orm);
+    return await ctx.orm.query.gameSession.findFirst(gameBalanceQuery);
+  });
 
 export const invest = gameMutation
   .input(z.object({ amount: z.number().nonnegative() }))

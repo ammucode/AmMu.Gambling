@@ -13,6 +13,7 @@ export const api = {
   games: {
     balance: {
       cashOut: createApiLeaf<"mutation", typeof import("../functions/games/balance").cashOut>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/balance").cashOut>("games/balance:cashOut"), { auth: "required", type: "mutation" }),
+      info: createApiLeaf<"query", typeof import("../functions/games/balance").info>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/balance").info>("games/balance:info"), { auth: "optional", type: "query" }),
       invest: createApiLeaf<"mutation", typeof import("../functions/games/balance").invest>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/balance").invest>("games/balance:invest"), { auth: "required", type: "mutation" }),
     },
     session: {

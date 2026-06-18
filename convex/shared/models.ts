@@ -1,16 +1,20 @@
 import { z } from 'zod';
-import schema, { gameSessionTable, GameTable, Select, userTable } from '~schema';
-import { BuildQueryResult, ConvexTableWithColumns, DatabaseWithQuery, TableConfig, TableName, TableRelationalConfig, TablesRelationalConfig } from 'kitcn/orm';
+import { gameSessionTable, userTable } from '~schema';
+import { BuildQueryResult, DBQueryConfig } from 'kitcn/orm';
 import { GAME_PATH_SCHEMA, GameSlugSchema } from '@/lib/games/games';
-import { StrictPartial, StrictPartialDeep } from '@/lib/types';
+import { MyPartialDeep, MyStrictPartialDeep, StrictPartial, StrictPartialDeep } from '@/lib/types';
 import { usernameSchema } from '@convex-lib/validators';
-import { DataModel, TableNames } from '../functions/_generated/dataModel';
-import { QueryCtx } from '../functions/generated/server';
-import { PartialDeep, SimplifyDeep } from 'type-fest';
+import { TableNames } from '../functions/_generated/dataModel';
+import { OrmCtx } from '../functions/generated/server';
+import { If, IsEqual, IsUnknown, Or, PartialDeep, SimplifyDeep } from 'type-fest';
 import { FindFirstConfigNoSearch, KnownKeysOnlyStrict } from '@/lib/convex/kitcn-mirror';
+import { dropField } from '@/lib/utils';
+
+export type OrmSchema = OrmCtx["orm"]["query"][TableNames]["_"]["schema"];
 
 function makeTableModel<
-  Table extends ConvexTableWithColumns<TableConfig>,
+  TableName extends TableNames,
+  Table extends OrmSchema[TableName]["table"],//ConvexTableWithColumns<TableConfig>,
   Cols extends Partial<Table['$inferSelect']>,
   ZObj extends z.ZodObject & z.ZodType<Cols>,
 >(
@@ -26,7 +30,7 @@ function makeTableModel<
       schema.keyof().options.map((field) => [field, true])
     ) as { [K in keyof ZObj['shape']]: true },
     returning: Object.fromEntries(
-      schema.keyof().options.map((field) => [field, table[field]])
+      schema.keyof().options.map((field: keyof ZObj['shape']) => [field, table[field]])
     ) as { [K in keyof ZObj['shape']]: Table[K] },
   };
 }
@@ -104,95 +108,103 @@ export const {
   })
 );
 
-declare const ctxOrm: QueryCtx["orm"];
-declare const ctxQuery: QueryCtx["orm"]["query"];
-type Schema = QueryCtx["orm"] extends DatabaseWithQuery<infer TSchema extends TablesRelationalConfig> ? TSchema : never;
-type TableConfigGeneric<TableName extends TableNames> = QueryCtx["orm"] extends DatabaseWithQuery<infer TSchema extends TablesRelationalConfig> ? TSchema[TableName] : never;
-type Config<TableName extends TableNames> = FindFirstConfigNoSearch<Schema, TableConfigGeneric<TableName>>;
-type ConfigParam<
+
+
+type QueryConfig<TableName extends TableNames> = FindFirstConfigNoSearch<OrmSchema, OrmSchema[TableName]>;
+// type QueryConfig<TableName extends TableNames> = DBQueryConfig<'many', true, OrmSchema, OrmSchema[TableName]>
+
+type RelationalModelOut<
   TableName extends TableNames,
-  TConfig extends Config<TableName>,
-  TSchema extends Schema = Schema,
-  TTableConfig extends TableConfigGeneric<TableName> = TableConfigGeneric<TableName>,
-  // THasIndex extends boolean = false,
-> = KnownKeysOnlyStrict<TConfig, FindFirstConfigNoSearch<TSchema, TTableConfig>> // & EnforcedConfig<TConfig, TTableConfig, THasIndex>
-// type t = typeof ctxQuery["easyCrapsSession"]["findFirst"]<5>;
-// function foo<
-//   TableName extends TableNames,
-//   // TSchema extends TablesRelationalConfig,
-//   // TTableConfig extends TableRelationalConfig,
-//   TConfig extends Config<TableName>,
-//   TConfigParam extends ConfigParam<TableName, TConfig> = ConfigParam<TableName, TConfig>
-//   // TConfig extends typeof ctxQuery extends RelationalQueryBuilder<infer TSchema extends TablesRelationalConfig, infer TTableConfig extends TableRelationalConfig> ? FindFirstConfigNoSearch<TSchema, TTableConfig> : never,
-// >(tableName: TableName) {
-//   return ctxQuery[tableName].findFirst<TConfig>;
-// }
-// type tt = ReturnType<typeof foo<"easyCrapsSession">>
+  Query extends QueryConfig<TableName>,
+  Result extends SimplifyDeep<Awaited<BuildQueryResult<OrmSchema, OrmSchema[TableName], Query>>>,
+  ZObjOut extends MyPartialDeep<Result>,
+  ZObj extends z.ZodObject & z.ZodType<ZObjOut>,
+> = {
+  query: KnownKeysOnlyStrict<Query, QueryConfig<TableName>>,
+  schema: ZObj & z.ZodType<MyStrictPartialDeep<Result, ZObjOut>>,
+};
+type RelationalModelWithXfmrOut<
+  TableName extends TableNames,
+  Query extends QueryConfig<TableName>,
+  Result extends SimplifyDeep<Awaited<BuildQueryResult<OrmSchema, OrmSchema[TableName], Query>>>,
+  // ZObjOut extends MyPartialDeep<Result>,
+  // ZObj extends z.ZodObject & z.ZodType<ZObjOut>,
+  XfmrResult,
+  XfmrZObjOut extends MyPartialDeep<XfmrResult>,
+  XfmrZObj extends z.ZodType<XfmrZObjOut, Awaited<XfmrResult>>
+> = {
+  query: KnownKeysOnlyStrict<Query, QueryConfig<TableName>>,
+  schema: XfmrZObj & z.ZodType<MyStrictPartialDeep<XfmrResult, XfmrZObjOut>>,
+};
 
 function makeRelationalModel<
   TableName extends TableNames,
-  // TSchema extends TablesRelationalConfig,
-  // TTableConfig extends TableRelationalConfig,
-  // TConfig extends FindFirstConfigNoSearch<TSchema, TTableConfig>,
-  // Query extends Parameters<QueryCtx["orm"]["query"][TableName]["findFirst"]>[0],
-  // Result extends GelRelationalQuery,
-  // Result extends ReturnType<QueryCtx["orm"]["query"][TableName]["findFirst"]>,
-  // SearchF extends QueryCtx["orm"]["query"][TableName]["findFirst"],
-  // SearchF extends QueryCtx["orm"]["query"][TableName]["findFirst"] & ((query: Query) => Result),
-  // Query extends Parameters<SearchF>[0],
-  // Result extends ReturnType<SearchF>,
-  // Result extends Exclude<ReturnType<SearchF>, never>,
-  // Result extends PartialDeep<ReturnType<SearchF>>,
-  // Cols extends Partial<DataModel[TableName]['$inferSelect']>,
-  // ZObj extends z.ZodObject & z.ZodType<Result>,
-  // ZObj extends NoInfer<z.ZodObject & z.ZodType<Awaited<ReturnType<SearchF>>>>
-  // TConfig extends Config<TableName>,
-  Query extends ConfigParam<TableName, Config<TableName>>,
-  TConfig extends Query extends ConfigParam<TableName, infer TConfig extends Config<TableName>> ? TConfig : never,
-  Result extends Awaited<BuildQueryResult<Schema, TableConfigGeneric<TableName>, TConfig>|null>,
-  // Out extends PartialDeep<Result>,
-  Out extends Result,
-  ZObj extends z.ZodObject & z.ZodType<SimplifyDeep<Out>>,
+  Query extends QueryConfig<TableName>,
+  Result extends SimplifyDeep<Awaited<BuildQueryResult<OrmSchema, OrmSchema[TableName], Query>>>,
+  ZObjOut extends MyPartialDeep<Result>,
+  ZObj extends z.ZodObject & z.ZodType<ZObjOut>,
 >(
   _tableName: TableName,
-  query: Query,
-  // schema: NoInfer<z.ZodObject & z.ZodType<Awaited<ReturnType<ReturnType<SearchF>["execute"]>>>>
-  schema: NoInfer<ZObj>
-  // schema: NoInfer<ZObj & z.ZodType<SimplifyDeep<StrictPartialDeep<Result, Out>>>>
+  query: KnownKeysOnlyStrict<Query, QueryConfig<TableName>>,
+  schema: ZObj & z.ZodType<MyStrictPartialDeep<Result, ZObjOut>>,
+): RelationalModelOut<TableName, Query, Result, ZObjOut, ZObj>;
+function makeRelationalModel<
+  TableName extends TableNames,
+  Query extends QueryConfig<TableName>,
+  Result extends SimplifyDeep<Awaited<BuildQueryResult<OrmSchema, OrmSchema[TableName], Query>>>,
+  // ZObjOut extends MyPartialDeep<Result>,
+  // ZObj extends z.ZodObject & z.ZodType<ZObjOut>,
+  XfmrResult,
+  XfmrZObjOut extends MyPartialDeep<XfmrResult>,
+  XfmrZObj extends z.ZodType<XfmrZObjOut, Awaited<XfmrResult>>
+>(
+  _tableName: TableName,
+  query: KnownKeysOnlyStrict<Query, QueryConfig<TableName>>,
+  schema: NoInfer<XfmrZObj & z.ZodType<MyStrictPartialDeep<XfmrResult, XfmrZObjOut>>>,
+  xfmr: (out: Result) => XfmrResult,
+): RelationalModelWithXfmrOut<TableName, Query, Result, XfmrResult, XfmrZObjOut, XfmrZObj>;
+
+function makeRelationalModel<
+  TableName extends TableNames,
+  Query extends QueryConfig<TableName>,
+  Result extends SimplifyDeep<Awaited<BuildQueryResult<OrmSchema, OrmSchema[TableName], Query>>>,
+  // ZObjOut extends MyPartialDeep<Result>,
+  // ZObj extends z.ZodObject & z.ZodType<ZObjOut>,
+  XfmrResult,
+  XfmrZObjOut extends MyPartialDeep<XfmrResult>,
+  XfmrZObj extends z.ZodType<XfmrZObjOut, Awaited<XfmrResult>>
+  // Xfmr extends {
+  //   xfmr: (out: ZObjOut|null) => NewOut,
+  //   outSchema: z.ZodType<NewOut, Awaited<NewOut>>,
+  // } = {
+  //   xfmr: (out: ZObjOut|null) => NewOut,
+  //   outSchema: z.ZodType<NewOut, Awaited<NewOut>>,
+  // }
+  // Xfmr extends undefined|((out: ZObjOut) => unknown) = undefined,
+>(
+  _tableName: TableName,
+  query: KnownKeysOnlyStrict<Query, QueryConfig<TableName>>,
+  schema: XfmrZObj & z.ZodType<MyStrictPartialDeep<XfmrResult, XfmrZObjOut>>,
+  xfmr?: (out: Result) => XfmrResult,
+  // xfmr?: (out: ZObjOut|null) => XfmrResult,
+  // { xfmr, outSchema }: Xfmr = {
+  //   xfmr: (o: ZObjOut) => o,
+  //   outSchema: schema
+  // } as unknown as Xfmr
 ) {
+  // const resultSchema = (schema as ZObj).nullable();
   return {
-    // schema: schema as z.ZodObject & z.ZodType<Result>,
-    schema,
-    query
+    // schema: schema as ZObj,
+    schema: xfmr ? z.preprocess((arg: Result|null) => arg === null ? null : xfmr(arg), (schema as XfmrZObj)) : (schema as XfmrZObj),
+    query,
   };
 }
 
-// type Q = {
-//   with: {
-//     gameSession: {
-//       columns: typeof gameSessionBalanceInfoColumnsFilter,
-//       // with: {
-//       //   user: {
-//       //     columns: {
-//       //       balance: true,
-//       //     }
-//       //   }
-//       // }
-//     },
-//     user: {
-//       columns: {balance: true}
-//     }
-//   },
-//   columns: {},
-// };
-// type TN = "easyCrapsSession"
-// type TC = Q extends ConfigParam<TN, infer TConfig extends Config<TN>> ? TConfig : never;
-// type R = BuildQueryResult<Schema, TableConfigGeneric<TN>, TC>
-// type O = SimplifyDeep<PartialDeep<R>>;
-
+export type gameBalanceInfo = z.infer<typeof gameBalanceSchema>;
 export const {
   schema: gameBalanceSchema,
   query: gameBalanceQuery,
+  // performQuery: gameBalancePerformQuery,
 } = makeRelationalModel(
   "gameSession",
   {
@@ -203,8 +215,28 @@ export const {
     },
     columns: gameSessionBalanceInfoColumnsFilter,
   },
+  // z.object({
+  //   ...gameSessionBalanceInfo.def.shape,
+  //   user: userBalanceInfo,
+  // }),
   z.object({
-    ...gameSessionBalanceInfo.def.shape,
-    user: userBalanceInfo,
-  })
+    accountBalance: z.number(),
+    playable: z.number(),
+    totalBet: z.number(),
+    lastResult: z.object({
+      bet: z.number(),
+      won: z.number(),
+    }),
+  }),
+  o => {
+    return {
+      accountBalance: o.user.balance,
+      playable: o.playable,
+      totalBet: o.totalBet,
+      lastResult: {
+        bet: o.lastResultBet,
+        won: o.lastResultWon,
+      },
+    }
+  },
 );

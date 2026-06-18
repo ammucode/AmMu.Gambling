@@ -10,6 +10,10 @@ export function useGameBalance() {
   const { user, userLoading, gameSession, gameSessionLoading } =
     useGameSession(gamePath);
 
+  const { data: gameBalance, gameBalanceLoading } = useQuery(
+    
+  )
+
   const investMutation = useMutation(
     crpc.games.balance.invest.mutationOptions()
   );

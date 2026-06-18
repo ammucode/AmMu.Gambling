@@ -53,6 +53,7 @@ export const clearAuthSessionFallback = () => {
 };
 
 import * as convex_values0 from "convex/values";
+import { GenericDatabaseReader, GenericDatabaseWriter } from 'convex/server';
 
 export const toAuthMutationError = (
   error: BetterFetchResponse<unknown>['error'] & { code?: string }
@@ -119,6 +120,10 @@ export const toAuthMutationError = (
 //   orderBy?: never;
 //   pipeline?: never;
 // };
+
+export type OrmCtxBase = {
+  db: GenericDatabaseReader<any> | GenericDatabaseWriter<any>;
+};
 
 export type FindFirstConfigNoSearch<TSchema extends TablesRelationalConfig, TTableConfig extends TableRelationalConfig> = Omit<DBQueryConfig<'many', true, TSchema, TTableConfig>, 'limit' | 'search' | 'vectorSearch' | 'cursor' | 'maxScan' | 'endCursor' | 'pipeline' | 'pageByKey'> & {
   search?: undefined;

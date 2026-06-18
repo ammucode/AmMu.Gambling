@@ -28,6 +28,18 @@ export declare const api: {
         { gamePath?: any; sessionKey?: string },
         any
       >;
+      info: FunctionReference<
+        "query",
+        "public",
+        { gamePath?: any; sessionKey?: string },
+        {
+          lastResultBet: number;
+          lastResultWon: number;
+          playable: number;
+          totalBet: number;
+          user: { balance: number };
+        } | null
+      >;
       invest: FunctionReference<
         "mutation",
         "public",
