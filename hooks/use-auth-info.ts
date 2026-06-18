@@ -26,18 +26,6 @@ export default function useAuthInfo() {
     });
   }, [hasSession, refetchSession]);
 
-  // console.log({
-  //   hasSession,
-  //   sessionLoading,
-  //   sessionData,
-  //   sessionUser,
-  //   hasUser,
-  //   hasAccount,
-  //   isGuest,
-  //   userData,
-  //   userLoading,
-  // });
-
   return {
     hasSession,
     authLoading: sessionLoading || userLoading,

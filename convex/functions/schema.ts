@@ -5,7 +5,6 @@ import {
   boolean,
   convexTable,
   defineSchema,
-  GenericSchema,
   index,
   InferInsertModel,
   InferSelectModel,
@@ -134,6 +133,7 @@ const genericGameColumns = {
 function genericGameExtras<Table extends typeof genericGameColumns>(
   table: Table
 ) {
+  void table;
   return [] as const;
 }
 
@@ -146,12 +146,16 @@ export const easyCrapsSessionTable = convexTable(
 );
 
 const gameTables = {
-  "craps/easy": easyCrapsSessionTable
+  'craps/easy': easyCrapsSessionTable,
 } as const satisfies Partial<Record<GamePathString, TableDefinition>>;
-export type GameTable = typeof gameTables[keyof typeof gameTables];
+export type GameTable = (typeof gameTables)[keyof typeof gameTables];
 
-function perGameTableObj<K extends PropertyKey, V>(functor: (tbl: GameTable, name: GameTable["tableName"]) => [K,V]): Record<K, V> {
-  return Object.fromEntries(Object.values(gameTables).map(tbl => functor(tbl, tbl.tableName))) as Record<K, V>;
+function perGameTableObj<K extends PropertyKey, V>(
+  functor: (tbl: GameTable, name: GameTable['tableName']) => [K, V]
+): Record<K, V> {
+  return Object.fromEntries(
+    Object.values(gameTables).map((tbl) => functor(tbl, tbl.tableName))
+  ) as Record<K, V>;
 }
 
 export const tables = {
@@ -161,69 +165,68 @@ export const tables = {
   jwks: jwksTable,
 
   gameSession: gameSessionTable,
-  ...perGameTableObj(tbl => [tbl.tableName, tbl]),
+  ...perGameTableObj((tbl) => [tbl.tableName, tbl]),
 };
 export type TableName = keyof typeof tables;
 export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
 export type Insert<T extends TableName> = InferInsertModel<(typeof tables)[T]>;
 
-export const Schema = defineSchema(tables)
-  .relations((r) => ({
-    user: {
-      sessions: r.many.session({
-        from: r.user.id,
-        to: r.session.userId,
-      }),
-      accounts: r.many.account({
-        from: r.user.id,
-        to: r.account.userId,
-      }),
-      gameSessions: r.many.gameSession({
-        from: r.user.id,
-        to: r.gameSession.userId,
-      }),
-    },
-    session: {
-      user: r.one.user({
-        from: r.session.userId,
-        to: r.user.id,
-      }),
-    },
-    account: {
-      user: r.one.user({
-        from: r.account.userId,
-        to: r.user.id,
-        optional: false,
-      }),
-    },
-    gameSession: {
-      user: r.one.user({
-        from: r.gameSession.userId,
-        to: r.user.id,
-        optional: false,
-      }),
-      ...perGameTableObj((_, name) => [
-        name,
-        r.many[name]({
-          from: r.gameSession.sessionKey,
-          to: r[name].sessionKey,
-        }),
-      ]),
-    },
+export const Schema = defineSchema(tables).relations((r) => ({
+  user: {
+    sessions: r.many.session({
+      from: r.user.id,
+      to: r.session.userId,
+    }),
+    accounts: r.many.account({
+      from: r.user.id,
+      to: r.account.userId,
+    }),
+    gameSessions: r.many.gameSession({
+      from: r.user.id,
+      to: r.gameSession.userId,
+    }),
+  },
+  session: {
+    user: r.one.user({
+      from: r.session.userId,
+      to: r.user.id,
+    }),
+  },
+  account: {
+    user: r.one.user({
+      from: r.account.userId,
+      to: r.user.id,
+      optional: false,
+    }),
+  },
+  gameSession: {
+    user: r.one.user({
+      from: r.gameSession.userId,
+      to: r.user.id,
+      optional: false,
+    }),
     ...perGameTableObj((_, name) => [
       name,
-      {
-        gameSession: r.one.gameSession({
-          from: r[name].sessionKey,
-          to: r.gameSession.sessionKey,
-          optional: false,
-        }),
-        user: r.one.user({
-          from: r[name].sessionKey.through(r.gameSession.userId),
-          to: r.user.userId.through(r.gameSession.sessionKey),
-          optional: false,
-        }),
-      }
+      r.many[name]({
+        from: r.gameSession.sessionKey,
+        to: r[name].sessionKey,
+      }),
     ]),
-  }));
+  },
+  ...perGameTableObj((_, name) => [
+    name,
+    {
+      gameSession: r.one.gameSession({
+        from: r[name].sessionKey,
+        to: r.gameSession.sessionKey,
+        optional: false,
+      }),
+      user: r.one.user({
+        from: r[name].sessionKey.through(r.gameSession.userId),
+        to: r.user.userId.through(r.gameSession.sessionKey),
+        optional: false,
+      }),
+    },
+  ]),
+}));
 export default Schema;

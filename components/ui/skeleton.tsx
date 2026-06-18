@@ -10,11 +10,22 @@ function Skeleton({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-type SkeletonOrProps = 'render'|'before'|'after';
-function SkeletonOr({ render, before, after, ...props }: React.ComponentProps<'div'> & Partial<Record<SkeletonOrProps, React.ReactNode>>) {
-  if (render) return (
-    <>{before}{render}{after}</>
-  );
+type SkeletonOrProps = 'render' | 'before' | 'after';
+function SkeletonOr({
+  render,
+  before,
+  after,
+  ...props
+}: React.ComponentProps<'div'> &
+  Partial<Record<SkeletonOrProps, React.ReactNode>>) {
+  if (render !== null && render !== undefined && render !== false)
+    return (
+      <>
+        {before}
+        {render}
+        {after}
+      </>
+    );
   return <Skeleton {...props} />;
 }
 

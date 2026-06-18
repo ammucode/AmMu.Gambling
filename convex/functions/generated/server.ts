@@ -34,7 +34,7 @@ const ormSchema = schema;
 registerProcedureNameLookup(
   {
   "games/balance.ts": [{ column: 36, line: 41, name: "games/balance:cashOut" }, { column: 3, line: 11, name: "games/balance:info" }, { column: 3, line: 20, name: "games/balance:invest" }],
-  "games/session.ts": [{ column: 3, line: 46, name: "games/session:getSession" }, { column: 3, line: 7, name: "games/session:maybeStartSession" }],
+  "games/session.ts": [{ column: 3, line: 26, name: "games/session:getSession" }, { column: 3, line: 7, name: "games/session:maybeStartSession" }],
   "users.ts": [{ column: 3, line: 6, name: "users:me" }],
 },
   "convex/functions"

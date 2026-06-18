@@ -1,21 +1,24 @@
 import { z } from 'zod';
 import { gameSessionTable, userTable } from '~schema';
-import { BuildQueryResult, DBQueryConfig } from 'kitcn/orm';
+import { BuildQueryResult } from 'kitcn/orm';
 import { GAME_PATH_SCHEMA, GameSlugSchema } from '@/lib/games/games';
-import { MyPartialDeep, MyStrictPartialDeep, StrictPartial, StrictPartialDeep } from '@/lib/types';
+import { MyPartialDeep, MyStrictPartialDeep, StrictPartial } from '@/lib/types';
 import { usernameSchema } from '@convex-lib/validators';
 import { TableNames } from '../functions/_generated/dataModel';
 import { OrmCtx } from '../functions/generated/server';
-import { If, IsUnknown, PartialDeep, SimplifyDeep } from 'type-fest';
-import { FindFirstConfigNoSearch, KnownKeysOnlyStrict } from '@/lib/convex/kitcn-mirror';
-import { dropField, nullOptXfmr } from '@/lib/utils';
+import { SimplifyDeep } from 'type-fest';
+import {
+  FindFirstConfigNoSearch,
+  KnownKeysOnlyStrict,
+} from '@/lib/convex/kitcn-mirror';
+import { nullOptXfmr } from '@/lib/utils';
 import { iHateNull } from '../lib/document';
 
-export type OrmSchema = OrmCtx["orm"]["query"][TableNames]["_"]["schema"];
+export type OrmSchema = OrmCtx['orm']['query'][TableNames]['_']['schema'];
 
 function makeTableModel<
   TableName extends TableNames,
-  Table extends OrmSchema[TableName]["table"],//ConvexTableWithColumns<TableConfig>,
+  Table extends OrmSchema[TableName]['table'], //ConvexTableWithColumns<TableConfig>,
   Cols extends Partial<Table['$inferSelect']>,
   ZObj extends z.ZodObject & z.ZodType<Cols>,
 >(
@@ -31,7 +34,9 @@ function makeTableModel<
       schema.keyof().options.map((field) => [field, true])
     ) as { [K in keyof ZObj['shape']]: true },
     returning: Object.fromEntries(
-      schema.keyof().options.map((field: keyof ZObj['shape']) => [field, table[field]])
+      schema
+        .keyof()
+        .options.map((field: keyof ZObj['shape']) => [field, table[field]])
     ) as { [K in keyof ZObj['shape']]: Table[K] },
   };
 }
@@ -71,7 +76,7 @@ export const {
   userTable,
   z.object({
     ...userPublicInfo.def.shape,
-    ...userBalanceInfo .def.shape,
+    ...userBalanceInfo.def.shape,
   })
 );
 
@@ -109,13 +114,18 @@ export const {
   })
 );
 
-type QueryConfig<TableName extends TableNames> = FindFirstConfigNoSearch<OrmSchema, OrmSchema[TableName]>;
+type QueryConfig<TableName extends TableNames> = FindFirstConfigNoSearch<
+  OrmSchema,
+  OrmSchema[TableName]
+>;
 // type QueryConfig<TableName extends TableNames> = DBQueryConfig<'many', true, OrmSchema, OrmSchema[TableName]>
 
 function makeRelationalModel<
   TableName extends TableNames,
   Query extends QueryConfig<TableName>,
-  Result extends SimplifyDeep<Awaited<BuildQueryResult<OrmSchema, OrmSchema[TableName], Query>>>,
+  Result extends SimplifyDeep<
+    Awaited<BuildQueryResult<OrmSchema, OrmSchema[TableName], Query>>
+  >,
   Out extends MyPartialDeep<Result>,
   ZObj extends z.ZodObject & z.ZodType<Out>,
   NewOut = Out,
@@ -124,7 +134,7 @@ function makeRelationalModel<
   tableName: TableName,
   query: KnownKeysOnlyStrict<Query, QueryConfig<TableName>>,
   schema: ZObj & z.ZodType<MyStrictPartialDeep<Result, Out>>,
-  select: (out: Out) => NewOut = o => (o as unknown as NewOut),
+  select: (out: Out) => NewOut = (o) => o as unknown as NewOut
 ) {
   const selector = (out: Out) => iHateNull(select(out));
   return {
@@ -142,12 +152,12 @@ export const {
   select: gameBalanceSelect,
   selectNullish: gameBalanceSelectNullish,
 } = makeRelationalModel(
-  "gameSession",
+  'gameSession',
   {
     with: {
       user: {
-        columns: userBalanceInfoColumnsFilter
-      }
+        columns: userBalanceInfoColumnsFilter,
+      },
     },
     columns: gameSessionBalanceInfoColumnsFilter,
   },
@@ -155,7 +165,7 @@ export const {
     ...gameSessionBalanceInfo.def.shape,
     user: userBalanceInfo,
   }),
-  o => {
+  (o) => {
     return {
       accountBalance: o.user.balance,
       playable: o.playable,
@@ -164,6 +174,6 @@ export const {
         bet: o.lastResultBet,
         won: o.lastResultWon,
       },
-    }
+    };
   }
 );

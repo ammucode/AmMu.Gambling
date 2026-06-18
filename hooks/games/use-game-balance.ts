@@ -12,9 +12,11 @@ export function useGameBalance() {
     useGameSession(gamePath);
 
   const { data: gameBalance, isLoading: gameBalanceLoading } = useQuery({
-    ...crpc.games.balance.info.queryOptions(gameSession ? {sessionKey: gameSession.sessionKey} : skipToken),
-    select: gameBalanceSelectNullish
-  })
+    ...crpc.games.balance.info.queryOptions(
+      gameSession ? { sessionKey: gameSession.sessionKey } : skipToken
+    ),
+    select: gameBalanceSelectNullish,
+  });
 
   const investMutation = useMutation(
     crpc.games.balance.invest.mutationOptions()
@@ -39,7 +41,7 @@ export function useGameBalance() {
   return {
     gameBalance,
     gameBalanceLoading,
-    invest: gameBalanceLoading ? invest : undefined,
-    cashOut: gameBalanceLoading ? cashOut : undefined,
+    invest: gameBalanceLoading ? undefined : invest,
+    cashOut: gameBalanceLoading ? undefined : cashOut,
   };
 }

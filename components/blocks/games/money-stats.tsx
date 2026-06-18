@@ -1,3 +1,4 @@
+import { SkeletonOr } from '@/components/ui/skeleton';
 import { FadingBar } from './fading-bar';
 import { useGameBalance } from '@/hooks/games/use-game-balance';
 
@@ -9,7 +10,7 @@ function LastResultIndicatorRow({ title, amount }: IndicatorProps) {
   return (
     <span className="">
       <span className="text-xs font-light text-gray-400 uppercase">
-        {title}:{' '}
+        {title}:&nbsp;
       </span>
       <span className="text-sm font-extrabold text-white">${amount}</span>
     </span>
@@ -17,14 +18,14 @@ function LastResultIndicatorRow({ title, amount }: IndicatorProps) {
 }
 interface LastResultIndicatorProps {
   bet: number;
-  win: number;
+  won: number;
 }
-function LastResultIndicator({ bet, win }: LastResultIndicatorProps) {
+function LastResultIndicator({ bet, won }: LastResultIndicatorProps) {
   return (
     <p className="h-min w-24 min-w-max align-middle leading-0">
       <LastResultIndicatorRow title="last bet" amount={bet} />
       <br />
-      <LastResultIndicatorRow title="last win" amount={win} />
+      <LastResultIndicatorRow title="last win" amount={won} />
     </p>
   );
 }
@@ -44,12 +45,29 @@ function BigMoneyIndicator({ title, amount }: IndicatorProps) {
 }
 
 export function MoneyStats() {
-  const { playable, totalBet, lastResultBet, lastResultWon } = useGameBalance();
+  const { gameBalance } = useGameBalance();
+
   return (
     <FadingBar className="ml-auto">
-      <LastResultIndicator bet={lastResultBet} win={lastResultWon} />
-      <BigMoneyIndicator title="playable" amount={playable} />
-      <BigMoneyIndicator title="bet" amount={totalBet} />
+      <SkeletonOr
+        render={
+          gameBalance && <LastResultIndicator {...gameBalance.lastResult} />
+        }
+      />
+      <SkeletonOr
+        render={
+          gameBalance && (
+            <BigMoneyIndicator title="playable" amount={gameBalance.playable} />
+          )
+        }
+      />
+      <SkeletonOr
+        render={
+          gameBalance && (
+            <BigMoneyIndicator title="bet" amount={gameBalance.totalBet} />
+          )
+        }
+      />
     </FadingBar>
   );
 }

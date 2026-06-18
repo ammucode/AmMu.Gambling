@@ -1,5 +1,5 @@
 import { gameSessionTable } from '~schema';
-import { gameSessionBalanceInfoColumnsFilter, gameSessionInfo, gameSessionInfoReturning } from '@convex/models';
+import { gameSessionInfo, gameSessionInfoReturning } from '@convex/models';
 import { maybeGameMutation, maybeGameQuery } from '@convex-lib/crpc-games';
 
 export const maybeStartSession = maybeGameMutation
@@ -8,26 +8,6 @@ export const maybeStartSession = maybeGameMutation
     if (ctx.game.session) {
       return ctx.game.session;
     }
-
-    const foo = await ctx.orm.query.easyCrapsSession.findFirst({
-      with: {
-        gameSession: {
-          columns: gameSessionBalanceInfoColumnsFilter,
-          // with: {
-          //   user: {
-          //     columns: {
-          //       balance: true,
-          //     }
-          //   }
-          // }
-        },
-        user: {
-          columns: {balance: true}
-        }
-      },
-      columns: {},
-    });
-
 
     return (
       await ctx.orm

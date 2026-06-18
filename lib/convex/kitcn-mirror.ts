@@ -1,6 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { BetterFetchResponse } from 'better-auth/react';
-import { ColumnBuilder, ColumnBuilderBaseConfig, ColumnBuilderWithTableName, ConvexTable, DBQueryConfig, DrizzleEntity, GetColumnData, SystemFields, TableRelationalConfig, TablesRelationalConfig } from 'kitcn/orm';
+import {
+  DBQueryConfig,
+  TableRelationalConfig,
+  TablesRelationalConfig,
+} from 'kitcn/orm';
 import { AuthMutationError } from 'kitcn/react';
+import { GenericDatabaseReader, GenericDatabaseWriter } from 'convex/server';
 
 const SESSION_TOKEN_FALLBACK_KEY = 'kitcn.auth.session-token';
 const SESSION_DATA_FALLBACK_KEY = 'kitcn.auth.session-data';
@@ -52,9 +59,6 @@ export const clearAuthSessionFallback = () => {
   writeAuthSessionFallbackData(null);
 };
 
-import * as convex_values0 from "convex/values";
-import { GenericDatabaseReader, GenericDatabaseWriter } from 'convex/server';
-
 export const toAuthMutationError = (
   error: BetterFetchResponse<unknown>['error'] & { code?: string }
 ) =>
@@ -65,72 +69,33 @@ export const toAuthMutationError = (
     statusText: error.statusText ?? 'AUTH_ERROR',
   });
 
-// declare const entityKind: keyof DrizzleEntity;
-// type ConvexSystemCreatedAtConfig = ColumnBuilderBaseConfig<'number', 'ConvexSystemCreatedAt'> & {
-//   data: number;
-//   driverParam: number;
-//   enumValues: undefined;
-// };
-// declare class ConvexSystemCreatedAtBuilder extends ColumnBuilder<ConvexSystemCreatedAtConfig, {}, {
-//   notNull: true;
-// }> {
-//   static readonly [entityKind]: string;
-//   readonly [entityKind]: string;
-//   constructor();
-//   build(): convex_values0.VFloat64<number, "required">;
-//   get convexValidator(): convex_values0.VFloat64<number, "required">;
-// }
-// type SystemFieldAliases<TName extends string, TColumns extends Record<string, unknown> = {}> = 'createdAt' extends keyof TColumns ? {} : {
-//   createdAt: ColumnBuilderWithTableName<ConvexSystemCreatedAtBuilder, TName>;
-// };
-// type TableColumns<TTableConfig extends TableRelationalConfig> = TTableConfig['table']['_']['columns'] & SystemFields<TTableConfig['table']['_']['name']> & SystemFieldAliases<TTableConfig['table']['_']['name'], TTableConfig['table']['_']['columns']>;
-
-// type RelationsFieldFilter<T = unknown> = RelationFieldsFilterInternals<T> | (unknown extends T ? never : T extends string | number | boolean | bigint | null | undefined ? T : T extends object ? never : T) | Placeholder;
-// type SchemaEntry = ConvexTable<any>;
-// type GetTableColumns<TTable extends SchemaEntry> = TTable extends ConvexTable<any> ? TTable['_']['columns'] & SystemFields<TTable['_']['name']> & SystemFieldAliases<TTable['_']['name'], TTable['_']['columns']> : never;
-// type TableFilterColumns<TColumns extends Record<string, unknown>> = { [K in keyof TColumns]?: (TColumns[K] extends {
-//   _: {
-//     data: infer Data;
-//   };
-// } ? RelationsFieldFilter<Data> : RelationsFieldFilter<unknown>) | undefined };
-
-// type TableFilter<TTable extends SchemaEntry = SchemaEntry, TColumns extends Record<string, unknown> = GetTableColumns<TTable>> = Simplify$1<TableFilterColumns<TColumns> & TableFilterCommons<TTable, TColumns>>;
-
-// type SearchIndexMap<TTableConfig extends TableRelationalConfig> = TTableConfig['table'] extends ConvexTable<any, any, infer TSearchIndexes, any> ? TSearchIndexes : Record<string, {
-//   searchField: string;
-//   filterFields: string;
-// }>;
-// type SearchIndexName<TTableConfig extends TableRelationalConfig> = Extract<keyof SearchIndexMap<TTableConfig>, string>;
-// type SearchIndexConfigByName<TTableConfig extends TableRelationalConfig, TIndexName extends SearchIndexName<TTableConfig>> = SearchIndexMap<TTableConfig>[TIndexName];
-// type SearchFilterFieldNames<TTableConfig extends TableRelationalConfig, TIndexName extends SearchIndexName<TTableConfig>> = SearchIndexConfigByName<TTableConfig, TIndexName> extends {
-//   filterFields: infer TFilterFields extends string;
-// } ? TFilterFields : never;
-// type SearchFilterValueForField<TTableConfig extends TableRelationalConfig, TFieldName extends string> = TFieldName extends keyof TableColumns<TTableConfig> ? TableColumns<TTableConfig>[TFieldName] extends ColumnBuilder<any, any, any> ? GetColumnData<TableColumns<TTableConfig>[TFieldName], 'raw'> : never : never;
-// type SearchFiltersForIndex<TTableConfig extends TableRelationalConfig, TIndexName extends SearchIndexName<TTableConfig>> = Partial<{ [K in SearchFilterFieldNames<TTableConfig, TIndexName>]: SearchFilterValueForField<TTableConfig, K> }>;
-// type SearchQueryConfig<TTableConfig extends TableRelationalConfig = TableRelationalConfig> = [SearchIndexName<TTableConfig>] extends [never] ? never : { [TIndexName in SearchIndexName<TTableConfig>]: {
-//   index: TIndexName;
-//   query: string;
-//   filters?: SearchFiltersForIndex<TTableConfig, TIndexName> | undefined;
-// } }[SearchIndexName<TTableConfig>];
-// type SearchWhereFilter<TTableConfig extends TableRelationalConfig> = TableFilter<TTableConfig['table']>;
-// export type SearchFindFirstConfig<TSchema extends TablesRelationalConfig, TTableConfig extends TableRelationalConfig> = Omit<DBQueryConfig<'many', true, TSchema, TTableConfig>, 'limit' | 'search' | 'vectorSearch' | 'where' | 'orderBy' | 'cursor' | 'maxScan' | 'pipeline'> & {
-//   search: SearchQueryConfig<TTableConfig>;
-//   vectorSearch?: never;
-//   where?: SearchWhereFilter<TTableConfig> | undefined;
-//   orderBy?: never;
-//   pipeline?: never;
-// };
-
 export type OrmCtxBase = {
   db: GenericDatabaseReader<any> | GenericDatabaseWriter<any>;
 };
 
-export type FindFirstConfigNoSearch<TSchema extends TablesRelationalConfig, TTableConfig extends TableRelationalConfig> = Omit<DBQueryConfig<'many', true, TSchema, TTableConfig>, 'limit' | 'search' | 'vectorSearch' | 'cursor' | 'maxScan' | 'endCursor' | 'pipeline' | 'pageByKey'> & {
+export type FindFirstConfigNoSearch<
+  TSchema extends TablesRelationalConfig,
+  TTableConfig extends TableRelationalConfig,
+> = Omit<
+  DBQueryConfig<'many', true, TSchema, TTableConfig>,
+  | 'limit'
+  | 'search'
+  | 'vectorSearch'
+  | 'cursor'
+  | 'maxScan'
+  | 'endCursor'
+  | 'pipeline'
+  | 'pageByKey'
+> & {
   search?: undefined;
   vectorSearch?: undefined;
   endCursor?: never;
   pipeline?: never;
   pageByKey?: never;
 };
-export type KnownKeysOnly<T, K> = { [P in keyof T]: P extends keyof K ? T[P] : never };
-export type KnownKeysOnlyStrict<T, K> = 0 extends 1 & T ? never : KnownKeysOnly<T, K>;
+export type KnownKeysOnly<T, K> = {
+  [P in keyof T]: P extends keyof K ? T[P] : never;
+};
+export type KnownKeysOnlyStrict<T, K> = 0 extends 1 & T
+  ? never
+  : KnownKeysOnly<T, K>;

@@ -1,25 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { If, IsEqual, IsLiteral, IsNever, PartialDeep, Primitive } from 'type-fest';
+import {
+  If,
+  IsEqual,
+  IsLiteral,
+  IsNever,
+  PartialDeep,
+  Primitive,
+} from 'type-fest';
 
 export type MyPartialDeep<T> = {
   [P in keyof T]?: T[P] extends object ? MyPartialDeep<T[P]> : T[P];
 };
 export type MyStrictPartialDeep<T, U extends MyPartialDeep<T>> = {
-  [K in keyof U]: K extends keyof T ?
-    U[K] extends PartialDeep<T[K]> ? StrictPartialDeep<T[K], U[K]>
-    : U[K]
-  : never;
-}
+  [K in keyof U]: K extends keyof T
+    ? U[K] extends PartialDeep<T[K]>
+      ? StrictPartialDeep<T[K], U[K]>
+      : U[K]
+    : never;
+};
 
 export type StrictPartial<T, U extends Partial<T>> = U & {
   [K in keyof U]: K extends keyof T ? U[K] : never;
 };
 export type StrictPartialDeep<T, U extends PartialDeep<T>> = U & {
-  [K in keyof U]: K extends keyof T ?
-    U[K] extends PartialDeep<T[K]> ? StrictPartialDeep<T[K], U[K]>
-    : U[K]
-  : never;
+  [K in keyof U]: K extends keyof T
+    ? U[K] extends PartialDeep<T[K]>
+      ? StrictPartialDeep<T[K], U[K]>
+      : U[K]
+    : never;
 };
 // <T, U> = Partial<T> & {
 //   [K in keyof U]: K extends keyof T ? U[K] : never;
