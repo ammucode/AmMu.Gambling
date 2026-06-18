@@ -1,9 +1,11 @@
 import { GAME_PATH_SCHEMA, GamePathString, GameSlug } from '@/lib/games/games';
 import { TableDefinition } from 'convex/server';
+import { v } from 'convex/values';
 import {
   arrayOf,
   boolean,
   convexTable,
+  custom,
   defineSchema,
   index,
   InferInsertModel,
@@ -14,6 +16,8 @@ import {
   uniqueIndex,
 } from 'kitcn/orm';
 import z from 'zod';
+import { Points } from "@/lib/games/craps"
+import { Simplify } from 'type-fest';
 
 export const userTable = convexTable(
   'user',
@@ -123,6 +127,7 @@ export const gameSessionTable = convexTable(
   ]
 );
 
+
 const genericGameColumns = {
   sessionKey: text()
     .notNull()
@@ -141,20 +146,41 @@ export const easyCrapsSessionTable = convexTable(
   'easyCrapsSession',
   {
     ...genericGameColumns,
+    point: custom(
+      v.optional(
+        v.nullable(v.union(...Points.map((point) => v.literal(point))))
+      )
+    ),
   },
   (easyCrapsSessionTable) => [...genericGameExtras(easyCrapsSessionTable)]
 );
 
-const gameTables = {
-  'craps/easy': easyCrapsSessionTable,
-} as const satisfies Partial<Record<GamePathString, TableDefinition>>;
-export type GameTable = (typeof gameTables)[keyof typeof gameTables];
+export const videoPokerSessionTable = convexTable(
+  'videoPokerSession',
+  { ...genericGameColumns },
+  (videoPokerSessionTable) => [...genericGameExtras(videoPokerSessionTable)]
+);
 
-function perGameTableObj<K extends PropertyKey, V>(
-  functor: (tbl: GameTable, name: GameTable['tableName']) => [K, V]
+export const gameTables = {
+  'craps/easy': easyCrapsSessionTable,
+  'video-poker': videoPokerSessionTable,
+} as const satisfies Partial<Record<GamePathString, TableDefinition>>;
+export type gameTables = typeof gameTables;
+export type GameTable = gameTables[keyof gameTables];
+export type GameTableName = GameTable["tableName"];
+export type GameTableByName<Name extends GameTableName> = Simplify<GameTable & {tableName: Name}>;
+
+type GameTableFunctor = <Path extends GamePathString, Table extends gameTables[Path], FK extends string, FV>(tbl: Table, name: Table['tableName'], pathString: Path) => [FK,FV]
+
+function perGameTableObj<
+  K extends PropertyKey,
+  V,
+  F extends GameTableFunctor,//(key: keyof GamePathString, value: T[keyof T]) => readonly [PropertyKey, any],
+>(
+  functor: F
 ): Record<K, V> {
   return Object.fromEntries(
-    Object.values(gameTables).map((tbl) => functor(tbl, tbl.tableName))
+    Object.entries(gameTables).map(([pathString, tbl]) => functor(tbl, tbl.tableName, pathString as keyof gameTables))
   ) as Record<K, V>;
 }
 
@@ -165,7 +191,7 @@ export const tables = {
   jwks: jwksTable,
 
   gameSession: gameSessionTable,
-  ...perGameTableObj((tbl) => [tbl.tableName, tbl]),
+  ...perGameTableObj(((tbl) => [tbl.tableName, tbl] as const) as GameTableFunctor),
 };
 export type TableName = keyof typeof tables;
 export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;

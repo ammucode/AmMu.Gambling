@@ -34,11 +34,11 @@ export type StrictPartialDeep<T, U extends PartialDeep<T>> = U & {
 //   [K in keyof U]: K extends keyof T ? U[K] : never;
 // };
 
-// export type Simplify<T> = T extends Date
-//   ? T
-//   : T extends any[]
-//     ? { [E in keyof T]: Simplify<T[E]> }
-//     : { [K in keyof T]: T[K] } & {};
+export type MySimplifyDeep<T> = T extends Date
+  ? T
+  : T extends any[]
+    ? { [E in keyof T]: MySimplifyDeep<T[E]> }
+    : { [K in keyof T]: T[K] } & {};
 
 export type MarkNonNull<T, K extends keyof T> = Omit<T, K> & {
   [P in K]-?: NonNullable<T[P]>;
@@ -92,3 +92,56 @@ export type MaybeUntagArray<T> = If<IsNever<UntagArray<T>>, T, UntagArray<T>>;
 export type StripNoInfer<T> = T extends NoInfer<infer _> | infer Rest
   ? Rest
   : T;
+
+export type ZipObject<
+  K extends readonly PropertyKey[], 
+  V extends readonly unknown[], 
+  Obj = {}
+> = K extends readonly [infer KHead, ...infer KTail extends readonly PropertyKey[]]
+  ? V extends readonly [infer VHead, ...infer VTail]
+    ? ZipObject<KTail, VTail, Obj & { [P in KHead & string]: VHead }>
+    : Obj
+  : Obj;
+
+
+
+// // 1. A type helper to extract the [Key, Value] tuple type returned by the functor
+// type FunctorOutput<
+//   K extends PropertyKey,
+//   V,
+//   F extends (k: K, v: V) => readonly [PropertyKey, unknown]
+// > = F extends (k: K, v: V) => readonly [infer NewKey extends PropertyKey, infer NewValue] 
+//   ? { key: NewKey; val: NewValue } 
+//   : never;
+
+// // 2. The main mapping type that loops through the object and transforms keys/values
+// type MapTable<
+//   T extends Record<PropertyKey, unknown>, 
+//   F extends (k: keyof T, v: T[keyof T]) => readonly [PropertyKey, unknown]
+// > = {
+//   [K in keyof T as FunctorOutput<K, T[K], F>["key"]]: FunctorOutput<K, T[K], F>["val"];
+// };
+// 1. A type helper to extract the [Key, Value] tuple type returned by the functor
+type FunctorOutput<
+  K, 
+  V, 
+  F extends (k: any, v: any) => readonly [any, any]
+> = F extends (k: K, v: V) => readonly [infer NewKey, infer NewValue] 
+  ? { key: NewKey & PropertyKey; val: NewValue } 
+  : never;
+
+// 2. The main mapping type that loops through the object and transforms keys/values
+type MapTable<
+  T extends Record<PropertyKey, any>, 
+  F extends (k: any, v: any) => readonly [any, any]
+> = {
+  [K in keyof T as FunctorOutput<K, T[K], F>["key"]]: FunctorOutput<K, T[K], F>["val"];
+};
+
+type inTable = {
+  str: "hi",
+  int: 5
+};
+const functor = <K extends Exclude<PropertyKey, symbol>, V extends string|number>(k: K, v: V) => [`${k}_new_key` as const, `${v}_new_value` as const] as const;
+type fout = FunctorOutput<keyof inTable, inTable[keyof inTable], typeof functor>;
+type out = MapTable<inTable, typeof functor>;

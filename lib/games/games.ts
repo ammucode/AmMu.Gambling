@@ -7,10 +7,11 @@ import {
   SubGameComponent,
 } from '@/components/games/types';
 import { Dices, LucideIcon, LucideProps, Spade } from 'lucide-react';
-import { FlattenOnce } from '../types';
+import { FlattenOnce, ZipObject } from '../types';
 import { Join, SimplifyDeep } from 'type-fest';
 import z from 'zod';
 
+// --- base defs ---
 export interface BaseGame {
   title: string;
   path: string;
@@ -65,7 +66,10 @@ type RootContainingSubServerFields = { subGames?: serverOnlyFields[] };
 type GameServerFields = SimplifyDeep<
   serverOnlyFields & RootContainingSubServerFields
 >;
+// END --- base defs ---
 
+
+// --- clientify ---
 export type clientifyGame<G extends GameServerFields> = SimplifyDeep<
   Omit<G, keyof GameServerFields> &
     (G extends Required<RootContainingSubServerFields>
@@ -95,7 +99,33 @@ export function clientifyGame<G extends GameServerFields>(
     subGames: clientSubs,
   } as unknown as clientifyGame<G>;
 }
+// END --- clientify ---
 
+
+// --- Flatten Games ---
+type games<G extends Game> = G extends RootGameWithSubs
+  ? G['subGames']
+  : [G];
+function games<G extends Game>(game: G): games<G> {
+  return (
+    'subGames' in game && game.subGames
+      ? game.subGames
+      : [game]
+  ) as games<G>;
+}
+type allGames<Gs extends Game[] = GAMES> = {
+  [K in keyof Gs]: games<Gs[K]>;
+};
+
+export const FLAT_GAMES = GAMES.flatMap(
+  (game) => games(game) as unknown
+) as unknown as FlattenOnce<allGames<GAMES>>;
+export type FLAT_GAMES = typeof FLAT_GAMES;
+export type FlatGame = FLAT_GAMES[number];
+// END --- Flatten Games ---
+
+
+// --- Flatten Game Paths ---
 type subGamePaths<Path extends string, Gs extends SubGame[]> = {
   [K in keyof Gs]: [Path, Gs[K]['path']];
 };
@@ -121,8 +151,9 @@ export type GamePath = GAME_PATHS[number];
 export const GAME_PATH_SCHEMA = z.custom<GamePath>(
   (val) => getGameByPath(val as GamePath) !== undefined
 );
-//(GAME_PATHS.map(path => z.array(path.map(el => z.literal(el)))));
+// END --- Flatten Game Paths ---
 
+// --- GamePathString ---
 type GamePathsToStrings<GPs extends string[][]> = GPs extends []
   ? []
   : GPs extends [infer Head extends string[]]
@@ -136,8 +167,18 @@ type GamePathsToStrings<GPs extends string[][]> = GPs extends []
 export const GamePathStrings = GAME_PATHS.map((path) =>
   path.join('/')
 ) as GamePathsToStrings<GAME_PATHS>;
-export type GamePathString = (typeof GamePathStrings)[number];
+export type GamePathStrings = typeof GamePathStrings;
+export type GamePathString = GamePathStrings[number];
 
+
+export const GamePathStringToGame = Object.fromEntries(GamePathStrings.map((path, i) => [
+  path,
+  FLAT_GAMES[i],
+] as const)) as SimplifyDeep<ZipObject<GamePathStrings, FLAT_GAMES>>;
+// END --- GamePathString ---
+
+
+// --- GamePair ---
 export type GamePair = [RootGame, undefined] | [RootGameWithSubs, SubGame];
 export function getGameByPath(path: GamePath): GamePair;
 export function getGameByPath(path: string[]): GamePair | undefined;
@@ -153,8 +194,10 @@ export function getGameByPath(path: string[]) {
   if (!subGame) return undefined;
   return [rootGame, subGame] as [RootGameWithSubs, SubGame];
 }
+// END --- GamePair ---
 
-export const GAME_SESSION_KEY_DELIM = '-._.-';
+// --- GameSlug / session key ---
+export const GAME_SESSION_KEY_DELIM = '-._.-' as const;
 export function makeGameSessionKey(username: string, path: GamePath) {
   return `${username}${GAME_SESSION_KEY_DELIM}${path.join('/') as GamePathString}` as const;
 }
@@ -167,3 +210,8 @@ export const GameSlugSchema = z.templateLiteral([
 export function pathFromGameSessionKey(sessionKey: GameSlug) {
   return sessionKey.split(GAME_SESSION_KEY_DELIM)[1].split('/') as GamePath;
 }
+
+export function sessionKeyForGame<PathString extends GamePathString>(sessionKey: GameSlug, path: PathString): sessionKey is `${string}${typeof GAME_SESSION_KEY_DELIM}${PathString}` {
+  return sessionKey.endsWith(path);
+}
+// END --- GameSlug / session key ---

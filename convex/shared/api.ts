@@ -16,6 +16,12 @@ export const api = {
       info: createApiLeaf<"query", typeof import("../functions/games/balance").info>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/balance").info>("games/balance:info"), { auth: "optional", type: "query" }),
       invest: createApiLeaf<"mutation", typeof import("../functions/games/balance").invest>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/balance").invest>("games/balance:invest"), { auth: "required", type: "mutation" }),
     },
+    craps: {
+      easy: {
+        betPassline: createApiLeaf<"mutation", typeof import("../functions/games/craps/easy").betPassline>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/craps/easy").betPassline>("games/craps/easy:betPassline"), { auth: "required", type: "mutation" }),
+        getPoint: createApiLeaf<"query", typeof import("../functions/games/craps/easy").getPoint>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/craps/easy").getPoint>("games/craps/easy:getPoint"), { auth: "optional", type: "query" }),
+      },
+    },
     session: {
       getSession: createApiLeaf<"query", typeof import("../functions/games/session").getSession>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/session").getSession>("games/session:getSession"), { auth: "optional", type: "query" }),
       maybeStartSession: createApiLeaf<"mutation", typeof import("../functions/games/session").maybeStartSession>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/session").maybeStartSession>("games/session:maybeStartSession"), { auth: "required", type: "mutation" }),

@@ -303,11 +303,12 @@ export type DataModel = {
   };
   easyCrapsSession: {
     document: {
+      point?: null | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | null;
       sessionKey: string;
       _id: Id<"easyCrapsSession">;
       _creationTime: number;
     };
-    fieldPaths: "_creationTime" | "_id" | "sessionKey";
+    fieldPaths: "_creationTime" | "_id" | "point" | "sessionKey";
     indexes: {
       by_id: ["_id"];
       by_creation_time: ["_creationTime"];
@@ -532,6 +533,21 @@ export type DataModel = {
       name: ["name", "_creationTime"];
       user_email_unique: ["email", "_creationTime"];
       user_username_unique: ["username", "_creationTime"];
+    };
+    searchIndexes: {};
+    vectorIndexes: {};
+  };
+  videoPokerSession: {
+    document: {
+      sessionKey: string;
+      _id: Id<"videoPokerSession">;
+      _creationTime: number;
+    };
+    fieldPaths: "_creationTime" | "_id" | "sessionKey";
+    indexes: {
+      by_id: ["_id"];
+      by_creation_time: ["_creationTime"];
+      videoPokerSession_sessionKey_unique: ["sessionKey", "_creationTime"];
     };
     searchIndexes: {};
     vectorIndexes: {};

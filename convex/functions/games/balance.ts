@@ -9,17 +9,19 @@ import { userTable, gameSessionTable } from '~schema';
 export const info = gameQuery
   .output(gameBalanceSchema.nullable())
   .query(async ({ ctx }) => {
-    return await ctx.orm.query.gameSession.findFirst({
-      ...gameBalanceQuery,
-      where: { id: ctx.game.session.id },
-    });
+    return {
+      ...ctx.game.session,
+      user: ctx.user,
+    };
+    // return await ctx.orm.query.gameSession.findFirst({
+    //   ...gameBalanceQuery,
+    //   where: { id: ctx.game.session.id },
+    // });
   });
 
 export const invest = gameMutation
   .input(z.object({ amount: z.number().nonnegative() }))
-  .mutation(async ({ ctx, input: input_ }) => {
-    const input = input_ as Simplify<typeof input_ & { amount: number }>;
-
+  .mutation(async ({ ctx, input }) => {
     if (ctx.user.balance < input.amount) {
       throw new CRPCError({
         code: 'PAYMENT_REQUIRED',
