@@ -18,10 +18,12 @@ export const info = gameQuery
     //   where: { id: ctx.game.session.id },
     // });
   });
-
+const amountSchema = z.object({ amount: z.number().nonnegative() });
 export const invest = gameMutation
-  .input(z.object({ amount: z.number().nonnegative() }))
-  .mutation(async ({ ctx, input }) => {
+  .input(amountSchema)
+  .mutation(async ({ ctx, input:input_ }) => {
+    const input = input_ as z.infer<typeof amountSchema>;
+
     if (ctx.user.balance < input.amount) {
       throw new CRPCError({
         code: 'PAYMENT_REQUIRED',

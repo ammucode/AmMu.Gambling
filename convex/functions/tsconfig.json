@@ -44,7 +44,7 @@
         "./schema"
       ],
     },
-    "noErrorTruncation": true
+    "noErrorTruncation": false
   },
   "include": [
     "./**/*",

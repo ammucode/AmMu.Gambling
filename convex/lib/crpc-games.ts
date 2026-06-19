@@ -52,75 +52,6 @@ const gameInputSchema = z
     path: ['path'],
   });
 
-// type maybeGameMiddlewareParams = Parameters<Exclude<Parameters<typeof authMutation.use|typeof optionalAuthQuery.use>[0], AnyMiddlewareBuilder>>[0];
-// const maybeGameMiddleware = async ({ctx, next, input}: maybeGameMiddlewareParams&{input: z.infer<typeof gameInputSchema>}) => {
-//   const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
-//   const sessionKey = input.sessionKey ?? (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
-//   const gamePair = getGameByPath(path);
-//   const activeGame = gamePair[1] ?? gamePair[0];
-//   const gameSession = sessionKey ? iHateNull(
-//     await ctx.orm.query.gameSession.findFirst({
-//       where: { sessionKey },
-//     }),
-//     true
-//   ) : null;
-
-//   return next({
-//     ctx: {
-//       ...ctx,
-//       game: { path: path, sessionKey, pair: gamePair, data: activeGame, session: gameSession },
-//     },
-//   });
-// };
-
-// // type maybeGameMiddlewareParams = Parameters<Exclude<Parameters<typeof authMutation.use|typeof authQuery.use>[0], AnyMiddlewareBuilder>>[0];
-// const requireGameMiddleware = async ({ctx, next}: {ctx: Awaited<ReturnType<typeof maybeGameMiddleware>>["ctx"], next: maybeGameMiddlewareParams['next']}) => {
-//   if (!ctx.game.session) {
-//     throw new CRPCError({
-//       code: 'PRECONDITION_FAILED',
-//       message: `Requires active game session for ${ctx.game.data.title}`,
-//     });
-//   }
-
-//   return next({
-//     ctx: { ...(ctx as MarkNonNull<typeof ctx, 'user'>), game: ctx.game as MarkNonNull<typeof ctx.game, 'session'> },
-//   });
-// };
-
-// export const maybeGameMutation = authMutation
-//   .meta({game: 'optional'})
-//   .input(gameInputSchema)
-//   .use(maybeGameMiddleware);
-// export const gameMutation = maybeGameMutation
-//   .meta({game: 'required'})
-//   .use(requireGameMiddleware);
-
-// export const maybeGameQuery = optionalAuthQuery
-//   .meta({game: 'optional'})
-//   .input(gameInputSchema)
-//   .use(maybeGameMiddleware);
-// export const gameQuery = maybeGameQuery
-//   .meta({game: 'required'})
-//   .use(requireGameMiddleware);
-type AnyQueryBuilder = QueryProcedureBuilder<
-  unknown,
-  unknown,
-  UnsetMarker | object,
-  z.ZodObject<any>,
-  UnsetMarker | z.ZodObject<any>,
-  UnsetMarker | z.ZodTypeAny,
-  object
->;
-type AnyMutationBuilder = MutationProcedureBuilder<
-  unknown,
-  unknown,
-  UnsetMarker | object,
-  z.ZodObject<any>,
-  UnsetMarker | z.ZodTypeAny,
-  object
->;
-
-type IsIncluded<T, U> = [T] extends [Extract<T, U>] ? true : false;
 
 type QueryCtxForMiddleware<QueryBuilder> =
   QueryBuilder extends QueryProcedureBuilder<
@@ -375,8 +306,7 @@ function middlewareFor<
   const out = {
     query: q.input(inputSchema).use<QueryOverrides>(queryMiddleware),
     mutation: m.input(inputSchema).use<MutationOverrides>(mutationMiddleware),
-    // middleware,
-    // mutMiddleware,
+    middleware,
   } as const;
   return out as typeof out & {
     _: {
@@ -409,7 +339,7 @@ type MergeZodObjects<T, U> =
       : T
     : T;
 
-export const { query: maybeGameQuery, mutation: maybeGameMutation } =
+export const { query: maybeGameQuery, mutation: maybeGameMutation_, middleware: maybeGameMiddleware } =
   middlewareFor(
     optionalAuthQuery,
     authMutation,
@@ -450,67 +380,12 @@ export const { query: maybeGameQuery, mutation: maybeGameMutation } =
     })
   );
 
-// type check = SimplifyDeep<typeof maybeGameMiddleware["_"]["middleware"]>;
-
-// const foo = maybeGameMiddleware.m//.use(maybeGameMiddleware.middleware)
-// const foo = maybeGameMiddleware.apply(authMutation)
-// const foo = authMutation.input(gameInputSchema).use(maybeGameMiddleware.mutMiddleware)
-const foo = maybeGameMutation
-  // .use(({ctx,next})=>next({
-  //   ctx: {
-  //     ...ctx as MarkNonNull<typeof ctx, 'user'>,
-  //     game: ctx.game as MarkNonNull<typeof ctx.game, 'sessionKey'>
-  //   }
-  // }))
-  .output(gameSessionInfo)
-  .mutation(async ({ ctx }) => {
-    if (ctx.game.session) {
-      return ctx.game.session;
-    }
-
-    return (
-      await ctx.orm
-        .insert(gameSessionTable)
-        .values({
-          path: ctx.game.path,
-          userId: ctx.user.id,
-          sessionKey: ctx.game.sessionKey,
-        })
-        .returning(gameSessionInfoReturning)
-    )[0];
-  });
-
-export const maybeGameMutation_ = authMutation
-  .input(gameInputSchema)
-  .use(async ({ ctx, next, input }) => {
-    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
-    const sessionKey =
-      input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
-    const gamePair = getGameByPath(path);
-    const activeGame = gamePair[1] ?? gamePair[0];
-    const gameSession = sessionKey
-      ? iHateNull(
-          await ctx.orm.query.gameSession.findFirst({
-            where: { sessionKey },
-          }),
-          true
-        )
-      : null;
-
-    return next({
-      ctx: {
-        ...ctx,
-        game: {
-          path: path,
-          sessionKey,
-          pair: gamePair,
-          data: activeGame,
-          session: gameSession,
-        },
-      },
-    });
-  });
+export const maybeGameMutation = authMutation.input(gameInputSchema).use(maybeGameMiddleware).use(({ctx,next})=>next({
+  ctx: {
+    ...(ctx as MarkNonNull<typeof ctx, 'user'>),
+    game: ctx.game as MarkNonNull<typeof ctx.game, 'sessionKey'>,
+  }
+}));
 
 export const gameMutation = maybeGameMutation.use(async ({ ctx, next }) => {
   if (!ctx.game.session) {
@@ -528,37 +403,6 @@ export const gameMutation = maybeGameMutation.use(async ({ ctx, next }) => {
   });
 });
 
-export const maybeGameQuery_ = optionalAuthQuery
-  .input(gameInputSchema)
-  .use(async ({ ctx, next, input }) => {
-    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
-    const sessionKey =
-      input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
-    const gamePair = getGameByPath(path);
-    const activeGame = gamePair[1] ?? gamePair[0];
-    const gameSession = sessionKey
-      ? iHateNull(
-          await ctx.orm.query.gameSession.findFirst({
-            where: { sessionKey },
-          }),
-          true
-        )
-      : null;
-
-    return next({
-      ctx: {
-        ...ctx,
-        game: {
-          path: path,
-          sessionKey,
-          pair: gamePair,
-          data: activeGame,
-          session: gameSession,
-        },
-      },
-    });
-  });
 
 export const gameQuery = maybeGameQuery.use(async ({ ctx, next }) => {
   if (!ctx.game.session) {
@@ -623,7 +467,7 @@ interface PerGameTableKey_CRPCDefs_TypeLambda extends PerGameTableKey_TypeLambda
 > {
   return: ReturnType<typeof PerGameTableKey_CRPCDefs_Func<Arg0<this>>>;
 }
-const perGameTableResult_CRPCDefs =
+export const perGameTableResult_CRPCDefs =
   perGameTableObj<PerGameTableKey_CRPCDefs_TypeLambda>(
     PerGameTableKey_CRPCDefs_Func satisfies PerGameTableKey_Functor<PerGameTableKey_CRPCDefs_TypeLambda>
   );

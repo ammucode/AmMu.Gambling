@@ -43,7 +43,7 @@
       ]
     },
     "strictFunctionTypes": false,
-    "noErrorTruncation": true,
+    "noErrorTruncation": false,
   },
   "include": [
     "next-env.d.ts",
