@@ -481,20 +481,24 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
     if (!sessionKeyForGame(ctx.game.sessionKey, path)) {
       throw wrongGameError();
     }
-    const gameDoc = iHateNull(
+    const sessionDoc = iHateNull(
       await ctx.orm.query.gameSession.findFirst({
         where: { sessionKey: ctx.game.session.sessionKey },
         with: { [tblName]: true },
-      })
+      }),
+      true
     );
-    if (!gameDoc?.[tblName]?.length) {
+    if (!sessionDoc?.[tblName]?.length) {
       throw wrongGameError();
     }
+
+    const gameDoc = sessionDoc[tblName][0] as Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+
 
     return next({
       ctx: {
         ...ctx,
-        gameDoc: gameDoc, // (gameDoc as Pick<typeof gameDoc, typeof tblName>)[tblName][0],
+        gameDoc, // (gameDoc as Pick<typeof gameDoc, typeof tblName>)[tblName][0],
       },
     });
   }) satisfies Parameters<mutationOrQueryBuilder['use']>[0];

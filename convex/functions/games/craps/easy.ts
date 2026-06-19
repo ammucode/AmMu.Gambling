@@ -9,7 +9,7 @@ const { query: easyCrapsQuery, mutation: easyCrapsMutation } =
 export const getPoint = easyCrapsQuery
   .output(z.union(Points.map((point) => z.literal(point))).nullable())
   .query(async ({ ctx }) => {
-    return iHateNull(ctx.gameDoc.easyCrapsSession[0].point, true);
+    return iHateNull(ctx.gameDoc.point, true);
   });
 
 export const betPassline = easyCrapsMutation
