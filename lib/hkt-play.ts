@@ -18,6 +18,7 @@ import {
 } from 'hkt-core';
 import { GamePathString, GamePathStrings } from './games/games';
 import { List, ObjectHKTs } from './hkt';
+import { Simplify } from 'type-fest';
 
 type GameTableName = GameTable['tableName'];
 type GameTableByName<Name extends GameTableName> = Simplify<

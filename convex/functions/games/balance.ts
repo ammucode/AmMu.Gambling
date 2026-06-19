@@ -21,7 +21,7 @@ export const info = gameQuery
 const amountSchema = z.object({ amount: z.number().nonnegative() });
 export const invest = gameMutation
   .input(amountSchema)
-  .mutation(async ({ ctx, input:input_ }) => {
+  .mutation(async ({ ctx, input: input_ }) => {
     const input = input_ as z.infer<typeof amountSchema>;
 
     if (ctx.user.balance < input.amount) {

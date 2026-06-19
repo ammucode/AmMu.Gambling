@@ -34,7 +34,7 @@ const ormSchema = schema;
 registerProcedureNameLookup(
   {
   "games/balance.ts": [{ column: 36, line: 45, name: "games/balance:cashOut" }, { column: 3, line: 11, name: "games/balance:info" }, { column: 3, line: 24, name: "games/balance:invest" }],
-  "games/craps/easy.ts": [{ column: 3, line: 26, name: "games/craps/easy:betPassline" }, { column: 3, line: 20, name: "games/craps/easy:getPoint" }],
+  "games/craps/easy.ts": [{ column: 3, line: 24, name: "games/craps/easy:betPassline" }, { column: 3, line: 18, name: "games/craps/easy:getPoint" }],
   "games/session.ts": [{ column: 3, line: 26, name: "games/session:getSession" }, { column: 3, line: 7, name: "games/session:maybeStartSession" }],
   "users.ts": [{ column: 3, line: 6, name: "users:me" }],
 },
