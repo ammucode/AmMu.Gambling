@@ -1,6 +1,5 @@
 import {
   GAME_PATH_SCHEMA,
-  GamePathString,
   GamePathStringToGame,
   GameSlugSchema,
   getGameByPath,
@@ -8,21 +7,12 @@ import {
   pathFromGameSessionKey,
   sessionKeyForGame,
 } from '@/lib/games/games';
-import { MarkNonNull, MySimplifyDeep } from '@/lib/types';
-import {
-  AnyMiddlewareBuilder,
-  CRPCError,
-  MiddlewareFunction,
-  MutationProcedureBuilder,
-  QueryProcedureBuilder,
-  UnsetMarker,
-} from 'kitcn/server';
+import { MarkNonNull } from '@/lib/types';
+import { AnyMiddlewareBuilder, CRPCError } from 'kitcn/server';
 import z from 'zod';
 import { authMutation, optionalAuthQuery } from './crpc';
 import { iHateNull } from './document';
 import {
-  gameSessionTable,
-  GameTables,
   GameTablesKey,
   PerGameTableKey_Ctx,
   PerGameTableKey_Functor,
@@ -30,16 +20,6 @@ import {
   PerGameTableKey_TypeLambda,
   perGameTableObj,
 } from '~schema';
-import { Doc } from '../functions/_generated/dataModel';
-import { If, IsNever, IsUndefined, Simplify, SimplifyDeep } from 'type-fest';
-import { BuildQueryResult, InferModelFromColumns } from 'kitcn/orm';
-import { TablePolymorphicResult } from '@/lib/convex/kitcn-mirror';
-import { OrmCtx } from '../functions/generated/server';
-import {
-  gameSessionInfo,
-  gameSessionInfoReturning,
-  OrmSchema,
-} from '../shared/models';
 import { Arg0 } from 'hkt-core';
 
 const gameInputSchema = z
@@ -484,7 +464,6 @@ export const gameQuery = maybeGameQuery.use(async ({ ctx, next }) => {
 
 const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
   path,
-  tbl,
   tblName,
 }: PerGameTableKey_Ctx<Path>) => {
   const expectedGame = GamePathStringToGame[path];
@@ -511,7 +490,6 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
     if (!gameDoc?.[tblName]?.length) {
       throw wrongGameError();
     }
-    type t = Pick<typeof gameDoc, typeof tblName>;
 
     return next({
       ctx: {

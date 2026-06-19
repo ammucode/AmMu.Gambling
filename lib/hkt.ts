@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import {
   Arg0,
   Arg1,
   Arg2,
-  Call1,
   Call1W,
   Call2W,
-  Curry,
   Param0,
   Param1,
   RetType,

@@ -1,6 +1,5 @@
 import {
   GAME_PATH_SCHEMA,
-  GAME_PATHS,
   GamePathString,
   GamePathStrings,
   GameSlug,
@@ -13,7 +12,6 @@ import {
   convexTable,
   custom,
   defineSchema,
-  endsWith,
   index,
   InferInsertModel,
   InferSelectModel,
@@ -24,32 +22,7 @@ import {
 } from 'kitcn/orm';
 import z from 'zod';
 import { Points } from '@/lib/games/craps';
-import { Entries, Simplify } from 'type-fest';
-import {
-  Arg0,
-  Arg1,
-  Args,
-  Ask,
-  Call1,
-  Call1W,
-  Call2,
-  Curry,
-  Flow,
-  Param0,
-  Params,
-  Pipe,
-  RawArgsW,
-  RetType,
-  Sig,
-  TArg,
-  TolerantParams,
-  TolerantRetType,
-  TypeArgs,
-  TypeLambda,
-  TypeLambda1,
-  TypeLambda3,
-  TypeLambdaG,
-} from 'hkt-core';
+import { Arg0, Call1, Pipe, TypeLambda1 } from 'hkt-core';
 import { List, ObjectHKTs } from '@/lib/hkt';
 
 export const userTable = convexTable(
@@ -284,10 +257,6 @@ export const tables = {
 export type TableName = keyof typeof tables;
 export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
 export type Insert<T extends TableName> = InferInsertModel<(typeof tables)[T]>;
-
-type relationBuilder = Parameters<
-  Parameters<ReturnType<typeof defineSchema<typeof tables>>['relations']>[0]
->[0];
 
 export const Schema = defineSchema(tables).relations((r) => {
   const PerGameTableKey_Relations_gameSession_Func = <

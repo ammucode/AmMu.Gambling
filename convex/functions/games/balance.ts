@@ -1,8 +1,7 @@
 import { gameMutation, gameQuery } from '@convex-lib/crpc-games';
-import { gameBalanceQuery, gameBalanceSchema } from '@convex/models';
+import { gameBalanceSchema } from '@convex/models';
 import { eq } from 'kitcn/orm';
 import { CRPCError } from 'kitcn/server';
-import { Simplify } from 'type-fest';
 import z from 'zod';
 import { userTable, gameSessionTable } from '~schema';
 

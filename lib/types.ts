@@ -96,7 +96,7 @@ export type StripNoInfer<T> = T extends NoInfer<infer _> | infer Rest
 export type ZipObject<
   K extends readonly PropertyKey[],
   V extends readonly unknown[],
-  Obj = {},
+  Obj = object,
 > = K extends readonly [
   infer KHead,
   ...infer KTail extends readonly PropertyKey[],
