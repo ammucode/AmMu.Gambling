@@ -18,7 +18,7 @@ import {
 import z from 'zod';
 import { Points } from "@/lib/games/craps"
 import { Entries, Simplify } from 'type-fest';
-import { Arg0, Arg1, Args, Ask, Call1, Call1W, Call2, Curry, Flow, Param0, Params, Pipe, RawArgsW, RetType, Sig, TArg, TolerantParams, TolerantRetType, TypeLambda, TypeLambda1, TypeLambda3, TypeLambdaG } from 'hkt-core'
+import { Arg0, Arg1, Args, Ask, Call1, Call1W, Call2, Curry, Flow, Param0, Params, Pipe, RawArgsW, RetType, Sig, TArg, TolerantParams, TolerantRetType, TypeArgs, TypeLambda, TypeLambda1, TypeLambda3, TypeLambdaG } from 'hkt-core'
 import { List, ObjectHKTs } from '@/lib/hkt';
 
 export const userTable = convexTable(
@@ -195,40 +195,55 @@ type final = Sig<PerGameFunctorTypeLambda<RetType<MakeTables>>>;
 type t = PerGameFunctorPipe<MakeTables>;
 
 // type PerGameLambda = <In extends RetType<PathToFunctorArgsLambda>, OutK extends PropertyKey, OutV>(arg: In) => [OutK, OutV];
-type PerGameLambda = (arg: Call1<PathToFunctorArgsLambda, GamePathString>) => [PropertyKey, unknown];
+// type PerGameLambda = <Path extends GameTablesKey>(arg: Call1<PathToFunctorArgsLambda, Path>) => [PropertyKey, unknown];
+type PerGameLambda = (arg: Call1<PathToFunctorArgsLambda, GameTablesKey>) => [PropertyKey, unknown];
 // interface InferLambda<F extends PerGameLambda> extends PerGameFunctorTypeLambda<F extends PerGameLambda> {
 
 // }
 // interface PerGameGenericLambda extends TypeLambdaG<[["F", PerGameLambda], ["OutK", PropertyKey], "OutV"]> {
 // interface PerGameGenericLambda extends TypeLambdaG<["F", ["Tbl", GameTable], ["TblName", GameTableName], ["Path", GamePathString], ["OutK", PropertyKey], "OutV"]> {
-interface PerGameGenericLambda extends TypeLambdaG<[["F", PerGameLambda], ["Path", GameTablesKey]]> {
+interface PerGameGenericLambda extends TypeLambdaG<[["F", PerGameLambda]]> {
   signature: (
     // f: TArg<this, "F"> & ((arg: Call1<PathToFunctorArgsLambda, TArg<this, "Path">>) => [TArg<this, "OutK">, TArg<this, "OutV">])
-    f: TArg<this, "F"> & ((arg: Call1<PathToFunctorArgsLambda, TArg<this, "Path">>) => [PropertyKey, unknown])
-  ) => TypeLambda1<Call1<PathToFunctorArgsLambda, TArg<this, "Path">>, ReturnType<TArg<this, "F">>>;
-  return: _PerGameGenericLambda<TArg<this, "F">, TArg<this, "Path">>;
+    f: TArg<this, "F">// & (<Path extends GameTablesKey>(arg: Call1<PathToFunctorArgsLambda, Path>) => [PropertyKey, unknown])
+  // ) => TypeLambda1<Call1<PathToFunctorArgsLambda, TArg<this, "Path">>, ReturnType<TArg<this, "F">>>;
+  ) => TypeLambda1<Call1<PathToFunctorArgsLambda, GameTablesKey>, [PropertyKey, unknown]>;
+  return: _PerGameGenericLambda<TArg<this, "F">>;
 }
-type _PerGameGenericLambda<F extends PerGameLambda, Path extends GamePathString> = 
-  F extends (arg: Call1<PathToFunctorArgsLambda, Path>) => [infer K extends PropertyKey, infer V]
-    ? TypeLambda1<Call1<PathToFunctorArgsLambda, Path>, [K, V]>
-    : TypeLambda<Call1<PathToFunctorArgsLambda, Path>, [PropertyKey, unknown]>;
-// type _PerGameGenericLambda<F extends PerGameLambda> = 
-//   F extends (arg: RetType<PathToFunctorArgsLambda>) => [infer K extends PropertyKey, infer V]
-//     ? PerGameFunctorTypeLambda<[K, V]>
-//     : never;
-// type _PerGameGenericLambda<F extends PerGameLambda, OutK extends PropertyKey, OutV> = 
-//   F extends (arg: RetType<PathToFunctorArgsLambda>) => [infer K extends OutK, infer V extends OutV]
-//     ? PerGameFunctorTypeLambda<[K, V]>
-//     : never;
-// type _PerGameGenericLambda<F, Tbl extends GameTable, TblName extends GameTableName, Path extends GamePathString, OutK extends PropertyKey, OutV> = 
-//   F extends (arg: [infer T extends Tbl, infer N extends TblName, infer P extends Path]) => [infer K extends OutK, infer V extends OutV]
-//     ? TypeLambda1<[T, N, P], [K, V]>
-//     : TypeLambda<[Tbl, TblName, GameTableName], [OutK, OutV]>;
+interface _PerGameGenericLambda<F extends PerGameLambda> extends TypeLambda1<Call1<PathToFunctorArgsLambda, GameTablesKey>, [PropertyKey, unknown]> {
+  return: ReturnType<F & ((arg: Arg0<this>) => ReturnType<F>)>
+  // return: F extends (arg: Arg0<this>) => [infer K extends PropertyKey, infer V]
+  //   ? [K, V]
+  //   : [PropertyKey, unknown];
+}
+    
+// type _PerGameGenericLambda<F extends PerGameLambda, Path extends GamePathString> =
+//   TypeLambda1<Call1<PathToFunctorArgsLambda, Path>, [PropertyKey, unknown]> & {
+//     return: F extends (arg: Call1<PathToFunctorArgsLambda, Path>) => [infer K extends PropertyKey, infer V]
+//       ? [K, V]
+//       : [PropertyKey, unknown];
+//   };
 
+interface new_test<F extends PerGameLambda> extends TypeLambda1<GameTablesKey, [PropertyKey, unknown]> {
+  return: ReturnType<F & ((arg: Call1<PathToFunctorArgsLambda, Arg0<this>>) => ReturnType<F>)>
+  // return: F extends (arg: Arg0<this>) => [infer K extends PropertyKey, infer V]
+  //   ? [K, V]
+  //   : [PropertyKey, unknown];
+}
 const foo = <Path extends GamePathString>([tbl, name]: [GameTables[Path], GameTables[Path]["tableName"], Path]) => [name, tbl] as [GameTables[Path]["tableName"], GameTables[Path]];
-type PGGLParams = TolerantParams<PerGameGenericLambda>[0];
+type PGGLParams = TolerantParams<PerGameGenericLambda>;
 type pgglfoo = typeof foo;
-type PGGLMakeTable = Call1<PerGameGenericLambda, typeof foo>;
+type pggltargs = TypeArgs<PerGameGenericLambda, {0:pgglfoo}>;
+type rawtest = ReturnType<typeof foo & ((arg: Call1<PathToFunctorArgsLambda, "craps/easy">) => ReturnType<typeof foo<"craps/easy">>)>;
+type rawtest_ = _PerGameGenericLambda<typeof foo>;
+type rawtest_2 = Call1<rawtest_, Call1<PathToFunctorArgsLambda, "craps/easy">>;
+type easyCrapsFunctorArgs = Call1<PathToFunctorArgsLambda, "craps/easy">;
+type rawext_test = pgglfoo extends (arg: easyCrapsFunctorArgs) => infer R ? R : never;
+type newtest = new_test<typeof foo>;
+type newtest2 = Call1<newtest, "craps/easy">;
+type test = _PerGameGenericLambda<pggltargs["~F"]>;
+type test2 = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<test>>//, ObjectHKTs.FromEntries>;
+type PGGLMakeTable = Call1<PerGameGenericLambda, pgglfoo>;
 type tgpipepggltest = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<PGGLMakeTable>>//, ObjectHKTs.FromEntries>;
 
 // type GameTableFunctor = <Path extends GamePathString, Table extends GameTables[Path], FK extends string, FV>(tbl: Table, name: Table['tableName'], pathString: Path) => [FK,FV]
