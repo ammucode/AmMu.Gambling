@@ -13,7 +13,7 @@ import { CRPCError } from 'kitcn/server';
 import z from 'zod';
 import { authMutation, optionalAuthQuery } from './crpc';
 import { iHateNull } from './document';
-import { gameTables } from "~schema";
+import { GameTables } from "~schema";
 import { Doc } from '../functions/_generated/dataModel';
 import { Simplify, SimplifyDeep } from 'type-fest';
 import { BuildQueryResult, InferModelFromColumns } from 'kitcn/orm';
@@ -178,7 +178,7 @@ export const gameQuery = maybeGameQuery.use(async ({ ctx, next }) => {
 
 export function gameMiddlewareFor<PathString extends GamePathString>(pathString: PathString) {
   const expectedGame = GamePathStringToGame[pathString];
-  const table = gameTables[pathString];
+  const table = GameTables[pathString];
   type tableName = typeof table["tableName"];
 
   // type ExpectedGameDoc = Simplify<InferModelFromColumns<typeof table["_"]["columns"]> & TablePolymorphicResult<OrmCtx['orm']['query'][typeof table["tableName"]]['_']["tableConfig"]>>;
@@ -214,7 +214,7 @@ export function gameMiddlewareFor<PathString extends GamePathString>(pathString:
 
 export function gameMutationFor<PathString extends GamePathString>(pathString: PathString) {
   const expectedGame = GamePathStringToGame[pathString];
-  const table = gameTables[pathString];
+  const table = GameTables[pathString];
   return gameMutation.use(async ({ ctx, next }) => {
     const wrongGameError = () => new CRPCError({
       code: 'PRECONDITION_FAILED',

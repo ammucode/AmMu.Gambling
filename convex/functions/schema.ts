@@ -1,4 +1,4 @@
-import { GAME_PATH_SCHEMA, GamePathString, GameSlug } from '@/lib/games/games';
+import { GAME_PATH_SCHEMA, GAME_PATHS, GamePathString, GamePathStrings, GameSlug } from '@/lib/games/games';
 import { TableDefinition } from 'convex/server';
 import { v } from 'convex/values';
 import {
@@ -17,7 +17,9 @@ import {
 } from 'kitcn/orm';
 import z from 'zod';
 import { Points } from "@/lib/games/craps"
-import { Simplify } from 'type-fest';
+import { Entries, Simplify } from 'type-fest';
+import { Arg0, Arg1, Args, Ask, Call1, Call1W, Call2, Curry, Flow, Param0, Params, Pipe, RawArgsW, RetType, Sig, TArg, TolerantParams, TolerantRetType, TypeLambda, TypeLambda1, TypeLambda3 } from 'hkt-core'
+import { List, ObjectHKTs } from '@/lib/hkt';
 
 export const userTable = convexTable(
   'user',
@@ -161,16 +163,42 @@ export const videoPokerSessionTable = convexTable(
   (videoPokerSessionTable) => [...genericGameExtras(videoPokerSessionTable)]
 );
 
-export const gameTables = {
-  'craps/easy': easyCrapsSessionTable,
-  'video-poker': videoPokerSessionTable,
-} as const satisfies Partial<Record<GamePathString, TableDefinition>>;
-export type gameTables = typeof gameTables;
-export type GameTable = gameTables[keyof gameTables];
+export const GameTables = {
+  'craps/easy': {tableName: "easyCrapsSession", table: true}, //easyCrapsSessionTable,
+  'video-poker': {tableName: "videoPokerSession", table: true}, //videoPokerSessionTable,
+} as const //satisfies Partial<Record<GamePathString, TableDefinition>>;
+export type GameTables = typeof GameTables;
+export type GameTablesKey = keyof GameTables;
+export type GameTable = GameTables[GameTablesKey];
 export type GameTableName = GameTable["tableName"];
 export type GameTableByName<Name extends GameTableName> = Simplify<GameTable & {tableName: Name}>;
 
-type GameTableFunctor = <Path extends GamePathString, Table extends gameTables[Path], FK extends string, FV>(tbl: Table, name: Table['tableName'], pathString: Path) => [FK,FV]
+
+interface PathToFunctorArgsLambda extends TypeLambda<[path: GameTablesKey], [GameTable, GameTableName, GamePathString]> {
+// interface PathToFunctorArgsLambda extends TypeLambda<[path: GameTablesKey], [GameTablesKey]> {
+  return: [GameTables[Arg0<this>], GameTables[Arg0<this>]["tableName"], Arg0<this>];
+  // return: _PathToFunctorArgsLambda<Arg0<this>>;//, GameTables[Arg0<this>]];
+}
+// type _PathToFunctorArgsLambda<Path extends GameTablesKey> = [Path];
+type _PathToFunctorArgsLambda<Path extends GameTablesKey> = [Path];
+type PathToFunctorArgs = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>>//, MapBy2<MakeTables>>//, ObjectHKTs.FromEntries>;
+type PFCheck = PathToFunctorArgs[0][2];
+
+// interface MakeTables extends TypeLambda<[tbl: GameTable, tblName: GameTableName, path: GamePathString], [GameTableName, GameTable]> {
+// interface MakeTables extends TypeLambda1<PathToFunctorArgs[number], [GameTableName, GameTable]> {
+interface MakeTables extends TypeLambda1<[GameTable, GameTableName, GamePathString], [GameTableName, GameTable]> {
+  return: [Arg0<this>[1], Arg0<this>[0]];
+}
+type MakeTablesFunctor = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<MakeTables>, ObjectHKTs.FromEntries>;
+type MTCheck = MakeTablesFunctor["easyCrapsSession"];
+
+type thing<T, M extends MakeTables> = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<M>, ObjectHKTs.FromEntries>;
+type thing2 = thing<0, MakeTables>;//["signature"];
+
+type PerGameFunctor<F extends TypeLambda1<[GameTable, GameTableName, GamePathString]>> = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<F>, ObjectHKTs.FromEntries>;
+type testfunctor = PerGameFunctor<MakeTables>;
+
+type GameTableFunctor = <Path extends GamePathString, Table extends GameTables[Path], FK extends string, FV>(tbl: Table, name: Table['tableName'], pathString: Path) => [FK,FV]
 
 function perGameTableObj<
   K extends PropertyKey,
@@ -180,7 +208,7 @@ function perGameTableObj<
   functor: F
 ): Record<K, V> {
   return Object.fromEntries(
-    Object.entries(gameTables).map(([pathString, tbl]) => functor(tbl, tbl.tableName, pathString as keyof gameTables))
+    Object.entries(GameTables).map(([pathString, tbl]) => functor(tbl, tbl.tableName, pathString as keyof GameTables))
   ) as Record<K, V>;
 }
 
