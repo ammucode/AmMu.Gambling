@@ -1,4 +1,10 @@
-import { GAME_PATH_SCHEMA, GAME_PATHS, GamePathString, GamePathStrings, GameSlug } from '@/lib/games/games';
+import {
+  GAME_PATH_SCHEMA,
+  GAME_PATHS,
+  GamePathString,
+  GamePathStrings,
+  GameSlug,
+} from '@/lib/games/games';
 import { TableDefinition } from 'convex/server';
 import { v } from 'convex/values';
 import {
@@ -7,6 +13,7 @@ import {
   convexTable,
   custom,
   defineSchema,
+  endsWith,
   index,
   InferInsertModel,
   InferSelectModel,
@@ -16,9 +23,33 @@ import {
   uniqueIndex,
 } from 'kitcn/orm';
 import z from 'zod';
-import { Points } from "@/lib/games/craps"
+import { Points } from '@/lib/games/craps';
 import { Entries, Simplify } from 'type-fest';
-import { Arg0, Arg1, Args, Ask, Call1, Call1W, Call2, Curry, Flow, Param0, Params, Pipe, RawArgsW, RetType, Sig, TArg, TolerantParams, TolerantRetType, TypeArgs, TypeLambda, TypeLambda1, TypeLambda3, TypeLambdaG } from 'hkt-core'
+import {
+  Arg0,
+  Arg1,
+  Args,
+  Ask,
+  Call1,
+  Call1W,
+  Call2,
+  Curry,
+  Flow,
+  Param0,
+  Params,
+  Pipe,
+  RawArgsW,
+  RetType,
+  Sig,
+  TArg,
+  TolerantParams,
+  TolerantRetType,
+  TypeArgs,
+  TypeLambda,
+  TypeLambda1,
+  TypeLambda3,
+  TypeLambdaG,
+} from 'hkt-core';
 import { List, ObjectHKTs } from '@/lib/hkt';
 
 export const userTable = convexTable(
@@ -129,7 +160,6 @@ export const gameSessionTable = convexTable(
   ]
 );
 
-
 const genericGameColumns = {
   sessionKey: text()
     .notNull()
@@ -164,104 +194,83 @@ export const videoPokerSessionTable = convexTable(
 );
 
 export const GameTables = {
-  'craps/easy': {tableName: "easyCrapsSession", table: true}, //easyCrapsSessionTable,
-  'video-poker': {tableName: "videoPokerSession", table: true}, //videoPokerSessionTable,
-} as const //satisfies Partial<Record<GamePathString, TableDefinition>>;
+  'craps/easy': easyCrapsSessionTable,
+  'video-poker': videoPokerSessionTable,
+} as const satisfies Record<GamePathString, TableDefinition>;
 export type GameTables = typeof GameTables;
 export type GameTablesKey = keyof GameTables;
 export type GameTable = GameTables[GameTablesKey];
-export type GameTableName = GameTable["tableName"];
-export type GameTableByName<Name extends GameTableName> = Simplify<GameTable & {tableName: Name}>;
 
-
-interface PathToFunctorArgsLambda extends TypeLambda<[path: GameTablesKey], [GameTable, GameTableName, GamePathString]> {
-  return: _PathToFunctorArgsLambda<Arg0<this>>;
-}
-type _PathToFunctorArgsLambda<Path extends GameTablesKey> = [GameTables[Path], GameTables[Path]["tableName"], Path];
-
-
-interface PerGameFunctorTypeLambda<Ret extends readonly [PropertyKey, unknown]> extends TypeLambda1<[GameTable, GameTableName, GamePathString], Ret> {
-  // table: Arg0<this>[0];
-  // tableName: Arg0<this>[1];
-  // path: Arg0<this>[2];
+export type PerGameTableKey_LambdaOutUpper = [PropertyKey, unknown];
+export type PerGameTableKey_TypeLambda<
+  Ret extends PerGameTableKey_LambdaOutUpper,
+> = TypeLambda1<GameTablesKey, Ret>;
+export type PerGameTableKey_Ctx<Path extends GameTablesKey> = {
+  path: Path;
+  tbl: GameTables[Path];
+  tblName: GameTables[Path]['tableName'];
 };
-interface MakeTables extends PerGameFunctorTypeLambda<[GameTableName, GameTable]> {
-  // return: [this["tableName"], this["table"]];
-  return: [Arg0<this>[0]["tableName"], Arg0<this>[0]];
-}
+export type PerGameTableKey_Functor<
+  Lambda extends PerGameTableKey_TypeLambda<PerGameTableKey_LambdaOutUpper> =
+    PerGameTableKey_TypeLambda<PerGameTableKey_LambdaOutUpper>,
+> = <Path extends GameTablesKey>(
+  ctx: PerGameTableKey_Ctx<Path>
+) => Call1<Lambda, Path>;
 
-type PerGameFunctorPipe<F extends PerGameFunctorTypeLambda<[PropertyKey, unknown]>> = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<F>, ObjectHKTs.FromEntries>;
-type final = Sig<PerGameFunctorTypeLambda<RetType<MakeTables>>>;
-type t = PerGameFunctorPipe<MakeTables>;
-
-// type PerGameLambda = <In extends RetType<PathToFunctorArgsLambda>, OutK extends PropertyKey, OutV>(arg: In) => [OutK, OutV];
-// type PerGameLambda = <Path extends GameTablesKey>(arg: Call1<PathToFunctorArgsLambda, Path>) => [PropertyKey, unknown];
-type PerGameLambda = (arg: Call1<PathToFunctorArgsLambda, GameTablesKey>) => [PropertyKey, unknown];
-// interface InferLambda<F extends PerGameLambda> extends PerGameFunctorTypeLambda<F extends PerGameLambda> {
-
-// }
-// interface PerGameGenericLambda extends TypeLambdaG<[["F", PerGameLambda], ["OutK", PropertyKey], "OutV"]> {
-// interface PerGameGenericLambda extends TypeLambdaG<["F", ["Tbl", GameTable], ["TblName", GameTableName], ["Path", GamePathString], ["OutK", PropertyKey], "OutV"]> {
-interface PerGameGenericLambda extends TypeLambdaG<[["F", PerGameLambda]]> {
-  signature: (
-    // f: TArg<this, "F"> & ((arg: Call1<PathToFunctorArgsLambda, TArg<this, "Path">>) => [TArg<this, "OutK">, TArg<this, "OutV">])
-    f: TArg<this, "F">// & (<Path extends GameTablesKey>(arg: Call1<PathToFunctorArgsLambda, Path>) => [PropertyKey, unknown])
-  // ) => TypeLambda1<Call1<PathToFunctorArgsLambda, TArg<this, "Path">>, ReturnType<TArg<this, "F">>>;
-  ) => TypeLambda1<Call1<PathToFunctorArgsLambda, GameTablesKey>, [PropertyKey, unknown]>;
-  return: _PerGameGenericLambda<TArg<this, "F">>;
-}
-interface _PerGameGenericLambda<F extends PerGameLambda> extends TypeLambda1<Call1<PathToFunctorArgsLambda, GameTablesKey>, [PropertyKey, unknown]> {
-  return: ReturnType<F & ((arg: Arg0<this>) => ReturnType<F>)>
-  // return: F extends (arg: Arg0<this>) => [infer K extends PropertyKey, infer V]
-  //   ? [K, V]
-  //   : [PropertyKey, unknown];
-}
-    
-// type _PerGameGenericLambda<F extends PerGameLambda, Path extends GamePathString> =
-//   TypeLambda1<Call1<PathToFunctorArgsLambda, Path>, [PropertyKey, unknown]> & {
-//     return: F extends (arg: Call1<PathToFunctorArgsLambda, Path>) => [infer K extends PropertyKey, infer V]
-//       ? [K, V]
-//       : [PropertyKey, unknown];
-//   };
-
-interface new_test<F extends PerGameLambda> extends TypeLambda1<GameTablesKey, [PropertyKey, unknown]> {
-  return: ReturnType<F & ((arg: Call1<PathToFunctorArgsLambda, Arg0<this>>) => ReturnType<F>)>
-  // return: F extends (arg: Arg0<this>) => [infer K extends PropertyKey, infer V]
-  //   ? [K, V]
-  //   : [PropertyKey, unknown];
-}
-const foo = <Path extends GamePathString>([tbl, name]: [GameTables[Path], GameTables[Path]["tableName"], Path]) => [name, tbl] as [GameTables[Path]["tableName"], GameTables[Path]];
-type PGGLParams = TolerantParams<PerGameGenericLambda>;
-type pgglfoo = typeof foo;
-type pggltargs = TypeArgs<PerGameGenericLambda, {0:pgglfoo}>;
-type rawtest = ReturnType<typeof foo & ((arg: Call1<PathToFunctorArgsLambda, "craps/easy">) => ReturnType<typeof foo<"craps/easy">>)>;
-type rawtest_ = _PerGameGenericLambda<typeof foo>;
-type rawtest_2 = Call1<rawtest_, Call1<PathToFunctorArgsLambda, "craps/easy">>;
-type easyCrapsFunctorArgs = Call1<PathToFunctorArgsLambda, "craps/easy">;
-type rawext_test = pgglfoo extends (arg: easyCrapsFunctorArgs) => infer R ? R : never;
-type newtest = new_test<typeof foo>;
-type newtest2 = Call1<newtest, "craps/easy">;
-type test = _PerGameGenericLambda<pggltargs["~F"]>;
-type test2 = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<test>>//, ObjectHKTs.FromEntries>;
-type PGGLMakeTable = Call1<PerGameGenericLambda, pgglfoo>;
-type tgpipepggltest = Pipe<GamePathStrings, List.Map$<PathToFunctorArgsLambda>, List.Map$<PGGLMakeTable>>//, ObjectHKTs.FromEntries>;
-
-// type GameTableFunctor = <Path extends GamePathString, Table extends GameTables[Path], FK extends string, FV>(tbl: Table, name: Table['tableName'], pathString: Path) => [FK,FV]
-
-function perGameTableObj<
-  // K extends PropertyKey,
-  // V,
-  // Ret extends [PropertyKey, unknown],
-  F extends PerGameFunctorTypeLambda<[PropertyKey, unknown]>,//(key: keyof GamePathString, value: T[keyof T]) => readonly [PropertyKey, any],
->(
-  functor: Sig<F> //& ((...args: Parameters<Sig<F>>) => Ret),
-): PerGameFunctorPipe<F>{// extends PerGameFunctor<[infer K extends PropertyKey, infer V]> ? PerGameFunctor<[K, V]>: F> {
+export type PerGameTableKey_Pipe<
+  Lambda extends PerGameTableKey_TypeLambda<PerGameTableKey_LambdaOutUpper>,
+> = Pipe<GamePathStrings, List.Map$<Lambda>, ObjectHKTs.FromEntries>;
+export function perGameTableObj<
+  Lambda extends PerGameTableKey_TypeLambda<PerGameTableKey_LambdaOutUpper>,
+>(functor: PerGameTableKey_Functor<Lambda>) {
   return Object.fromEntries(
-    Object.entries(GameTables).map(([pathString, tbl]) => functor([tbl, tbl.tableName, pathString as keyof GameTables]))
-  ) as PerGameFunctorPipe<F>;
+    GamePathStrings.map((path) =>
+      functor({
+        path,
+        tbl: GameTables[path],
+        tblName: GameTables[path].tableName,
+      })
+    )
+  ) as PerGameTableKey_Pipe<Lambda>;
 }
+export const PerGameTableKey_MakeEntry = <
+  K extends PerGameTableKey_LambdaOutUpper[0],
+  V extends PerGameTableKey_LambdaOutUpper[1],
+>(
+  k: K,
+  v: V
+) => [k, v] as [K, V];
 
-const gschema = perGameTableObj<MakeTables>((([tbl]) => [tbl.tableName, tbl]));
+/* TEMPLATE:
+const PerGameTableKey_<FILL>_Func = <Path extends GameTablesKey>({,}: PerGameTableKey_Ctx<Path>) => {
+  return PerGameTableKey_MakeEntry(,);
+};
+interface PerGameTableKey_<FILL>_TypeLambda extends PerGameTableKey_TypeLambda<
+  ReturnType<typeof PerGameTableKey_<FILL>_Func>
+> {
+  return: ReturnType<typeof PerGameTableKey_<FILL>_Func<Arg0<this>>>;
+}
+const perGameTableResult_<FILL> =
+  perGameTableObj<PerGameTableKey_<FILL>_TypeLambda>(
+    PerGameTableKey_<FILL>_Func satisfies PerGameTableKey_Functor<PerGameTableKey_<FILL>_TypeLambda>
+  );
+*/
+
+const PerGameTableKey_Schema_Func = <Path extends GameTablesKey>({
+  tbl,
+  tblName,
+}: PerGameTableKey_Ctx<Path>) => {
+  return PerGameTableKey_MakeEntry(tblName, tbl);
+};
+interface PerGameTableKey_Schema_TypeLambda extends PerGameTableKey_TypeLambda<
+  ReturnType<typeof PerGameTableKey_Schema_Func>
+> {
+  return: ReturnType<typeof PerGameTableKey_Schema_Func<Arg0<this>>>;
+}
+const perGameTableResult_Schema =
+  perGameTableObj<PerGameTableKey_Schema_TypeLambda>(
+    PerGameTableKey_Schema_Func satisfies PerGameTableKey_Functor<PerGameTableKey_Schema_TypeLambda>
+  );
 
 export const tables = {
   user: userTable,
@@ -270,68 +279,105 @@ export const tables = {
   jwks: jwksTable,
 
   gameSession: gameSessionTable,
-  ...perGameTableObj((([tbl]) => [tbl.tableName, tbl] as const)),
+  ...perGameTableResult_Schema,
 };
 export type TableName = keyof typeof tables;
 export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
 export type Insert<T extends TableName> = InferInsertModel<(typeof tables)[T]>;
 
-export const Schema = defineSchema(tables).relations((r) => ({
-  user: {
-    sessions: r.many.session({
-      from: r.user.id,
-      to: r.session.userId,
-    }),
-    accounts: r.many.account({
-      from: r.user.id,
-      to: r.account.userId,
-    }),
-    gameSessions: r.many.gameSession({
-      from: r.user.id,
-      to: r.gameSession.userId,
-    }),
-  },
-  session: {
-    user: r.one.user({
-      from: r.session.userId,
-      to: r.user.id,
-    }),
-  },
-  account: {
-    user: r.one.user({
-      from: r.account.userId,
-      to: r.user.id,
-      optional: false,
-    }),
-  },
-  gameSession: {
-    user: r.one.user({
-      from: r.gameSession.userId,
-      to: r.user.id,
-      optional: false,
-    }),
-    ...perGameTableObj((_, name) => [
-      name,
-      r.many[name]({
+type relationBuilder = Parameters<
+  Parameters<ReturnType<typeof defineSchema<typeof tables>>['relations']>[0]
+>[0];
+
+export const Schema = defineSchema(tables).relations((r) => {
+  const PerGameTableKey_Relations_gameSession_Func = <
+    Path extends GameTablesKey,
+  >({
+    tblName,
+  }: PerGameTableKey_Ctx<Path>) => {
+    return PerGameTableKey_MakeEntry(
+      tblName,
+      r.many[tblName]({
         from: r.gameSession.sessionKey,
-        to: r[name].sessionKey,
-      }),
-    ]),
-  },
-  ...perGameTableObj((_, name) => [
-    name,
-    {
+        to: r[tblName].sessionKey,
+      })
+    );
+  };
+  interface PerGameTableKey_Relations_gameSession_TypeLambda extends PerGameTableKey_TypeLambda<
+    ReturnType<typeof PerGameTableKey_Relations_gameSession_Func>
+  > {
+    return: ReturnType<
+      typeof PerGameTableKey_Relations_gameSession_Func<Arg0<this>>
+    >;
+  }
+  const perGameTableResult_Relations_gameSession =
+    perGameTableObj<PerGameTableKey_Relations_gameSession_TypeLambda>(
+      PerGameTableKey_Relations_gameSession_Func satisfies PerGameTableKey_Functor<PerGameTableKey_Relations_gameSession_TypeLambda>
+    );
+
+  const PerGameTableKey_Relations_game_Func = <Path extends GameTablesKey>({
+    tblName,
+  }: PerGameTableKey_Ctx<Path>) => {
+    return PerGameTableKey_MakeEntry(tblName, {
       gameSession: r.one.gameSession({
-        from: r[name].sessionKey,
+        from: r[tblName].sessionKey,
         to: r.gameSession.sessionKey,
         optional: false,
       }),
       user: r.one.user({
-        from: r[name].sessionKey.through(r.gameSession.userId),
+        from: r[tblName].sessionKey.through(r.gameSession.userId),
         to: r.user.userId.through(r.gameSession.sessionKey),
         optional: false,
       }),
+    });
+  };
+  interface PerGameTableKey_Relations_game_TypeLambda extends PerGameTableKey_TypeLambda<
+    ReturnType<typeof PerGameTableKey_Relations_game_Func>
+  > {
+    return: ReturnType<typeof PerGameTableKey_Relations_game_Func<Arg0<this>>>;
+  }
+  const perGameTableResult_Relations_game =
+    perGameTableObj<PerGameTableKey_Relations_game_TypeLambda>(
+      PerGameTableKey_Relations_game_Func satisfies PerGameTableKey_Functor<PerGameTableKey_Relations_game_TypeLambda>
+    );
+
+  return {
+    user: {
+      sessions: r.many.session({
+        from: r.user.id,
+        to: r.session.userId,
+      }),
+      accounts: r.many.account({
+        from: r.user.id,
+        to: r.account.userId,
+      }),
+      gameSessions: r.many.gameSession({
+        from: r.user.id,
+        to: r.gameSession.userId,
+      }),
     },
-  ]),
-}));
+    session: {
+      user: r.one.user({
+        from: r.session.userId,
+        to: r.user.id,
+      }),
+    },
+    account: {
+      user: r.one.user({
+        from: r.account.userId,
+        to: r.user.id,
+        optional: false,
+      }),
+    },
+    gameSession: {
+      user: r.one.user({
+        from: r.gameSession.userId,
+        to: r.user.id,
+        optional: false,
+      }),
+      ...perGameTableResult_Relations_gameSession,
+    },
+    ...perGameTableResult_Relations_game,
+  };
+});
 export default Schema;

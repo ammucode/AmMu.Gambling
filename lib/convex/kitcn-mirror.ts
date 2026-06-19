@@ -2,7 +2,7 @@
 
 import { BetterFetchResponse } from 'better-auth/react';
 import {
-    AnyColumn,
+  AnyColumn,
   DBQueryConfig,
   InferModelFromColumns,
   TableRelationalConfig,
@@ -71,7 +71,6 @@ export const toAuthMutationError = (
     statusText: error.statusText ?? 'AUTH_ERROR',
   });
 
-
 // findFirst query defs
 export type OrmCtxBase = {
   db: GenericDatabaseReader<any> | GenericDatabaseWriter<any>;
@@ -105,29 +104,60 @@ export type KnownKeysOnlyStrict<T, K> = 0 extends 1 & T
   : KnownKeysOnly<T, K>;
 // END findFirst query defs
 
-
 // query output thing
 // export type TableColumns<TTableConfig extends TableRelationalConfig> = TTableConfig['table']['_']['columns'] & SystemFields<TTableConfig['table']['_']['name']> & SystemFieldAliases<TTableConfig['table']['_']['name'], TTableConfig['table']['_']['columns']>;
 // export interface ColumnBuilderBase<T extends ColumnBuilderBaseConfig<ColumnDataType, string> = ColumnBuilderBaseConfig<ColumnDataType, string>, TTypeConfig extends object = object> {
 //   _: ColumnBuilderTypeConfig<T, TTypeConfig>;
 // }
 export type ColumnBuilderBase = AnyColumn;
-export type TablePolymorphicMetadataFromColumn<TColumn, TDiscriminator extends string> = TColumn extends {
+export type TablePolymorphicMetadataFromColumn<
+  TColumn,
+  TDiscriminator extends string,
+> = TColumn extends {
   __polymorphic: infer TMeta;
-} ? TMeta extends {
-  as: infer TAlias extends string;
-  variants: infer TVariants extends Record<string, Record<string, ColumnBuilderBase>>;
-} ? {
-  as: TAlias;
-  discriminator: TDiscriminator;
-  variants: TVariants;
-} : never : never;
-export type TablePolymorphicMetadata<TTableConfig extends TableRelationalConfig> = { [K in Extract<keyof TTableConfig['table']['_']['columns'], string>]: TablePolymorphicMetadataFromColumn<TTableConfig['table']['_']['columns'][K], K> }[Extract<keyof TTableConfig['table']['_']['columns'], string>];
+}
+  ? TMeta extends {
+      as: infer TAlias extends string;
+      variants: infer TVariants extends Record<
+        string,
+        Record<string, ColumnBuilderBase>
+      >;
+    }
+    ? {
+        as: TAlias;
+        discriminator: TDiscriminator;
+        variants: TVariants;
+      }
+    : never
+  : never;
+export type TablePolymorphicMetadata<
+  TTableConfig extends TableRelationalConfig,
+> = {
+  [K in Extract<
+    keyof TTableConfig['table']['_']['columns'],
+    string
+  >]: TablePolymorphicMetadataFromColumn<
+    TTableConfig['table']['_']['columns'][K],
+    K
+  >;
+}[Extract<keyof TTableConfig['table']['_']['columns'], string>];
 export type PolymorphicResultFromMetadata<TMetadata> = TMetadata extends {
   as: infer TAlias extends string;
   discriminator: infer TDiscriminator extends string;
-  variants: infer TVariants extends Record<string, Record<string, ColumnBuilderBase>>;
-} ? { [TCase in keyof TVariants & string]: { [K in TDiscriminator]: TCase } & { [K in TAlias]: InferModelFromColumns<TVariants[TCase]> } }[keyof TVariants & string] : {};
-export type TablePolymorphicResult<TTableConfig extends TableRelationalConfig> = [TablePolymorphicMetadata<TTableConfig>] extends [never] ? {} : PolymorphicResultFromMetadata<TablePolymorphicMetadata<TTableConfig>>;
+  variants: infer TVariants extends Record<
+    string,
+    Record<string, ColumnBuilderBase>
+  >;
+}
+  ? {
+      [TCase in keyof TVariants & string]: { [K in TDiscriminator]: TCase } & {
+        [K in TAlias]: InferModelFromColumns<TVariants[TCase]>;
+      };
+    }[keyof TVariants & string]
+  : {};
+export type TablePolymorphicResult<TTableConfig extends TableRelationalConfig> =
+  [TablePolymorphicMetadata<TTableConfig>] extends [never]
+    ? {}
+    : PolymorphicResultFromMetadata<TablePolymorphicMetadata<TTableConfig>>;
 
 // END query output thing

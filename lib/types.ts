@@ -94,10 +94,13 @@ export type StripNoInfer<T> = T extends NoInfer<infer _> | infer Rest
   : T;
 
 export type ZipObject<
-  K extends readonly PropertyKey[], 
-  V extends readonly unknown[], 
-  Obj = {}
-> = K extends readonly [infer KHead, ...infer KTail extends readonly PropertyKey[]]
+  K extends readonly PropertyKey[],
+  V extends readonly unknown[],
+  Obj = {},
+> = K extends readonly [
+  infer KHead,
+  ...infer KTail extends readonly PropertyKey[],
+]
   ? V extends readonly [infer VHead, ...infer VTail]
     ? ZipObject<KTail, VTail, Obj & { [P in KHead & string]: VHead }>
     : Obj

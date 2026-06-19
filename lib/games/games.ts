@@ -68,7 +68,6 @@ type GameServerFields = SimplifyDeep<
 >;
 // END --- base defs ---
 
-
 // --- clientify ---
 export type clientifyGame<G extends GameServerFields> = SimplifyDeep<
   Omit<G, keyof GameServerFields> &
@@ -101,16 +100,11 @@ export function clientifyGame<G extends GameServerFields>(
 }
 // END --- clientify ---
 
-
 // --- Flatten Games ---
-type games<G extends Game> = G extends RootGameWithSubs
-  ? G['subGames']
-  : [G];
+type games<G extends Game> = G extends RootGameWithSubs ? G['subGames'] : [G];
 function games<G extends Game>(game: G): games<G> {
   return (
-    'subGames' in game && game.subGames
-      ? game.subGames
-      : [game]
+    'subGames' in game && game.subGames ? game.subGames : [game]
   ) as games<G>;
 }
 type allGames<Gs extends Game[] = GAMES> = {
@@ -123,7 +117,6 @@ export const FLAT_GAMES = GAMES.flatMap(
 export type FLAT_GAMES = typeof FLAT_GAMES;
 export type FlatGame = FLAT_GAMES[number];
 // END --- Flatten Games ---
-
 
 // --- Flatten Game Paths ---
 type subGamePaths<Path extends string, Gs extends SubGame[]> = {
@@ -170,13 +163,10 @@ export const GamePathStrings = GAME_PATHS.map((path) =>
 export type GamePathStrings = typeof GamePathStrings;
 export type GamePathString = GamePathStrings[number];
 
-
-export const GamePathStringToGame = Object.fromEntries(GamePathStrings.map((path, i) => [
-  path,
-  FLAT_GAMES[i],
-] as const)) as SimplifyDeep<ZipObject<GamePathStrings, FLAT_GAMES>>;
+export const GamePathStringToGame = Object.fromEntries(
+  GamePathStrings.map((path, i) => [path, FLAT_GAMES[i]] as const)
+) as SimplifyDeep<ZipObject<GamePathStrings, FLAT_GAMES>>;
 // END --- GamePathString ---
-
 
 // --- GamePair ---
 export type GamePair = [RootGame, undefined] | [RootGameWithSubs, SubGame];
@@ -211,7 +201,10 @@ export function pathFromGameSessionKey(sessionKey: GameSlug) {
   return sessionKey.split(GAME_SESSION_KEY_DELIM)[1].split('/') as GamePath;
 }
 
-export function sessionKeyForGame<PathString extends GamePathString>(sessionKey: GameSlug, path: PathString): sessionKey is `${string}${typeof GAME_SESSION_KEY_DELIM}${PathString}` {
+export function sessionKeyForGame<PathString extends GamePathString>(
+  sessionKey: GameSlug,
+  path: PathString
+): sessionKey is `${string}${typeof GAME_SESSION_KEY_DELIM}${PathString}` {
   return sessionKey.endsWith(path);
 }
 // END --- GameSlug / session key ---
