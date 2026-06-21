@@ -1,12 +1,13 @@
 import {
   GAME_PATH_SCHEMA,
+  GamePathString,
   GamePathStringToGame,
   GameSlugSchema,
   getGameByPath,
   makeGameSessionKey,
   pathFromGameSessionKey,
   sessionKeyForGame,
-} from '@/lib/games/games';
+} from '@/lib/games';
 import { MarkNonNull } from '@/lib/types';
 import { AnyMiddlewareBuilder, CRPCError } from 'kitcn/server';
 import z from 'zod';
@@ -21,16 +22,34 @@ import {
   perGameTableObj,
 } from '~schema';
 import { Arg0 } from 'hkt-core';
+import { Simplify } from 'type-fest';
 
-const gameInputSchema = z
+const gameInputSchemaPath = z
+  .object({
+    path: GAME_PATH_SCHEMA,
+    sessionKey: z.never().optional(),
+  });
+const gameInputSchemaSessionKey = z
+  .object({
+    path: z.never().optional(),
+    sessionKey: GameSlugSchema,
+  });
+const gameInputSchemaInitial = z
   .object({
     path: GAME_PATH_SCHEMA.optional(),
     sessionKey: GameSlugSchema.optional(),
-  })
-  .refine((data) => data.path || data.sessionKey, {
+  });
+
+function gameInputRefinement(data: z.infer<typeof gameInputSchemaInitial>): data is z.infer<typeof gameInputSchemaPath>|z.infer<typeof gameInputSchemaSessionKey> {
+  return !!(data.path || data.sessionKey);
+}
+
+const gameInputSchema = gameInputSchemaInitial
+  .refine(gameInputRefinement, {
     message: 'Either path or sessionKey must be provided',
     path: ['path'],
-  });
+  }) as unknown as typeof gameInputSchemaPath|typeof gameInputSchemaSessionKey;
+type t = Simplify<z.infer<typeof gameInputSchema>>;
 
 // type QueryCtxForMiddleware<QueryBuilder> =
 //   QueryBuilder extends QueryProcedureBuilder<
@@ -369,10 +388,11 @@ const gameInputSchema = z
 export const maybeGameMutation = authMutation
   .input(gameInputSchema)
   .use(async ({ ctx, next, input }) => {
-    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
+    const path = input.path ?? pathFromGameSessionKey(input.sessionKey);
+    const pathString = path.join('/') as GamePathString;
     const sessionKey =
       input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
+      (ctx.user && makeGameSessionKey(ctx.user.username, input.path));
     const gamePair = getGameByPath(path);
     const activeGame = gamePair[1] ?? gamePair[0];
     const gameSession = sessionKey
@@ -389,6 +409,7 @@ export const maybeGameMutation = authMutation
         ...ctx,
         game: {
           path: path,
+          pathString,
           sessionKey,
           pair: gamePair,
           info: activeGame,
@@ -401,10 +422,10 @@ export const maybeGameMutation = authMutation
 export const maybeGameQuery = optionalAuthQuery
   .input(gameInputSchema)
   .use(async ({ ctx, next, input }) => {
-    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
+    const path = input.path ?? pathFromGameSessionKey(input.sessionKey);
     const sessionKey =
       input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
+      (ctx.user && makeGameSessionKey(ctx.user.username, input.path));
     const gamePair = getGameByPath(path);
     const activeGame = gamePair[1] ?? gamePair[0];
     const gameSession = sessionKey
@@ -484,7 +505,7 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
     const sessionDoc = iHateNull(
       await ctx.orm.query.gameSession.findFirst({
         where: { sessionKey: ctx.game.session.sessionKey },
-        with: { [tblName]: true },
+        with: { [tblName]: { limit: 1 } },
       }),
       true
     );

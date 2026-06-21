@@ -1,8 +1,9 @@
 'use client';
 
 import { useCRPC } from '@/lib/convex/crpc';
-import { GameProps } from '../../types';
+import { GameProps } from '../../../../lib/games/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useGameMutation } from '@/hooks/games/use-game-request';
 
 // export interface EasyCrapsProps extends GameProps {}
 export type EasyCrapsProps = GameProps;
@@ -10,14 +11,7 @@ export function EasyCraps({gameSession}: EasyCrapsProps) {
   const crpc = useCRPC();
   const queryClient = useQueryClient();
   
-  const betPassline = useMutation(crpc.games.craps.easy.betPassline.mutationOptions({
-    onSettled: async () => {
-      await queryClient.invalidateQueries(
-        crpc.games.balance.info.staticQueryOptions({ sessionKey: gameSession.sessionKey })
-      );
-    },
-  }));
-  
+  const betPassline = useGameMutation(gameSession, crpc.games.craps.easy.betPassline.mutationOptions());
 
   return (
     <>
@@ -33,7 +27,7 @@ export function EasyCraps({gameSession}: EasyCrapsProps) {
         </div>
         <div
           className="col-span-7 col-start-8 row-span-10 row-start-10 grid bg-gray-800/30"
-          onClick={() => betPassline.mutate({amount: 10})}
+          onClick={() => betPassline({amount: 10})}
         >
           field/passline
         </div>

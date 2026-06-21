@@ -1,4 +1,4 @@
-import { GamePath, getGameByPath } from '@/lib/games/games';
+import { GamePath, getGameByPath } from '@/lib/games';
 import { usePathname } from 'next/navigation';
 
 export function useGamePath(): GamePath {

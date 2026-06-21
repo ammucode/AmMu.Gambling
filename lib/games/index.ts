@@ -1,37 +1,37 @@
-import { EasyCraps } from '@/components/games/craps/easy/root';
-import { Craps } from '@/components/games/craps/root';
-import { VideoPoker } from '@/components/games/poker/video/root';
-import {
-  GameComponent,
-  RootGameComponent,
-  SubGameComponent,
-} from '@/components/games/types';
+
 import { Dices, LucideIcon, LucideProps, Spade } from 'lucide-react';
 import { FlattenOnce, ZipObject } from '../types';
 import { Join, SimplifyDeep } from 'type-fest';
 import z from 'zod';
 
+export const RootGameComponentPlaceholder = Symbol.for("RootGameComponent");
+export type RootGameComponentPlaceholder = typeof RootGameComponentPlaceholder;
+export const GameComponentPlaceholder = Symbol.for("GameComponent");
+export type GameComponentPlaceholder = typeof GameComponentPlaceholder;
+export const SubGameComponentPlaceholder = Symbol.for("SubGameComponent");
+export type SubGameComponentPlaceholder = typeof SubGameComponentPlaceholder;
+
 // --- base defs ---
 export interface BaseGame {
   title: string;
   path: string;
-  icon?:
-    | LucideIcon
-    | (LucideProps & {
-        lucideIcon: LucideIcon;
-      });
+  // icon?:
+  //   | LucideIcon
+  //   | (LucideProps & {
+  //       lucideIcon: LucideIcon;
+  //     });
 }
 export interface RootGame extends Required<BaseGame> {
-  component: GameComponent;
-  rootComponent?: never;
+  // component: GameComponentPlaceholder;
+  // rootComponent?: never;
   subGames?: never;
 }
 export interface SubGame extends BaseGame {
-  component: SubGameComponent;
+  // component: SubGameComponentPlaceholder;
 }
 export interface RootGameWithSubs extends Required<BaseGame> {
-  component?: never;
-  rootComponent?: RootGameComponent;
+  // component?: never;
+  // rootComponent?: RootGameComponentPlaceholder;
   subGames: SubGame[];
 }
 export type Game = RootGame | RootGameWithSubs;
@@ -39,66 +39,67 @@ export const GAMES = [
   {
     title: 'Craps',
     path: 'craps',
-    icon: Dices,
-    rootComponent: Craps,
+    // icon: Dices,
+    // rootComponent: RootGameComponentPlaceholder,
     subGames: [
       {
         title: 'Easy Craps',
         path: 'easy',
-        component: EasyCraps,
+        // component: SubGameComponentPlaceholder,
       },
     ],
   },
   {
     title: 'Video Poker',
     path: 'video-poker',
-    icon: Spade,
-    component: VideoPoker,
+    // icon: Spade,
+    // component: GameComponentPlaceholder,
   },
 ] as const satisfies Game[];
 type GAMES = typeof GAMES;
 
-type serverOnlyFields = SimplifyDeep<
-  Partial<Pick<BaseGame, 'icon'> & Pick<Game, 'component' | 'rootComponent'>>
->;
-
-type RootContainingSubServerFields = { subGames?: serverOnlyFields[] };
-type GameServerFields = SimplifyDeep<
-  serverOnlyFields & RootContainingSubServerFields
->;
 // END --- base defs ---
 
-// --- clientify ---
-export type clientifyGame<G extends GameServerFields> = SimplifyDeep<
-  Omit<G, keyof GameServerFields> &
-    (G extends Required<RootContainingSubServerFields>
-      ? {
-          subGames: SimplifyDeep<
-            Omit<G['subGames'][number], keyof serverOnlyFields>[]
-          >;
-        }
-      : object)
->;
-export type clientifyGameList<T extends (GameServerFields | undefined)[]> = {
-  [E in keyof T]: T[E] extends undefined
-    ? undefined
-    : clientifyGame<Exclude<T[E], undefined>>;
-};
-export function clientifyGame<G extends GameServerFields>(
-  game: G
-): clientifyGame<G> {
-  const { icon, component, rootComponent, subGames, ...result } = game;
-  if (!subGames) return result as clientifyGame<G>;
-  const clientSubs = subGames.map((sub) => {
-    const { icon, component, rootComponent, ...subRes } = sub;
-    return subRes;
-  });
-  return {
-    result,
-    subGames: clientSubs,
-  } as unknown as clientifyGame<G>;
-}
-// END --- clientify ---
+// // --- clientify ---
+// type serverOnlyFields = SimplifyDeep<
+//   Partial<Pick<BaseGame, 'icon'> & Pick<Game, 'component' | 'rootComponent'>>
+// >;
+
+// type RootContainingSubServerFields = { subGames?: serverOnlyFields[] };
+// type GameServerFields = SimplifyDeep<
+//   serverOnlyFields & RootContainingSubServerFields
+// >;
+
+// export type clientifyGame<G extends GameServerFields> = SimplifyDeep<
+//   Omit<G, keyof GameServerFields> &
+//     (G extends Required<RootContainingSubServerFields>
+//       ? {
+//           subGames: SimplifyDeep<
+//             Omit<G['subGames'][number], keyof serverOnlyFields>[]
+//           >;
+//         }
+//       : object)
+// >;
+// export type clientifyGameList<T extends (GameServerFields | undefined)[]> = {
+//   [E in keyof T]: T[E] extends undefined
+//     ? undefined
+//     : clientifyGame<Exclude<T[E], undefined>>;
+// };
+// export function clientifyGame<G extends GameServerFields>(
+//   game: G
+// ): clientifyGame<G> {
+//   const { icon, component, rootComponent, subGames, ...result } = game;
+//   if (!subGames) return result as clientifyGame<G>;
+//   const clientSubs = subGames.map((sub) => {
+//     const { icon, component, rootComponent, ...subRes } = sub;
+//     return subRes;
+//   });
+//   return {
+//     result,
+//     subGames: clientSubs,
+//   } as unknown as clientifyGame<G>;
+// }
+// // END --- clientify ---
 
 // --- Flatten Games ---
 type games<G extends Game> = G extends RootGameWithSubs ? G['subGames'] : [G];

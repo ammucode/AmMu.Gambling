@@ -14,7 +14,7 @@ import {
   SidebarMenuSubButton,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Game, GAMES, BaseGame, SubGame } from '@/lib/games/games';
+import { Game, GAMES, BaseGame, SubGame } from '@/lib/games';
 import { ChevronRight } from 'lucide-react';
 import Link, { LinkProps } from 'next/link';
 import { useMemo } from 'react';

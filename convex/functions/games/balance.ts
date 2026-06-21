@@ -14,10 +14,6 @@ export const info = gameQuery
       ...ctx.game.session,
       user: ctx.user,
     };
-    // return await ctx.orm.query.gameSession.findFirst({
-    //   ...gameBalanceQuery,
-    //   where: { id: ctx.game.session.id },
-    // });
   });
 export const invest = gameMutation
   .input(amountSchema)

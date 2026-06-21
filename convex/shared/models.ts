@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { gameSessionTable, userTable } from '~schema';
 import { BuildQueryResult } from 'kitcn/orm';
-import { GAME_PATH_SCHEMA, GameSlugSchema } from '@/lib/games/games';
+import { GAME_PATH_SCHEMA, GameSlugSchema } from '@/lib/games';
 import { MyPartialDeep, MyStrictPartialDeep, StrictPartial } from '@/lib/types';
 import { usernameSchema } from '@convex-lib/validators';
 import { TableNames } from '../functions/_generated/dataModel';

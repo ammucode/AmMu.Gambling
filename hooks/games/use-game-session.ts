@@ -1,6 +1,6 @@
 import { iHateNull } from '@/convex/lib/document';
 import { useCRPC } from '@/lib/convex/crpc';
-import { GamePath } from '@/lib/games/games';
+import { GamePath } from '@/lib/games';
 import useAuthInfo from '@hooks/use-auth-info';
 import { skipToken, useQuery } from '@tanstack/react-query';
 
