@@ -1,3 +1,4 @@
+import { gameSessionInfo } from '@/convex/shared/models';
 import {
   clientifyGame,
   GamePath,
@@ -9,6 +10,7 @@ import {
 export interface GameProps {
   game: clientifyGame<RootGame | SubGame>;
   fullPath: GamePath;
+  gameSession: gameSessionInfo,
 }
 
 export interface RootGameProps {

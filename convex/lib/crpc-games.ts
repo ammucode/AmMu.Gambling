@@ -391,7 +391,7 @@ export const maybeGameMutation = authMutation
           path: path,
           sessionKey,
           pair: gamePair,
-          data: activeGame,
+          info: activeGame,
           session: gameSession,
         },
       },
@@ -423,7 +423,7 @@ export const maybeGameQuery = optionalAuthQuery
           path: path,
           sessionKey,
           pair: gamePair,
-          data: activeGame,
+          info: activeGame,
           session: gameSession,
         },
       },
@@ -434,7 +434,7 @@ export const gameMutation = maybeGameMutation.use(async ({ ctx, next }) => {
   if (!ctx.game.session) {
     throw new CRPCError({
       code: 'PRECONDITION_FAILED',
-      message: `Requires active game session for ${ctx.game.data.title}`,
+      message: `Requires active game session for ${ctx.game.info.title}`,
     });
   }
 
@@ -450,7 +450,7 @@ export const gameQuery = maybeGameQuery.use(async ({ ctx, next }) => {
   if (!ctx.game.session) {
     throw new CRPCError({
       code: 'PRECONDITION_FAILED',
-      message: `Requires active game session for ${ctx.game.data.title}`,
+      message: `Requires active game session for ${ctx.game.info.title}`,
     });
   }
 
@@ -476,7 +476,7 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
     const wrongGameError = () =>
       new CRPCError({
         code: 'PRECONDITION_FAILED',
-        message: `No game session is not for ${expectedGame.title}! (got ${ctx.game.sessionKey} for ${ctx.game.data.title})`,
+        message: `No game session is not for ${expectedGame.title}! (got ${ctx.game.sessionKey} for ${ctx.game.info.title})`,
       });
     if (!sessionKeyForGame(ctx.game.sessionKey, path)) {
       throw wrongGameError();
@@ -492,13 +492,18 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
       throw wrongGameError();
     }
 
-    const gameDoc = sessionDoc[tblName][0] as Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+    type TGameDoc = Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+    const gameDoc = sessionDoc[tblName][0] as TGameDoc;
 
 
     return next({
       ctx: {
         ...ctx,
-        gameDoc, // (gameDoc as Pick<typeof gameDoc, typeof tblName>)[tblName][0],
+        game: {
+          ...ctx.game,
+          doc: gameDoc,
+          bets: gameDoc.bets as TGameDoc["bets"],
+        },
       },
     });
   }) satisfies Parameters<mutationOrQueryBuilder['use']>[0];

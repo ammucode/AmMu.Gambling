@@ -9,6 +9,7 @@ import { useGameSession } from '@/hooks/games/use-game-session';
 import { Skeleton } from '@ui/skeleton';
 import { BalanceManager } from './balance-manager';
 import { MoneyStats } from '../blocks/games/money-stats';
+import { Card, CardContent } from '@ui/card';
 
 export interface GameWrapperProps {
   path: GamePath;
@@ -41,16 +42,26 @@ export function GameRoot({ path }: GameWrapperProps) {
     }
   }, [needsSession, maybeStartSession]);
 
-  if (user ? !gameSession : userLoading) {
-    return <Skeleton className="m-4 h-full w-full bg-accent" />;
-  }
+  const loadingDisplay = <Skeleton className="m-4 h-full w-full bg-accent" />;
 
-  if (!user) {
+  if (userLoading) return loadingDisplay;
+  else if (!user) {
     return <NoAccountBlock onAuth={maybeStartSession} />;
   }
 
+  if (gameSessionLoading) return loadingDisplay;
+  else if (!gameSession) {
+    return (
+      <Card className="flex min-w-72 flex-col gap-6 sm:min-w-sm md:max-w-md">
+        <CardContent>
+          something broken! try reloading...
+        </CardContent>
+      </Card>
+    );
+  }
+
   let renderedGame: React.ReactNode = (
-    <activeGame.component game={clientifyGame(activeGame)} fullPath={path} />
+    <activeGame.component game={clientifyGame(activeGame)} fullPath={path} gameSession={gameSession} />
   );
 
   if (subGame && rootGame.rootComponent) {

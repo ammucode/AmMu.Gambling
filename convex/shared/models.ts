@@ -91,10 +91,20 @@ export const {
   z.object({
     path: GAME_PATH_SCHEMA,
     sessionKey: GameSlugSchema,
-    // playable: z.number(),
-    // totalBet: z.number(),
-    // lastResultBet: z.number(),
-    // lastResultWon: z.number(),
+  })
+);
+
+export type gameSessionActiveBetsInfo = z.infer<typeof gameSessionActiveBetsInfo>;
+export const {
+  schema: gameSessionActiveBetsInfo,
+  cols: gameSessionActiveBetsInfoColumns,
+  filter: gameSessionActiveBetsInfoColumnsFilter,
+  returning: gameSessionActiveBetsInfoReturning,
+} = makeTableModel(
+  gameSessionTable,
+  z.object({
+    playable: z.number(),
+    totalBet: z.number(),
   })
 );
 
@@ -107,8 +117,7 @@ export const {
 } = makeTableModel(
   gameSessionTable,
   z.object({
-    playable: z.number(),
-    totalBet: z.number(),
+    ...gameSessionActiveBetsInfo.def.shape,
     lastResultBet: z.number(),
     lastResultWon: z.number(),
   })

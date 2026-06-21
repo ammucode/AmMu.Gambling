@@ -1,26 +1,26 @@
 'use client';
 
+import { useCRPC } from '@/lib/convex/crpc';
 import { GameProps } from '../../types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // export interface EasyCrapsProps extends GameProps {}
 export type EasyCrapsProps = GameProps;
-export function EasyCraps({}: EasyCrapsProps) {
-  /*
-  22 rows: 8 - point area, 1 gap, 10 - field/passline, 1 gap, 2 - roll history
-     rows: 19 hardways/hops
-  14 cols: 4 - hardways/hops, 10 - point area
-     cols:                  , 3 - C/E, 7 - field/passline
-  */
+export function EasyCraps({gameSession}: EasyCrapsProps) {
+  const crpc = useCRPC();
+  const queryClient = useQueryClient();
+  
+  const betPassline = useMutation(crpc.games.craps.easy.betPassline.mutationOptions({
+    onSettled: async () => {
+      await queryClient.invalidateQueries(
+        crpc.games.balance.info.staticQueryOptions({ sessionKey: gameSession.sessionKey })
+      );
+    },
+  }));
+  
 
   return (
     <>
-      {/* <div className="absolute top-0 right-0 h-16">
-        <MoneyStats
-          playable={money}
-          bet={0}
-          lastResult={{ bet: 10, win: 50 }}
-        />
-      </div> */}
       <div className="absolute bottom-0 grid aspect-2/1 max-h-[calc(100%-72px)] max-w-full min-w-full grid-cols-14 grid-rows-22 bg-gray-800/30 transition-[min-width] duration-300 ease-in-out @max-md:hidden @5xl:min-w-[90%] @6xl:min-w-[80%]">
         <div className="col-span-4 col-start-1 row-span-19 row-start-1 grid bg-gray-800/30">
           hard
@@ -33,7 +33,7 @@ export function EasyCraps({}: EasyCrapsProps) {
         </div>
         <div
           className="col-span-7 col-start-8 row-span-10 row-start-10 grid bg-gray-800/30"
-          // onClick={() => setMoney((m) => m - 1)}
+          onClick={() => betPassline.mutate({amount: 10})}
         >
           field/passline
         </div>
