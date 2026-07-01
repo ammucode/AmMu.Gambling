@@ -10,7 +10,7 @@ import { Skeleton } from '@ui/skeleton';
 import { BalanceManager } from './balance-manager';
 import { MoneyStats } from '../blocks/games/money-stats';
 import { Card, CardContent } from '@ui/card';
-import { GameComponents } from '@/lib/games/client';
+import { GameComponentDefs } from '@/lib/games/client';
 
 export interface GameWrapperProps {
   path: GamePath;
@@ -61,7 +61,7 @@ export function GameRoot({ path }: GameWrapperProps) {
     );
   }
 
-  const [rootComponent,subComponent] = GameComponents[path.join('/') as GamePathString];
+  const [rootComponent,subComponent] = GameComponentDefs[path.join('/') as GamePathString];
   const activeComponent = subComponent ?? rootComponent;
 
   let renderedGame: React.ReactNode = (

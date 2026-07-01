@@ -1,4 +1,4 @@
-import { MutationFunction, useMutation, UseMutationOptions, UseMutationResult, useQueryClient } from "@tanstack/react-query";
+import { Mutation, MutationFunction, useMutation, UseMutationOptions, UseMutationResult, useQueryClient } from "@tanstack/react-query";
 import { useGamePath } from "./use-game-path";
 import { useGameSession } from "./use-game-session";
 import { useCRPC } from "@/lib/convex/crpc";
@@ -8,23 +8,15 @@ import { gameMutation } from "@/convex/lib/crpc-games";
 import { MutationProcedureBuilder } from "kitcn/server";
 import { unknown } from "better-auth";
 import { z } from "zod";
-import { Simplify } from "type-fest";
+import { EmptyObject, SetParameterType, Simplify } from "type-fest";
 
 type gameMutationParams = z.infer<typeof gameMutation extends MutationProcedureBuilder<unknown, unknown, object, infer TInput, z.ZodTypeAny, object> ? TInput : never>;
 
 export function useGameMutation<
   MutationOpts extends UseMutationOptions<unknown, unknown, gameMutationParams>,
-  // RealMutationOpts extends MutationOpts extends UseMutationOptions<
-  //   infer Data,
-  //   infer Error,
-  //   infer Params extends gameMutationParams,
-  //   infer OnMutateResult
-  //   > 
-  //   ? UseMutationOptions<Data, Error, Params, OnMutateResult>
-  //   : never
 >(
   gameSession: gameSessionInfo,
-  mutationOpts: MutationOpts,// & NoInfer<RealMutationOpts>
+  mutationOpts: MutationOpts,
 ) {
   type MutConfig = MutationOpts extends UseMutationOptions<infer Data, infer Error, infer Params extends gameMutationParams, infer OnMutateResult> ? {
     data: Data,
@@ -32,10 +24,9 @@ export function useGameMutation<
     params: Params,
     onMutResult: OnMutateResult
   } : never;
-  // const realMutationOpts = mutationOpts as unknown as RealMutationOpts;
   const crpc = useCRPC();
   const queryClient = useQueryClient();
-  const {mutate,mutateAsync} = useMutation({
+  const mutation = useMutation({
     ...mutationOpts,
     onSettled: async (data, error, variables, onMutateResult, context) => {
       await queryClient.invalidateQueries(
@@ -45,15 +36,37 @@ export function useGameMutation<
     },
   }) as UseMutationResult<MutConfig["data"], MutConfig["error"], MutConfig["params"], MutConfig["onMutResult"]>;
 
-  // type params = Omit<Parameters<typeof mutate>[0], 'path'|'sessionKey'>
-  type params = Simplify<Omit<Parameters<typeof mutate>[0], keyof gameMutationParams>>;
-  // type params = Omit<Params, 'path'|'sessionKey'>
+  type MutationVariables = Simplify<Omit<Parameters<typeof mutation["mutate"]>[0], keyof gameMutationParams>>;
+  type CallbackInput = MutationVariables|(MutationVariables extends EmptyObject ? void : never);
 
-  return useCallback((params: params) => {
-    return mutateAsync({
+  const mutate = useCallback((variables: CallbackInput) => {
+    return mutation.mutate({
       sessionKey: gameSession.sessionKey,
-      ...params
+      ...variables
     });
-  }, [gameSession, mutate]);
-  // return mutate// as MutationFunction<unknown, FullParams>;
+  }, [gameSession, mutation]);
+  const mutateAsync = useCallback((variables: CallbackInput) => {
+    return mutation.mutateAsync({
+      sessionKey: gameSession.sessionKey,
+      ...variables
+    });
+  }, [gameSession, mutation]);
+
+  return {
+    ...mutation,
+    mutate,
+    mutateAsync
+  };
+}
+
+
+export function useGameMutationCallback<
+  MutationOpts extends UseMutationOptions<unknown, unknown, gameMutationParams>,
+>(
+  gameSession: gameSessionInfo,
+  mutationOpts: MutationOpts,
+) {
+  const {mutateAsync} = useGameMutation(gameSession, mutationOpts);
+
+  return mutateAsync;
 }

@@ -4,17 +4,19 @@ import { iHateNull } from '@convex-lib/document';
 import z from 'zod';
 import { createGamesBalanceCaller } from '../../generated/games/balance.runtime';
 import { CRPCError } from 'kitcn/server';
-import { easyCrapsSessionTable } from '~schema';
-import { eq } from 'kitcn/orm';
+import { easyCrapsSessionTable, gameSessionTable } from '~schema';
+import { eq, unsetToken, UpdateSet } from 'kitcn/orm';
+import { EasyCrapsBetsSchema, EasyCrapsInitialBets, EasyCrapsSchema, makeEasyCrapsInitialBets } from '@/lib/games/craps/easy';
+import { rollDice, RollDiceResult } from '@/lib/games/simulation';
+import { Sum } from 'type-fest';
+import { aBetSchema } from '@/lib/games/bets';
 
 const { query: easyCrapsQuery, mutation: easyCrapsMutation } =
   perGameTableResult_CRPCDefs['craps/easy'];
 
-export const getPoint = easyCrapsQuery
-  .output(z.union(Points.map((point) => z.literal(point))).nullable())
-  .query(async ({ ctx }) => {
-    return iHateNull(ctx.game.doc.point, true);
-  });
+export const getSession = easyCrapsQuery
+  .output(EasyCrapsSchema)
+  .query(async ({ ctx }) => iHateNull(ctx.game.doc, true));
 
 export const betPassline = easyCrapsMutation
   .input(z.object({ amount: z.number().positive() }))
@@ -29,15 +31,131 @@ export const betPassline = easyCrapsMutation
     void await balance.makeBet(input);
 
     return (await ctx.orm
-      .update(easyCrapsSessionTable)
-      .set({
-        bets: {
+      .insert(easyCrapsSessionTable)
+      .values({
+        sessionKey: ctx.game.sessionKey,
+        // bets: {
+        //   ...ctx.game.bets,
+        //   passLine: ctx.game.bets.passLine + input.amount
+        // }
+      })
+      .onConflictDoUpdate({
+        target: easyCrapsSessionTable.sessionKey,
+        set: { bets: {
           ...ctx.game.bets,
           passLine: ctx.game.bets.passLine + input.amount
-        }
+        } },
       })
-      .where(eq(easyCrapsSessionTable.sessionKey, ctx.game.session.sessionKey))
       .returning({
         bets: easyCrapsSessionTable.bets
       }))[0].bets.passLine;
+  });
+
+export const roll = easyCrapsMutation
+  .output(z.object({
+    dice: z.tuple([z.number().min(1).max(6),z.number().min(1).max(6)]) as z.ZodType<RollDiceResult<2>>,
+    roll: z.number().min(2).max(12),
+    newBets: z.object({
+      total: aBetSchema,
+      breakdown: EasyCrapsBetsSchema,
+    }),
+    winnings: z.object({
+      total: aBetSchema,
+      breakdown: EasyCrapsBetsSchema,
+    }),
+  }))
+  .mutation(async ({ ctx }) => {
+    const session = ctx.game.session;
+    const game = ctx.game.doc;
+    const bets = game.bets;
+
+    const dice = rollDice(2);
+    const roll = (dice[0]+dice[1]) as Sum<typeof dice[0], typeof dice[1]>;
+
+    const winnings = makeEasyCrapsInitialBets();
+    const newBets = makeEasyCrapsInitialBets();
+
+    let totalWinnings = 0;
+    let newTotalBet = 0;
+    let gotResult = false;
+    let newPoint = game.point;
+
+    if (game.point) {
+      if (roll === 7) {
+        newPoint = undefined;
+        gotResult = true;
+      } else if (roll === game.point) {
+        winnings.passLine = 2*bets.passLine;
+        totalWinnings += winnings.passLine;
+        winnings.passLineOdds = 2*bets.passLineOdds; // TODO: do math
+        totalWinnings += winnings.passLineOdds;
+
+        newBets.passLine = bets.passLine;
+        newTotalBet += newBets.passLine;
+
+        newPoint = undefined;
+        gotResult = true;
+      }
+    } else {
+      if (roll === 7) {
+        winnings.passLine = 2*bets.passLine;
+        totalWinnings += winnings.passLine;
+
+        gotResult = true;
+      } else {
+        newPoint = roll;
+      }
+      newBets.passLine = bets.passLine;
+      newTotalBet += newBets.passLine;
+    }
+
+    const gameSessionUpdate = (gotResult ? {
+      lastResultBet: session.totalBet,
+      lastResultWon: totalWinnings,
+      totalBet: newTotalBet,
+      playable: session.playable + totalWinnings,
+    } : {
+      lastResultBet: session.lastResultBet,
+      lastResultWon: session.lastResultWon,
+      totalBet: session.totalBet,
+      playable: session.playable,
+    }) satisfies UpdateSet<typeof gameSessionTable>;
+
+    const easyCrapsSessionUpdate = {
+      bets: newBets,
+      rollHistory: [dice, ...game.rollHistory],
+      point: newPoint ?? unsetToken,
+    } satisfies UpdateSet<typeof easyCrapsSessionTable>;
+
+    await ctx.orm
+      .insert(gameSessionTable)
+      .values({
+        path: session.path,
+        sessionKey: session.sessionKey,
+        userId: session.userId,
+        // ...gameSessionUpdate
+      })
+      .onConflictDoUpdate({target: gameSessionTable.sessionKey, set: gameSessionUpdate});
+
+    await ctx.orm
+      .insert(easyCrapsSessionTable)
+      .values({
+        sessionKey: session.sessionKey,
+        // ...easyCrapsSessionUpdate,
+        // point: newPoint,
+      })
+      .onConflictDoUpdate({target: easyCrapsSessionTable.sessionKey, set: easyCrapsSessionUpdate});
+
+    return {
+      dice,
+      roll,
+      winnings: {
+        total: totalWinnings,
+        breakdown: winnings,
+      },
+      newBets: {
+        total: newTotalBet,
+        breakdown: newBets,
+      }
+    };
   });

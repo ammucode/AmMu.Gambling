@@ -55,11 +55,170 @@ export declare const api: {
           { amount: number; path?: any; sessionKey?: string },
           number
         >;
-        getPoint: FunctionReference<
+        getSession: FunctionReference<
           "query",
           "public",
           { path?: any; sessionKey?: string },
-          2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | null
+          {
+            bets: {
+              C: number;
+              C_and_E: number;
+              E: number;
+              anyCraps: number;
+              field: number;
+              hardWays: { p10: number; p4: number; p6: number; p8: number };
+              highField: number;
+              hop: {
+                p13: number;
+                p14: number;
+                p15: number;
+                p16: number;
+                p23: number;
+                p24: number;
+                p25: number;
+                p26: number;
+                p34: number;
+                p35: number;
+                p36: number;
+                p45: number;
+                p46: number;
+              };
+              hoppingHardWays: {
+                p10: number;
+                p4: number;
+                p6: number;
+                p8: number;
+              };
+              horn: { p11: number; p12: number; p2: number; p3: number };
+              lowField: number;
+              passLine: number;
+              passLineOdds: number;
+              place: {
+                p10: number;
+                p11: number;
+                p12: number;
+                p2: number;
+                p3: number;
+                p4: number;
+                p5: number;
+                p6: number;
+                p8: number;
+                p9: number;
+              };
+              seven: number;
+            };
+            point?: 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12;
+            rollHistory: Array<any>;
+          }
+        >;
+        roll: FunctionReference<
+          "mutation",
+          "public",
+          { path?: any; sessionKey?: string },
+          {
+            dice: Array<number | number>;
+            newBets: {
+              breakdown: {
+                C: number;
+                C_and_E: number;
+                E: number;
+                anyCraps: number;
+                field: number;
+                hardWays: { p10: number; p4: number; p6: number; p8: number };
+                highField: number;
+                hop: {
+                  p13: number;
+                  p14: number;
+                  p15: number;
+                  p16: number;
+                  p23: number;
+                  p24: number;
+                  p25: number;
+                  p26: number;
+                  p34: number;
+                  p35: number;
+                  p36: number;
+                  p45: number;
+                  p46: number;
+                };
+                hoppingHardWays: {
+                  p10: number;
+                  p4: number;
+                  p6: number;
+                  p8: number;
+                };
+                horn: { p11: number; p12: number; p2: number; p3: number };
+                lowField: number;
+                passLine: number;
+                passLineOdds: number;
+                place: {
+                  p10: number;
+                  p11: number;
+                  p12: number;
+                  p2: number;
+                  p3: number;
+                  p4: number;
+                  p5: number;
+                  p6: number;
+                  p8: number;
+                  p9: number;
+                };
+                seven: number;
+              };
+              total: number;
+            };
+            roll: number;
+            winnings: {
+              breakdown: {
+                C: number;
+                C_and_E: number;
+                E: number;
+                anyCraps: number;
+                field: number;
+                hardWays: { p10: number; p4: number; p6: number; p8: number };
+                highField: number;
+                hop: {
+                  p13: number;
+                  p14: number;
+                  p15: number;
+                  p16: number;
+                  p23: number;
+                  p24: number;
+                  p25: number;
+                  p26: number;
+                  p34: number;
+                  p35: number;
+                  p36: number;
+                  p45: number;
+                  p46: number;
+                };
+                hoppingHardWays: {
+                  p10: number;
+                  p4: number;
+                  p6: number;
+                  p8: number;
+                };
+                horn: { p11: number; p12: number; p2: number; p3: number };
+                lowField: number;
+                passLine: number;
+                passLineOdds: number;
+                place: {
+                  p10: number;
+                  p11: number;
+                  p12: number;
+                  p2: number;
+                  p3: number;
+                  p4: number;
+                  p5: number;
+                  p6: number;
+                  p8: number;
+                  p9: number;
+                };
+                seven: number;
+              };
+              total: number;
+            };
+          }
         >;
       };
     };

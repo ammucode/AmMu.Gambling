@@ -25,7 +25,8 @@ import z from 'zod';
 import { Points } from '@/lib/games/craps';
 import { Arg0, Call1, Pipe, TypeLambda1 } from 'hkt-core';
 import { List, ObjectHKTs } from '@/lib/hkt';
-import {EasyCrapsBets, EasyCrpsInitialBets} from '@/lib/games/craps/easy';
+import {EasyCrapsBets, EasyCrapsInitialBets, makeEasyCrapsInitialBets} from '@/lib/games/craps/easy';
+import { RollDiceResult } from '@/lib/games/simulation';
 
 export const userTable = convexTable(
   'user',
@@ -158,7 +159,8 @@ export const easyCrapsSessionTable = convexTable(
         v.nullable(v.union(...Points.map((point) => v.literal(point))))
       )
     ),
-    bets: json<EasyCrapsBets>().notNull().default(EasyCrpsInitialBets),
+    bets: json<EasyCrapsBets>().notNull().$defaultFn(makeEasyCrapsInitialBets),
+    rollHistory: arrayOf(json<RollDiceResult<2>>().notNull()).notNull().default([]),
   },
   (easyCrapsSessionTable) => [...genericGameExtras(easyCrapsSessionTable)]
 );
@@ -197,7 +199,7 @@ export type PerGameTableKey_Functor<
 
 export type PerGameTableKey_Pipe<
   Lambda extends PerGameTableKey_TypeLambda<PerGameTableKey_LambdaOutUpper>,
-> = Pipe<GamePathStrings, List.Map$<Lambda>, ObjectHKTs.FromEntries>;
+> = Pipe<GamePathStrings, List.MapRO$<Lambda>, ObjectHKTs.FromEntries>;
 export function perGameTableObj<
   Lambda extends PerGameTableKey_TypeLambda<PerGameTableKey_LambdaOutUpper>,
 >(functor: PerGameTableKey_Functor<Lambda>) {

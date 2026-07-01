@@ -34,6 +34,11 @@ const gameInputSchemaSessionKey = z
     path: z.never().optional(),
     sessionKey: GameSlugSchema,
   });
+const gameInputSchemaBoth = z
+  .object({
+    path: GAME_PATH_SCHEMA,
+    sessionKey: GameSlugSchema,
+  });
 const gameInputSchemaInitial = z
   .object({
     path: GAME_PATH_SCHEMA.optional(),
@@ -48,7 +53,7 @@ const gameInputSchema = gameInputSchemaInitial
   .refine(gameInputRefinement, {
     message: 'Either path or sessionKey must be provided',
     path: ['path'],
-  }) as unknown as typeof gameInputSchemaPath|typeof gameInputSchemaSessionKey;
+  }) as unknown as typeof gameInputSchemaPath|typeof gameInputSchemaSessionKey|typeof gameInputSchemaBoth;
 type t = Simplify<z.infer<typeof gameInputSchema>>;
 
 // type QueryCtxForMiddleware<QueryBuilder> =
@@ -488,50 +493,82 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
   tblName,
 }: PerGameTableKey_Ctx<Path>) => {
   const expectedGame = GamePathStringToGame[path];
-  type mutationOrQueryBuilder = typeof gameMutation | typeof gameQuery;
-  type middlewareT = Exclude<
-    Parameters<mutationOrQueryBuilder['use']>[0],
-    AnyMiddlewareBuilder
-  >;
-  const middleware = (async ({ ctx, next }: Parameters<middlewareT>[0]) => {
-    const wrongGameError = () =>
-      new CRPCError({
-        code: 'PRECONDITION_FAILED',
-        message: `No game session is not for ${expectedGame.title}! (got ${ctx.game.sessionKey} for ${ctx.game.info.title})`,
-      });
-    if (!sessionKeyForGame(ctx.game.sessionKey, path)) {
-      throw wrongGameError();
-    }
-    const sessionDoc = iHateNull(
-      await ctx.orm.query.gameSession.findFirst({
-        where: { sessionKey: ctx.game.session.sessionKey },
-        with: { [tblName]: { limit: 1 } },
-      }),
-      true
-    );
-    if (!sessionDoc?.[tblName]?.length) {
-      throw wrongGameError();
-    }
-
-    type TGameDoc = Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
-    const gameDoc = sessionDoc[tblName][0] as TGameDoc;
-
-
-    return next({
-      ctx: {
-        ...ctx,
-        game: {
-          ...ctx.game,
-          doc: gameDoc,
-          bets: gameDoc.bets as TGameDoc["bets"],
-        },
-      },
-    });
-  }) satisfies Parameters<mutationOrQueryBuilder['use']>[0];
   return PerGameTableKey_MakeEntry(path, {
-    mutation: gameMutation.use(middleware),
-    query: gameQuery.use(middleware),
+    mutation: gameMutation.use(async ({ ctx, next }) => {
+      const wrongGameError = () =>
+        new CRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: `No game session is not for ${expectedGame.title}! (got ${ctx.game.sessionKey} for ${ctx.game.info.title})`,
+        });
+      if (!sessionKeyForGame(ctx.game.sessionKey, path)) {
+        throw wrongGameError();
+      }
+      const sessionDoc = iHateNull(
+        await ctx.orm.query.gameSession.findFirst({
+          where: { sessionKey: ctx.game.session.sessionKey },
+          with: { [tblName]: { limit: 1 } },
+        }),
+        true
+      );
+      if (!sessionDoc?.[tblName]?.length) {
+        throw wrongGameError();
+      }
+
+      type TGameDoc = Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+      const gameDoc = sessionDoc[tblName][0] as TGameDoc;
+
+
+      return next({
+        ctx: {
+          ...ctx,
+          game: {
+            ...ctx.game,
+            doc: gameDoc,
+            bets: gameDoc.bets as TGameDoc["bets"],
+          },
+        },
+      });
+    }),
+    query: gameQuery.use(async ({ ctx, next }) => {
+      const wrongGameError = () =>
+        new CRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: `No game session is not for ${expectedGame.title}! (got ${ctx.game.sessionKey} for ${ctx.game.info.title})`,
+        });
+      if (!sessionKeyForGame(ctx.game.sessionKey, path)) {
+        throw wrongGameError();
+      }
+      const sessionDoc = iHateNull(
+        await ctx.orm.query.gameSession.findFirst({
+          where: { sessionKey: ctx.game.session.sessionKey },
+          with: { [tblName]: { limit: 1 } },
+        }),
+        true
+      );
+      if (!sessionDoc?.[tblName]?.length) {
+        throw wrongGameError();
+      }
+
+      type TGameDoc = Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+      const gameDoc = sessionDoc[tblName][0] as TGameDoc;
+
+
+      return next({
+        ctx: {
+          ...ctx,
+          game: {
+            ...ctx.game,
+            doc: gameDoc,
+            bets: gameDoc.bets as TGameDoc["bets"],
+          },
+        },
+      });
+    }),
   });
+  // return PerGameTableKey_MakeEntry(path, {
+  //   mutation: gameMutation.use(middleware as typeof middleware<typeof gameMutation>),
+  //   query: gameQuery.use(middleware),
+  // });
 };
 interface PerGameTableKey_CRPCDefs_TypeLambda extends PerGameTableKey_TypeLambda<
   ReturnType<typeof PerGameTableKey_CRPCDefs_Func>
