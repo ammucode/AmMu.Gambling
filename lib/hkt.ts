@@ -160,17 +160,26 @@ export namespace Str {
   }
 
   /* Append */
-  export interface Append<Suffix extends string> extends TypeLambda<[s: string], string> {
+  export interface Append<Suffix extends string> extends TypeLambda<
+    [s: string],
+    string
+  > {
     return: `${Arg0<this>}${Suffix}`;
   }
 
   /* Prepend */
-  export interface Prepend<Prefix extends string> extends TypeLambda<[s: string], string> {
+  export interface Prepend<Prefix extends string> extends TypeLambda<
+    [s: string],
+    string
+  > {
     return: `${Prefix}${Arg0<this>}`;
   }
 
   /* ToString */
-  export interface ToString extends TypeLambda1<ValidTemplateLiteralType, string> {
+  export interface ToString extends TypeLambda1<
+    ValidTemplateLiteralType,
+    string
+  > {
     return: `${Arg0<this>}`;
   }
 

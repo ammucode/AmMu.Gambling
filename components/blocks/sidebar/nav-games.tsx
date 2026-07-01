@@ -39,9 +39,11 @@ function GameLink<Raw extends boolean>({
     [open, path, raw]
   );
   const renderedIcon = Icon ? (
-    'lucideIcon' in Icon
-      ? <Icon.lucideIcon {...Icon} />
-      : <Icon />
+    'lucideIcon' in Icon ? (
+      <Icon.lucideIcon {...Icon} />
+    ) : (
+      <Icon />
+    )
   ) : null;
   const children = (
     <>
@@ -68,7 +70,11 @@ export function NavGames() {
       <SidebarMenu>
         {GAMES.map((game: Game) => {
           const hasSubGames = 'subGames' in game;
-          const baseComponents = hasSubGames ? GameComponentDefs[`${game.path}/${game.subGames![0].path}` as GamePathString] : GameComponentDefs[`${game.path}` as GamePathString];
+          const baseComponents = hasSubGames
+            ? GameComponentDefs[
+                `${game.path}/${game.subGames![0].path}` as GamePathString
+              ]
+            : GameComponentDefs[`${game.path}` as GamePathString];
           const baseIcon = baseComponents[0].icon;
           if (hasSubGames) {
             return (
@@ -107,7 +113,9 @@ export function NavGames() {
               <SidebarMenuItem key={game.title}>
                 <SidebarMenuButton
                   tooltip={game.title}
-                  render={<GameLink game={game} Icon={baseIcon} path={[game.path]} />}
+                  render={
+                    <GameLink game={game} Icon={baseIcon} path={[game.path]} />
+                  }
                 />
               </SidebarMenuItem>
             );

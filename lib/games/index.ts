@@ -1,14 +1,12 @@
-
-import { Dices, LucideIcon, LucideProps, Spade } from 'lucide-react';
 import { FlattenOnce, ZipObject } from '../types';
 import { Join, SimplifyDeep } from 'type-fest';
 import z from 'zod';
 
-export const RootGameComponentPlaceholder = Symbol.for("RootGameComponent");
+export const RootGameComponentPlaceholder = Symbol.for('RootGameComponent');
 export type RootGameComponentPlaceholder = typeof RootGameComponentPlaceholder;
-export const GameComponentPlaceholder = Symbol.for("GameComponent");
+export const GameComponentPlaceholder = Symbol.for('GameComponent');
 export type GameComponentPlaceholder = typeof GameComponentPlaceholder;
-export const SubGameComponentPlaceholder = Symbol.for("SubGameComponent");
+export const SubGameComponentPlaceholder = Symbol.for('SubGameComponent');
 export type SubGameComponentPlaceholder = typeof SubGameComponentPlaceholder;
 
 // --- base defs ---
@@ -26,6 +24,7 @@ export interface RootGame extends Required<BaseGame> {
   // rootComponent?: never;
   subGames?: never;
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SubGame extends BaseGame {
   // component: SubGameComponentPlaceholder;
 }

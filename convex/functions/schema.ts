@@ -25,7 +25,10 @@ import z from 'zod';
 import { Points } from '@/lib/games/craps';
 import { Arg0, Call1, Pipe, TypeLambda1 } from 'hkt-core';
 import { List, ObjectHKTs } from '@/lib/hkt';
-import {EasyCrapsBets, EasyCrapsInitialBets, makeEasyCrapsInitialBets} from '@/lib/games/craps/easy';
+import {
+  EasyCrapsBets,
+  makeEasyCrapsInitialBets,
+} from '@/lib/games/craps/easy';
 import { RollDiceResult } from '@/lib/games/simulation';
 
 export const userTable = convexTable(
@@ -160,16 +163,16 @@ export const easyCrapsSessionTable = convexTable(
       )
     ),
     bets: json<EasyCrapsBets>().notNull().$defaultFn(makeEasyCrapsInitialBets),
-    rollHistory: arrayOf(json<RollDiceResult<2>>().notNull()).notNull().default([]),
+    rollHistory: arrayOf(json<RollDiceResult<2>>().notNull())
+      .notNull()
+      .default([]),
   },
   (easyCrapsSessionTable) => [...genericGameExtras(easyCrapsSessionTable)]
 );
 
 export const videoPokerSessionTable = convexTable(
   'videoPokerSession',
-  { ...genericGameColumns,
-    bets: json<object>().notNull()
-   },
+  { ...genericGameColumns, bets: json<object>().notNull() },
   (videoPokerSessionTable) => [...genericGameExtras(videoPokerSessionTable)]
 );
 

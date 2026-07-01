@@ -9,7 +9,7 @@ import {
   sessionKeyForGame,
 } from '@/lib/games';
 import { MarkNonNull } from '@/lib/types';
-import { AnyMiddlewareBuilder, CRPCError } from 'kitcn/server';
+import { CRPCError } from 'kitcn/server';
 import z from 'zod';
 import { authMutation, optionalAuthQuery } from './crpc';
 import { iHateNull } from './document';
@@ -22,39 +22,43 @@ import {
   perGameTableObj,
 } from '~schema';
 import { Arg0 } from 'hkt-core';
-import { Simplify } from 'type-fest';
 
-const gameInputSchemaPath = z
-  .object({
-    path: GAME_PATH_SCHEMA,
-    sessionKey: z.never().optional(),
-  });
-const gameInputSchemaSessionKey = z
-  .object({
-    path: z.never().optional(),
-    sessionKey: GameSlugSchema,
-  });
-const gameInputSchemaBoth = z
-  .object({
-    path: GAME_PATH_SCHEMA,
-    sessionKey: GameSlugSchema,
-  });
-const gameInputSchemaInitial = z
-  .object({
-    path: GAME_PATH_SCHEMA.optional(),
-    sessionKey: GameSlugSchema.optional(),
-  });
+type gameInputSchemaPath = ReturnType<
+  typeof z.object<{
+    path: typeof GAME_PATH_SCHEMA;
+    sessionKey: z.ZodOptional<z.ZodNever>;
+  }>
+>;
+type gameInputSchemaSessionKey = ReturnType<
+  typeof z.object<{
+    path: z.ZodOptional<z.ZodNever>;
+    sessionKey: typeof GameSlugSchema;
+  }>
+>;
+type gameInputSchemaBoth = ReturnType<
+  typeof z.object<{
+    path: typeof GAME_PATH_SCHEMA;
+    sessionKey: typeof GameSlugSchema;
+  }>
+>;
+const gameInputSchemaInitial = z.object({
+  path: GAME_PATH_SCHEMA.optional(),
+  sessionKey: GameSlugSchema.optional(),
+});
 
-function gameInputRefinement(data: z.infer<typeof gameInputSchemaInitial>): data is z.infer<typeof gameInputSchemaPath>|z.infer<typeof gameInputSchemaSessionKey> {
+function gameInputRefinement(
+  data: z.infer<typeof gameInputSchemaInitial>
+): data is z.infer<gameInputSchemaPath> | z.infer<gameInputSchemaSessionKey> {
   return !!(data.path || data.sessionKey);
 }
 
-const gameInputSchema = gameInputSchemaInitial
-  .refine(gameInputRefinement, {
-    message: 'Either path or sessionKey must be provided',
-    path: ['path'],
-  }) as unknown as typeof gameInputSchemaPath|typeof gameInputSchemaSessionKey|typeof gameInputSchemaBoth;
-type t = Simplify<z.infer<typeof gameInputSchema>>;
+const gameInputSchema = gameInputSchemaInitial.refine(gameInputRefinement, {
+  message: 'Either path or sessionKey must be provided',
+  path: ['path'],
+}) as unknown as
+  | gameInputSchemaPath
+  | gameInputSchemaSessionKey
+  | gameInputSchemaBoth;
 
 // type QueryCtxForMiddleware<QueryBuilder> =
 //   QueryBuilder extends QueryProcedureBuilder<
@@ -514,9 +518,11 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
         throw wrongGameError();
       }
 
-      type TGameDoc = Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+      type TGameDoc = Pick<
+        typeof sessionDoc,
+        typeof tblName
+      >[typeof tblName][0];
       const gameDoc = sessionDoc[tblName][0] as TGameDoc;
-
 
       return next({
         ctx: {
@@ -524,7 +530,7 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
           game: {
             ...ctx.game,
             doc: gameDoc,
-            bets: gameDoc.bets as TGameDoc["bets"],
+            bets: gameDoc.bets as TGameDoc['bets'],
           },
         },
       });
@@ -549,9 +555,11 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
         throw wrongGameError();
       }
 
-      type TGameDoc = Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+      type TGameDoc = Pick<
+        typeof sessionDoc,
+        typeof tblName
+      >[typeof tblName][0];
       const gameDoc = sessionDoc[tblName][0] as TGameDoc;
-
 
       return next({
         ctx: {
@@ -559,7 +567,7 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
           game: {
             ...ctx.game,
             doc: gameDoc,
-            bets: gameDoc.bets as TGameDoc["bets"],
+            bets: gameDoc.bets as TGameDoc['bets'],
           },
         },
       });

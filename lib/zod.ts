@@ -9,9 +9,11 @@ export function createUnionSchema<T extends readonly any[]>(values: T) {
 }
 
 export function defaultObject<T extends z.ZodObject>(schema: T) {
-  return z.transform(val => val ?? {}).pipe(schema);
+  return z.transform((val) => val ?? {}).pipe(schema);
 }
 
-export function defaultObjectByDef<T extends Record<PropertyKey, z.ZodType>>(schemaDef: T) {
-  return z.transform(val => val ?? {}).pipe(z.object(schemaDef));
+export function defaultObjectByDef<T extends Record<PropertyKey, z.ZodType>>(
+  schemaDef: T
+) {
+  return z.transform((val) => val ?? {}).pipe(z.object(schemaDef));
 }

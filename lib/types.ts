@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 
 import {
   If,
@@ -9,11 +10,19 @@ import {
   Primitive,
 } from 'type-fest';
 
-
 export type BuiltIns = Primitive | void | Date | RegExp;
-export type NonRecursiveType = BuiltIns | Function | (new (...arguments_: any[]) => unknown) | Promise<unknown>;
-export type ValidTemplateLiteralType = string | number | bigint | boolean | null | undefined;
-
+export type NonRecursiveType =
+  | BuiltIns
+  | Function
+  | (new (...arguments_: any[]) => unknown)
+  | Promise<unknown>;
+export type ValidTemplateLiteralType =
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined;
 
 export type MyPartialDeep<T> = {
   [P in keyof T]?: T[P] extends object ? MyPartialDeep<T[P]> : T[P];
@@ -112,22 +121,28 @@ export type ZipObject<
     : Obj
   : Obj;
 
-export type AnyFieldValueOf<Obj> = 
-  Obj extends NonRecursiveType ? Obj
-  : Obj extends object ? AnyFieldValueOf<Obj[keyof Obj]>
-  : Obj;
+export type AnyFieldValueOf<Obj> = Obj extends NonRecursiveType
+  ? Obj
+  : Obj extends object
+    ? AnyFieldValueOf<Obj[keyof Obj]>
+    : Obj;
 
-
-export type ReplaceTypeDeep<Within, From, To> = Within extends unknown ?
-  Within extends From ? To
-  : Within extends NonRecursiveType ? Within
-  : Within extends unknown[] ? { [I in keyof Within]: ReplaceTypeDeep<Within[I], From, To> }
-  : { [K in keyof Within]: Within[K] } & {}
+export type ReplaceTypeDeep<Within, From, To> = Within extends unknown
+  ? Within extends From
+    ? To
+    : Within extends NonRecursiveType
+      ? Within
+      : Within extends unknown[]
+        ? { [I in keyof Within]: ReplaceTypeDeep<Within[I], From, To> }
+        : { [K in keyof Within]: Within[K] } & {}
   : never;
 
-export type PickByKeyDeep<T, Key extends PropertyKey> = T extends unknown ?
-  T extends NonRecursiveType ? T
-  : T extends unknown[] ? { [I in keyof T]: PickByKeyDeep<T[I], Key> }
-  : T extends object ? { [K in keyof T]: K extends Key ? T[K] : never } & {}
-  : T
+export type PickByKeyDeep<T, Key extends PropertyKey> = T extends unknown
+  ? T extends NonRecursiveType
+    ? T
+    : T extends unknown[]
+      ? { [I in keyof T]: PickByKeyDeep<T[I], Key> }
+      : T extends object
+        ? { [K in keyof T]: K extends Key ? T[K] : never } & {}
+        : T
   : never;

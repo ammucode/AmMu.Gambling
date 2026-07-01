@@ -15,7 +15,8 @@ const fontMono = Geist_Mono({
   variable: '--font-mono',
 });
 
-export const maybeGradientBackground = "bg-radial-[at_50%_30%] from-[rgb(63,140,46)] to-[rgb(25,63,19)]";
+export const maybeGradientBackground =
+  'bg-radial-[at_50%_30%] from-[rgb(63,140,46)] to-[rgb(25,63,19)]';
 
 export default function RootLayout({
   children,

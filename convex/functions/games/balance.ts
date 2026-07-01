@@ -1,5 +1,9 @@
 import { gameMutation, gameQuery } from '@convex-lib/crpc-games';
-import { gameBalanceSchema, gameSessionActiveBetsInfo, gameSessionActiveBetsInfoReturning } from '@convex/models';
+import {
+  gameBalanceSchema,
+  gameSessionActiveBetsInfo,
+  gameSessionActiveBetsInfoReturning,
+} from '@convex/models';
 import { eq } from 'kitcn/orm';
 import { CRPCError } from 'kitcn/server';
 import z from 'zod';
@@ -59,13 +63,15 @@ export const makeBet = gameMutation
       });
     }
 
-  // return {playable:0,totalBet:0};
-  return (await ctx.orm
-    .update(gameSessionTable)
-    .set({
-      playable: ctx.game.session.playable - input.amount,
-      totalBet: ctx.game.session.totalBet + input.amount,
-    })
-    .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey))
-    .returning(gameSessionActiveBetsInfoReturning))[0];
-});
+    // return {playable:0,totalBet:0};
+    return (
+      await ctx.orm
+        .update(gameSessionTable)
+        .set({
+          playable: ctx.game.session.playable - input.amount,
+          totalBet: ctx.game.session.totalBet + input.amount,
+        })
+        .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey))
+        .returning(gameSessionActiveBetsInfoReturning)
+    )[0];
+  });

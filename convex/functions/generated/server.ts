@@ -33,9 +33,9 @@ const ormSchema = schema;
 
 registerProcedureNameLookup(
   {
-  "games/balance.ts": [{ column: 36, line: 39, name: "games/balance:cashOut" }, { column: 3, line: 12, name: "games/balance:info" }, { column: 3, line: 20, name: "games/balance:invest" }, { column: 3, line: 54, name: "games/balance:makeBet" }],
-  "games/craps/easy.ts": [{ column: 3, line: 24, name: "games/craps/easy:betPassline" }, { column: 3, line: 19, name: "games/craps/easy:getSession" }, { column: 3, line: 67, name: "games/craps/easy:roll" }],
-  "games/session.ts": [{ column: 3, line: 34, name: "games/session:getSession" }, { column: 3, line: 9, name: "games/session:maybeStartSession" }],
+  "games/balance.ts": [{ column: 36, line: 43, name: "games/balance:cashOut" }, { column: 3, line: 16, name: "games/balance:info" }, { column: 3, line: 24, name: "games/balance:invest" }, { column: 3, line: 58, name: "games/balance:makeBet" }],
+  "games/craps/easy.ts": [{ column: 3, line: 27, name: "games/craps/easy:betPassline" }, { column: 3, line: 22, name: "games/craps/easy:getSession" }, { column: 3, line: 80, name: "games/craps/easy:roll" }],
+  "games/session.ts": [{ column: 3, line: 33, name: "games/session:getSession" }, { column: 3, line: 8, name: "games/session:maybeStartSession" }],
   "users.ts": [{ column: 3, line: 6, name: "users:me" }],
 },
   "convex/functions"

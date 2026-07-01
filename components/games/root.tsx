@@ -54,18 +54,21 @@ export function GameRoot({ path }: GameWrapperProps) {
   else if (!gameSession) {
     return (
       <Card className="flex min-w-72 flex-col gap-6 sm:min-w-sm md:max-w-md">
-        <CardContent>
-          something broken! try reloading...
-        </CardContent>
+        <CardContent>something broken! try reloading...</CardContent>
       </Card>
     );
   }
 
-  const [rootComponent,subComponent] = GameComponentDefs[path.join('/') as GamePathString];
+  const [rootComponent, subComponent] =
+    GameComponentDefs[path.join('/') as GamePathString];
   const activeComponent = subComponent ?? rootComponent;
 
   let renderedGame: React.ReactNode = (
-    <activeComponent.component game={activeGame} fullPath={path} gameSession={gameSession} />
+    <activeComponent.component
+      game={activeGame}
+      fullPath={path}
+      gameSession={gameSession}
+    />
   );
 
   if (subGame) {

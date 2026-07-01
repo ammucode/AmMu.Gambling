@@ -94,7 +94,9 @@ export const {
   })
 );
 
-export type gameSessionActiveBetsInfo = z.infer<typeof gameSessionActiveBetsInfo>;
+export type gameSessionActiveBetsInfo = z.infer<
+  typeof gameSessionActiveBetsInfo
+>;
 export const {
   schema: gameSessionActiveBetsInfo,
   cols: gameSessionActiveBetsInfoColumns,
