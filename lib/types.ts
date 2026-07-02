@@ -8,6 +8,7 @@ import {
   IsNever,
   PartialDeep,
   Primitive,
+  Sum,
 } from 'type-fest';
 
 export type BuiltIns = Primitive | void | Date | RegExp;
@@ -146,3 +147,13 @@ export type PickByKeyDeep<T, Key extends PropertyKey> = T extends unknown
         ? { [K in keyof T]: K extends Key ? T[K] : never } & {}
         : T
   : never;
+
+export type SumMany<Arr extends number[]> = Arr extends [
+  infer First extends number,
+]
+  ? First
+  : Arr extends [infer First extends number, infer Second extends number]
+    ? Sum<First, Second>
+    : Arr extends [infer First extends number, ...infer Rest extends number[]]
+      ? Sum<First, SumMany<Rest>>
+      : never;

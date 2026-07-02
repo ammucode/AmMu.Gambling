@@ -80,12 +80,12 @@ export const {
   })
 );
 
-export type gameSessionInfo = z.infer<typeof gameSessionInfo>;
+export type gameSessionMetaInfo = z.infer<typeof gameSessionMetaInfo>;
 export const {
-  schema: gameSessionInfo,
-  cols: gameSessionInfoColumns,
-  filter: gameSessionInfoColumnsFilter,
-  returning: gameSessionInfoReturning,
+  schema: gameSessionMetaInfo,
+  cols: gameSessionMetaInfoColumns,
+  filter: gameSessionMetaInfoColumnsFilter,
+  returning: gameSessionMetaInfoReturning,
 } = makeTableModel(
   gameSessionTable,
   z.object({

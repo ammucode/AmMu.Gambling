@@ -13,6 +13,13 @@ import {
 import { rollDice, RollDiceResult } from '@/lib/games/simulation';
 import { Sum } from 'type-fest';
 import { aBetSchema } from '@/lib/games/bets';
+import {
+  getPlaceBetPayout,
+  getTrueOddsPayout,
+  PlaceBetPayouts,
+  Points,
+} from '@/lib/games/craps';
+import { sum } from '@/lib/utils';
 
 const { query: easyCrapsQuery, mutation: easyCrapsMutation } =
   perGameTableResult_CRPCDefs['craps/easy'];
@@ -82,8 +89,14 @@ export const roll = easyCrapsMutation
     const game = ctx.game.doc;
     const bets = game.bets;
 
+    if (session.totalBet === 0)
+      throw new CRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: `Cannot roll with no active bets!`,
+      });
+
     const dice = rollDice(2);
-    const roll = (dice[0] + dice[1]) as Sum<(typeof dice)[0], (typeof dice)[1]>;
+    const roll = sum(dice);
 
     const winnings = makeEasyCrapsInitialBets();
     const newBets = makeEasyCrapsInitialBets();
@@ -92,33 +105,49 @@ export const roll = easyCrapsMutation
     let newTotalBet = 0;
     let gotResult = false;
     let newPoint = game.point;
+    let shouldCopyPassline = false;
 
     if (game.point) {
       if (roll === 7) {
         newPoint = undefined;
         gotResult = true;
-      } else if (roll === game.point) {
-        winnings.passLine = 2 * bets.passLine;
-        totalWinnings += winnings.passLine;
-        winnings.passLineOdds = 2 * bets.passLineOdds; // TODO: do math
-        totalWinnings += winnings.passLineOdds;
+      } else {
+        if (roll === game.point) {
+          winnings.passLine = 2 * bets.passLine;
+          totalWinnings += winnings.passLine;
 
-        newBets.passLine = bets.passLine;
-        newTotalBet += newBets.passLine;
+          const payoutRatio = getTrueOddsPayout(roll);
+          winnings.passLineOdds = payoutRatio * bets.passLineOdds;
+          totalWinnings += winnings.passLineOdds;
 
-        newPoint = undefined;
-        gotResult = true;
+          shouldCopyPassline = true;
+
+          newPoint = undefined;
+          gotResult = true;
+        }
+        const rollKey = `p${roll}` as const;
+        if (bets.place[rollKey] > 0) {
+          const payoutRatio = getPlaceBetPayout(roll);
+          winnings.place[rollKey] = payoutRatio * bets.place[rollKey];
+          totalWinnings += winnings.place[rollKey];
+        }
       }
     } else {
       if (roll === 7) {
         winnings.passLine = 2 * bets.passLine;
         totalWinnings += winnings.passLine;
 
+        shouldCopyPassline = true;
+
         gotResult = true;
       } else {
         newPoint = roll;
       }
-      newBets.passLine = bets.passLine;
+    }
+
+    if (shouldCopyPassline) {
+      const toBet = Math.min(bets.passLine, session.playable + totalWinnings);
+      newBets.passLine = toBet;
       newTotalBet += newBets.passLine;
     }
 
@@ -130,16 +159,11 @@ export const roll = easyCrapsMutation
             totalBet: newTotalBet,
             playable: session.playable + totalWinnings,
           }
-        : {
-            lastResultBet: session.lastResultBet,
-            lastResultWon: session.lastResultWon,
-            totalBet: session.totalBet,
-            playable: session.playable,
-          }
+        : {}
     ) satisfies UpdateSet<typeof gameSessionTable>;
 
     const easyCrapsSessionUpdate = {
-      bets: newBets,
+      bets: gotResult ? newBets : undefined,
       rollHistory: [dice, ...game.rollHistory],
       point: newPoint ?? unsetToken,
     } satisfies UpdateSet<typeof easyCrapsSessionTable>;

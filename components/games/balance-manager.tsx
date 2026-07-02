@@ -25,7 +25,12 @@ export function BalanceManager() {
           <BanknoteArrowDownIcon className="ml-3" />
         </span>
       </Button>
-      <Button size="sm" className="my-1 max-w-full" onClick={() => cashOut?.()}>
+      <Button
+        size="sm"
+        className="my-1 max-w-full"
+        onClick={() => cashOut?.()}
+        disabled={gameBalance ? gameBalance.totalBet > 0 : true}
+      >
         Cash out (
         <SkeletonOr
           className="h-4 w-[80%]"

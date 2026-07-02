@@ -18,7 +18,7 @@ export default async function Layout({
 
   return (
     <>
-      <header className="relative flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14">
+      <header className="relative flex shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           {/* <Separator
@@ -45,7 +45,7 @@ export default async function Layout({
           {activeGame.title}
         </h1>
       </header>
-      <div className="relative flex h-full w-full flex-1 flex-col items-center p-4 pt-2">
+      <div className="relative flex w-full flex-1 flex-col items-center p-4 pt-2">
         {children}
       </div>
     </>

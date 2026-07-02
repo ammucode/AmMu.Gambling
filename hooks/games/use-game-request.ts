@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { useCRPC } from '@/lib/convex/crpc';
-import { gameSessionInfo } from '@/convex/shared/models';
+import { gameSessionMetaInfo } from '@/convex/shared/models';
 import { useCallback } from 'react';
 import { gameMutation } from '@/convex/lib/crpc-games';
 import { MutationProcedureBuilder } from 'kitcn/server';
@@ -27,7 +27,7 @@ type gameMutationParams = z.infer<
 
 export function useGameMutation<
   MutationOpts extends UseMutationOptions<unknown, unknown, gameMutationParams>,
->(gameSession: gameSessionInfo, mutationOpts: MutationOpts) {
+>(gameSession: gameSessionMetaInfo, mutationOpts: MutationOpts) {
   type MutConfig =
     MutationOpts extends UseMutationOptions<
       infer Data,
@@ -102,7 +102,7 @@ export function useGameMutation<
 
 export function useGameMutationCallback<
   MutationOpts extends UseMutationOptions<unknown, unknown, gameMutationParams>,
->(gameSession: gameSessionInfo, mutationOpts: MutationOpts) {
+>(gameSession: gameSessionMetaInfo, mutationOpts: MutationOpts) {
   const { mutateAsync } = useGameMutation(gameSession, mutationOpts);
 
   return mutateAsync;

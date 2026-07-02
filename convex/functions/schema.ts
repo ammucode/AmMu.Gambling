@@ -264,9 +264,6 @@ export const tables = {
   gameSession: gameSessionTable,
   ...perGameTableResult_Schema,
 };
-export type TableName = keyof typeof tables;
-export type Select<T extends TableName> = InferSelectModel<(typeof tables)[T]>;
-export type Insert<T extends TableName> = InferInsertModel<(typeof tables)[T]>;
 
 export const Schema = defineSchema(tables).relations((r) => {
   const PerGameTableKey_Relations_gameSession_Func = <

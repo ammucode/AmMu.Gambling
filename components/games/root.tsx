@@ -11,6 +11,7 @@ import { BalanceManager } from './balance-manager';
 import { MoneyStats } from '../blocks/games/money-stats';
 import { Card, CardContent } from '@ui/card';
 import { GameComponentDefs } from '@/lib/games/client';
+import { cn } from '@/lib/utils';
 
 export interface GameWrapperProps {
   path: GamePath;
@@ -67,7 +68,7 @@ export function GameRoot({ path }: GameWrapperProps) {
     <activeComponent.component
       game={activeGame}
       fullPath={path}
-      gameSession={gameSession}
+      gameSessionMeta={gameSession}
     />
   );
 
@@ -77,7 +78,7 @@ export function GameRoot({ path }: GameWrapperProps) {
         game={rootGame}
         subGame={subGame}
         fullPath={path}
-        gameSession={gameSession}
+        gameSessionMeta={gameSession}
       >
         {renderedGame}
       </rootComponent.component>
@@ -86,11 +87,20 @@ export function GameRoot({ path }: GameWrapperProps) {
 
   return (
     <>
-      <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row md:justify-between md:gap-0">
+      <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row md:justify-between md:gap-0 md:gap-y-4">
         <BalanceManager />
         <MoneyStats />
       </div>
-      {renderedGame}
+      <div
+        className={cn(
+          '@container flex-1 relative w-full max-w-full max-[28rem]:hidden',
+          false
+            ? 'flex flex-col items-center justify-around'
+            : 'grid place-items-center'
+        )}
+      >
+        {renderedGame}
+      </div>
     </>
   );
 }

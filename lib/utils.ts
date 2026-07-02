@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { SumMany } from './types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -23,4 +24,8 @@ export function nullOptXfmr<In, Out, Fallback extends null | undefined>(
     if (input === null || input === undefined) return fallback;
     return xfmr(input);
   };
+}
+
+export function sum<Nums extends number[]>(arr: Nums) {
+  return (arr as any[]).reduce((sum, val) => sum + val, 0) as SumMany<Nums>;
 }

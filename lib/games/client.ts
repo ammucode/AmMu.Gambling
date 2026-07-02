@@ -3,7 +3,7 @@ import { EasyCraps } from '@/components/games/craps/easy/root';
 import { Craps } from '@/components/games/craps/root';
 import { VideoPoker } from '@/components/games/poker/video/root';
 
-import { gameSessionInfo } from '@/convex/shared/models';
+import { gameSessionMetaInfo } from '@/convex/shared/models';
 import {
   GamePath,
   RootGame,
@@ -17,7 +17,7 @@ import { LucideIcon, LucideProps } from 'lucide-react';
 export interface GameProps {
   game: RootGame | SubGame;
   fullPath: GamePath;
-  gameSession: gameSessionInfo;
+  gameSessionMeta: gameSessionMetaInfo;
 }
 
 export interface RootGameProps {

@@ -1,10 +1,13 @@
 import { gameSessionTable, GameTables } from '~schema';
-import { gameSessionInfo, gameSessionInfoReturning } from '@convex/models';
+import {
+  gameSessionMetaInfo,
+  gameSessionMetaInfoReturning,
+} from '@convex/models';
 import { maybeGameMutation, maybeGameQuery } from '@convex-lib/crpc-games';
 import { EasyCrapsInitialBets } from '@/lib/games/craps/easy';
 
 export const maybeStartSession = maybeGameMutation
-  .output(gameSessionInfo)
+  .output(gameSessionMetaInfo)
   .mutation(async ({ ctx }) => {
     if (ctx.game.session) {
       return ctx.game.session;
@@ -18,7 +21,7 @@ export const maybeStartSession = maybeGameMutation
           userId: ctx.user.id,
           sessionKey: ctx.game.sessionKey,
         })
-        .returning(gameSessionInfoReturning)
+        .returning(gameSessionMetaInfoReturning)
     )[0];
 
     await ctx.orm.insert(GameTables[ctx.game.pathString]).values({
@@ -29,8 +32,8 @@ export const maybeStartSession = maybeGameMutation
   });
 
 export const getSession = maybeGameQuery
-  .output(gameSessionInfo.nullable())
+  .output(gameSessionMetaInfo.nullable())
   .query(
     async ({ ctx }) =>
-      await gameSessionInfo.nullable().parseAsync(ctx.game.session)
+      await gameSessionMetaInfo.nullable().parseAsync(ctx.game.session)
   );

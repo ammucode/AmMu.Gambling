@@ -127,3 +127,27 @@
     @apply font-sans;
     }
 }
+
+@utility h-fill {
+  height: -webkit-fill-available;
+  height: -moz-available;
+  height: fill-available;
+  height: stretch;
+}
+@utility min-h-fill {
+  min-height: -webkit-fill-available;
+  min-height: -moz-available;
+  min-height: fill-available;
+  min-height: stretch;
+}
+@utility max-h-fill {
+  max-height: -webkit-fill-available;
+  max-height: -moz-available;
+  max-height: fill-available;
+  max-height: stretch;
+}
+@utility h-fill-strict {
+  @apply h-fill;
+  @apply min-h-fill;
+  @apply max-h-fill;
+}

@@ -17,7 +17,7 @@ const diceIcons = {
   6: Dice6Icon,
 } as const;
 
-export function DiceComponent({
+export function DieComponent({
   value,
   size,
 }: {
@@ -26,4 +26,20 @@ export function DiceComponent({
 }) {
   const DiceIcon = diceIcons[value];
   return <DiceIcon size={size ?? 100} className={`size-${size ?? 100}`} />;
+}
+
+export function DiceComponent({
+  roll,
+  size,
+}: {
+  roll: [IntClosedRange<1, 6>, ...IntClosedRange<1, 6>[]];
+  size: number;
+}) {
+  return (
+    <>
+      {roll.map((diceVal, i) => (
+        <DieComponent key={i} value={diceVal} size={size} />
+      ))}
+    </>
+  );
 }
