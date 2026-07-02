@@ -13,8 +13,6 @@ import {
   custom,
   defineSchema,
   index,
-  InferInsertModel,
-  InferSelectModel,
   integer,
   json,
   text,

@@ -11,14 +11,8 @@ import {
   makeEasyCrapsInitialBets,
 } from '@/lib/games/craps/easy';
 import { rollDice, RollDiceResult } from '@/lib/games/simulation';
-import { Sum } from 'type-fest';
 import { aBetSchema } from '@/lib/games/bets';
-import {
-  getPlaceBetPayout,
-  getTrueOddsPayout,
-  PlaceBetPayouts,
-  Points,
-} from '@/lib/games/craps';
+import { getPlaceBetPayout, getTrueOddsPayout } from '@/lib/games/craps';
 import { sum } from '@/lib/utils';
 
 const { query: easyCrapsQuery, mutation: easyCrapsMutation } =

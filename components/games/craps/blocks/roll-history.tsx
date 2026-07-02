@@ -1,6 +1,5 @@
 import { RollDiceResult } from '@/lib/games/simulation';
-import { DiceComponent, DieComponent } from '../../dice';
-import { Sum } from 'type-fest';
+import { DiceComponent } from '../../dice';
 import { sum } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 

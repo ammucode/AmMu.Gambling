@@ -1,6 +1,5 @@
 import z from 'zod';
-import { IntClosedRange, Sum, TupleOf } from 'type-fest';
-import { SumMany } from '@/lib/types';
+import { IntClosedRange, TupleOf } from 'type-fest';
 
 export function randInt<Min extends number, Max extends number>(
   min: Min,

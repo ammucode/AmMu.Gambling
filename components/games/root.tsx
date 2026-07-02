@@ -93,10 +93,8 @@ export function GameRoot({ path }: GameWrapperProps) {
       </div>
       <div
         className={cn(
-          '@container flex-1 relative w-full max-w-full max-[28rem]:hidden',
-          false
-            ? 'flex flex-col items-center justify-around'
-            : 'grid place-items-center'
+          '@container relative w-full max-w-full flex-1 max-[28rem]:hidden',
+          'flex flex-col items-center justify-around'
         )}
       >
         {renderedGame}

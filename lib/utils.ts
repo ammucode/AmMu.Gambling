@@ -27,5 +27,5 @@ export function nullOptXfmr<In, Out, Fallback extends null | undefined>(
 }
 
 export function sum<Nums extends number[]>(arr: Nums) {
-  return (arr as any[]).reduce((sum, val) => sum + val, 0) as SumMany<Nums>;
+  return arr.reduce((sum, val) => sum + val, 0) as SumMany<Nums>;
 }

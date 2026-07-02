@@ -7,7 +7,7 @@ import {
   useGameMutation,
   useGameMutationCallback,
 } from '@/hooks/games/use-game-request';
-import { DiceComponent, DieComponent } from '../../dice';
+import { DiceComponent } from '../../dice';
 import { EasyCrapsRewardDisplay } from './reward-display';
 import { useGameBalance } from '@/hooks/games/use-game-balance';
 import { Button } from '@/components/ui/button';
@@ -43,7 +43,7 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
   } = useGameMutation(
     gameSessionMeta,
     crpc.games.craps.easy.roll.mutationOptions({
-      onSuccess: async (data) => {
+      onSuccess: async () => {
         await refetchGame();
       },
     })
@@ -57,7 +57,7 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
 
   return (
     <>
-      <div className="absolute bottom-0 aspect-2/1 max-h-[calc(100%-72px)] max-w-full min-w-full @5xl:min-w-[90%] @6xl:min-w-[80%] transition-[min-width] duration-300 ease-in-out grid grid-cols-14 grid-rows-22">
+      <div className="grid aspect-2/1 max-w-full min-w-0 grid-cols-14 grid-rows-22 transition-[max-width] duration-300 ease-in-out @5xl:max-w-[90%] @6xl:max-w-[80%]">
         <div className="col-span-4 col-start-1 row-span-19 row-start-1 grid bg-gray-800/30">
           hard
         </div>
@@ -67,6 +67,7 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
             const [payoutNumerator, payoutDenominator] = PlaceBetPayouts[point];
             return (
               <div
+                key={point}
                 className={cn(
                   'col-span-1 flex flex-col items-center justify-center rounded-md border border-white/70 bg-black/20 px-1 text-center text-white inset-shadow-sm inset-shadow-black/50',
                   isPoint && 'bg-white/20'
@@ -85,6 +86,7 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
                     game && (
                       <Chip
                         value={game.bets.place[`p${point}`]}
+                        dynamicSizing={true}
                         className="@2xl:mt-3"
                       />
                     )
@@ -111,9 +113,7 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
           />
         </div>
       </div>
-      {/* <div className="">
-        <ChipDisplay activeDenom={1} className="" />
-      </div> */}
+      <ChipDisplay activeDenom={1} className="" />
       <>
         {/* Abolsute display items */}
         {rollSucceeded ? (
