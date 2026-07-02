@@ -57,30 +57,6 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
 
   return (
     <>
-      <>
-        {/* Abolsute display items */}
-        {rollSucceeded ? (
-          <EasyCrapsRewardDisplay winnings={rollResult.winnings} />
-        ) : null}
-        <div className="absolute top-0 flex flex-col items-center lg:-top-10">
-          <div className="flex h-fit w-fit flex-row items-center bg-none">
-            {rollInProgress ? (
-              'rolling...'
-            ) : lastRoll ? (
-              <DiceComponent roll={lastRoll} size={100} />
-            ) : null}
-          </div>
-        </div>
-        <div className="absolute right-0 bottom-0">
-          <Button
-            onClick={() => doRoll()}
-            disabled={!canRoll}
-            className="aspect-square h-14 w-14 rounded-full bg-gray-400 text-2xl shadow-sm hover:bg-gray-300"
-          >
-            Roll
-          </Button>
-        </div>
-      </>
       <div className="absolute bottom-0 aspect-2/1 max-h-[calc(100%-72px)] max-w-full min-w-full @5xl:min-w-[90%] @6xl:min-w-[80%] transition-[min-width] duration-300 ease-in-out grid grid-cols-14 grid-rows-22">
         <div className="col-span-4 col-start-1 row-span-19 row-start-1 grid bg-gray-800/30">
           hard
@@ -138,6 +114,30 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
       {/* <div className="">
         <ChipDisplay activeDenom={1} className="" />
       </div> */}
+      <>
+        {/* Abolsute display items */}
+        {rollSucceeded ? (
+          <EasyCrapsRewardDisplay winnings={rollResult.winnings} />
+        ) : null}
+        <div className="absolute top-0 flex flex-col items-center lg:-top-10">
+          <div className="flex h-fit w-fit flex-row items-center bg-none">
+            {rollInProgress ? (
+              'rolling...'
+            ) : lastRoll ? (
+              <DiceComponent roll={lastRoll} size={100} />
+            ) : null}
+          </div>
+        </div>
+        <div className="absolute right-0 bottom-0">
+          <Button
+            onClick={() => doRoll()}
+            disabled={!canRoll}
+            className="aspect-square h-14 w-14 rounded-full bg-gray-400 text-2xl shadow-sm hover:bg-gray-300"
+          >
+            Roll
+          </Button>
+        </div>
+      </>
     </>
   );
 }
