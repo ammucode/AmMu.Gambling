@@ -7,24 +7,20 @@ import {
   useGameMutation,
   useGameMutationCallback,
 } from '@/hooks/games/use-game-request';
-import { DiceComponent } from '../../dice';
-import { EasyCrapsRewardDisplay } from './reward-display';
 import { useGameBalance } from '@/hooks/games/use-game-balance';
 import { Button } from '@/components/ui/button';
 import { PlaceBetPayouts, Points } from '@/lib/games/craps';
-import { SkeletonOr } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { RollHistory } from '../blocks/roll-history';
-import { Chip, DraggableChip } from '../../chip';
+import { Chip } from '../../chip';
 import { ChipTray } from '../../blocks/chip-tray';
-import { DragDropProvider, useDragDropManager, useDragDropMonitor, useDraggable, useDroppable } from '@dnd-kit/react';
-import { useEffect, useMemo, useState } from 'react';
-import { ChipDenomination, ChipDenominations } from '@/lib/games/chips';
+import { useDraggable, useDroppable } from '@dnd-kit/react';
+import { useState } from 'react';
+import { ChipDenomination } from '@/lib/games/chips';
 import { useDropped } from '@/hooks/dnd/use-dropped';
 import { useGuardedCallback } from '@/hooks/use-guarded-callback';
 import { useMakeBet } from '@/hooks/games/use-make-bet';
-import { EasyCrapsBetsSchema, EasyCrapsInitialBets } from '@/lib/games/craps/easy';
-
+import { EasyCrapsInitialBets } from '@/lib/games/craps/easy';
 
 // export interface EasyCrapsProps extends GameProps {}
 export type EasyCrapsProps = GameProps;
@@ -40,10 +36,15 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
   } = useQuery(crpc.games.craps.easy.getSession.queryOptions(gameSessionMeta));
   const activeBets = game?.bets ?? EasyCrapsInitialBets;
 
-  const betPassline = useGuardedCallback(useMakeBet(useGameMutationCallback(
-    gameSessionMeta,
-    crpc.games.craps.easy.betPassline.mutationOptions()
-  )), !gameLoading && game ? game.point === undefined : false);
+  const betPassline = useGuardedCallback(
+    useMakeBet(
+      useGameMutationCallback(
+        gameSessionMeta,
+        crpc.games.craps.easy.betPassline.mutationOptions()
+      )
+    ),
+    !gameLoading && game ? game.point === undefined : false
+  );
   const {
     data: rollResult,
     isSuccess: rollSucceeded,
@@ -62,20 +63,30 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
   const canRoll =
     !gameLoading && !rollInProgress && (gameBalance?.totalBet ?? 0) > 0;
 
-  const passlineDroppable = useDroppable({id: "passline", accept: "chip"});
-  const passlineBetDraggable = useDraggable({id: "passlineBet", type: "bet"});
+  const passlineDroppable = useDroppable({ id: 'passline', accept: 'chip' });
+  const passlineBetDraggable = useDraggable({ id: 'passlineBet', type: 'bet' });
 
-  useDropped(source => {
-    const chip = parseInt(source.id.substring(4)) as ChipDenomination;
-    console.log("dropped chip on passline!", chip);
-    betPassline(chip);
-  }, {sourceType: "chip", sourceIdPrefix: "chip", targetId: passlineDroppable.droppable.id});
-
-  useDropped(source => {
-    if (source.id === "passlineBet") {
-      betPassline(-Math.min(activeChip, activeBets.passLine??0));
+  useDropped(
+    (source) => {
+      const chip = parseInt(source.id.substring(4)) as ChipDenomination;
+      console.log('dropped chip on passline!', chip);
+      betPassline(chip);
+    },
+    {
+      sourceType: 'chip',
+      sourceIdPrefix: 'chip',
+      targetId: passlineDroppable.droppable.id,
     }
-  }, {sourceType: "bet", targetId: "chipTray"});
+  );
+
+  useDropped(
+    (source) => {
+      if (source.id === 'passlineBet') {
+        betPassline(-Math.min(activeChip, activeBets.passLine ?? 0));
+      }
+    },
+    { sourceType: 'bet', targetId: 'chipTray' }
+  );
 
   const [activeChip, setActiveChip] = useState<ChipDenomination>(1);
 
@@ -110,7 +121,7 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
                   value={bet}
                   dynamicSizing={true}
                   hideOnZero={true}
-                  className={cn("@2xl:mt-3")}
+                  className={cn('@2xl:mt-3')}
                 />
               </div>
             );
@@ -121,34 +132,35 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
         </div>
         <div
           className={cn(
-            "col-span-7 col-start-8 row-span-10 row-start-10",
-            "flex flex-col items-center gap-0.5",
+            'col-span-7 col-start-8 row-span-10 row-start-10',
+            'flex flex-col items-center gap-0.5'
           )}
         >
-          <div className={cn(
-            "w-full flex-1 mt-[4%] min-h-0 rounded-md inset-ring inset-ring-white/50",
-            "bg-white/10 inset-shadow-sm inset-shadow-black/20",
-          )}>
+          <div
+            className={cn(
+              'mt-[4%] min-h-0 w-full flex-1 rounded-md inset-ring inset-ring-white/50',
+              'bg-white/10 inset-shadow-sm inset-shadow-black/20'
+            )}
+          >
             field
           </div>
-          <div className={cn(
-            "w-full flex-1 min-h-0 rounded-md inset-ring inset-ring-white/50",
-            "bg-white/10 inset-shadow-sm inset-shadow-black/20",
-          )}>
+          <div
+            className={cn(
+              'min-h-0 w-full flex-1 rounded-md inset-ring inset-ring-white/50',
+              'bg-white/10 inset-shadow-sm inset-shadow-black/20'
+            )}
+          >
             low/high field
           </div>
-          <div className={cn(
-            "w-full flex-1 min-h-0",
-            "",
-          )}>
+          <div className={cn('min-h-0 w-full flex-1', '')}>
             <div
               ref={passlineDroppable.ref}
               onClick={() => betPassline(activeChip)}
               className={cn(
-                "mt-[3%] w-full h-fill",
-                "rounded-md inset-ring inset-ring-white/50",
-                "bg-black/10 inset-shadow-sm inset-shadow-black/20",
-                "grid place-items-center"
+                'mt-[3%] h-fill w-full',
+                'rounded-md inset-ring inset-ring-white/50',
+                'bg-black/10 inset-shadow-sm inset-shadow-black/20',
+                'grid place-items-center'
               )}
             >
               <Chip
@@ -156,8 +168,9 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
                 value={activeBets.passLine}
                 hideOnZero={true}
                 className={cn(
-                  "h-3/4",
-                  passlineDroppable.isDropTarget && "shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]",
+                  'h-3/4',
+                  passlineDroppable.isDropTarget &&
+                    'shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]'
                 )}
                 dynamicTextSizing={true}
               />

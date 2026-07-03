@@ -9,25 +9,32 @@ export interface ChipTrayProps {
   setActiveChip: (chip: ChipDenomination) => unknown;
   className?: string;
 }
-export function ChipTray({ activeChip, setActiveChip, className }: ChipTrayProps) {
+export function ChipTray({
+  activeChip,
+  setActiveChip,
+  className,
+}: ChipTrayProps) {
   useDragDropMonitor({
     onDragStart(event) {
       const source = event.operation.source;
       if (!source) return;
-      if (source.type !== "chip") return;
-      if (typeof source.id !== "string") return;
-      if (!source.id.startsWith("chip")) return;
+      if (source.type !== 'chip') return;
+      if (typeof source.id !== 'string') return;
+      if (!source.id.startsWith('chip')) return;
       setActiveChip(parseInt(source.id.substring(4)) as ChipDenomination);
-    }
+    },
   });
 
-  const chipTrayDroppable = useDroppable({id: "chipTray", accept: "bet"});
+  const chipTrayDroppable = useDroppable({ id: 'chipTray', accept: 'bet' });
 
   return (
-    <div ref={chipTrayDroppable.ref} className={cn(
-      "flex flex-row items-center justify-between gap-4",
-      // chipTrayDroppable.isDropTarget && "shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]"
-    )}>
+    <div
+      ref={chipTrayDroppable.ref}
+      className={cn(
+        'flex flex-row items-center justify-between gap-4'
+        // chipTrayDroppable.isDropTarget && "shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]"
+      )}
+    >
       {ChipDenominations.map((chip) => {
         const draggable = useDraggable({
           id: `chip${chip}`,
@@ -36,14 +43,17 @@ export function ChipTray({ activeChip, setActiveChip, className }: ChipTrayProps
               feedback: 'clone',
             }),
           ],
-          type: "chip",
+          type: 'chip',
         });
         return (
           <Chip
             key={chip}
             value={chip}
             highlight={activeChip === chip}
-            className={cn("hover:scale-125 transition-all duration-100 ease-in-out", className)}
+            className={cn(
+              'transition-all duration-100 ease-in-out hover:scale-125',
+              className
+            )}
             ref={draggable.ref}
             onClick={() => setActiveChip(chip)}
           />
