@@ -12,6 +12,63 @@ import { MoneyStats } from '../blocks/games/money-stats';
 import { Card, CardContent } from '@ui/card';
 import { GameComponentDefs } from '@/lib/games/client';
 import { cn } from '@/lib/utils';
+import { DragDropProvider, useDragDropManager, useDragDropMonitor } from '@dnd-kit/react';
+
+const debugDrags = true;
+
+function DragMonitor() {
+  useDragDropMonitor({
+    onBeforeDragStart(event, manager) {
+      // Optionally prevent dragging
+      // if (shouldPreventDrag(event.operation.source)) {
+      //   event.preventDefault();
+      // }
+    },
+    onDragStart(event, manager) {
+      console.log('Started dragging', event.operation.source);
+    },
+    onDragMove(event, manager) {
+      // console.log('Current position:', event.operation.position);
+    },
+    onDragOver(event, manager) {
+      console.log('Over droppable:', event.operation.target);
+    },
+    onDragEnd(event, manager) {
+      const {operation, canceled} = event;
+
+      if (canceled) {
+        console.log('Drag cancelled');
+        return;
+      }
+
+      if (operation.target) {
+        console.log(`Dropped ${operation.source?.id} onto ${operation.target.id}`);
+      }
+    },
+    onCollision(event, manager) {
+      if (event.collisions.length) {
+        console.log('Collisions:', event.collisions.map(c=>c.id).join(', '));
+      }
+    }
+  });
+
+  return null;
+}
+// function DragLogger() {
+//   const manager = useDragDropManager();
+
+//   useEffect(() => {
+//     if (!manager) return;
+
+//     const cleanup = manager.monitor.addEventListener('dragstart', (event) => {
+//       console.log('drag started for', event.operation.source?.id);
+//     });
+
+//     return cleanup;
+//   }, [manager]);
+
+//   return null;
+// }
 
 export interface GameWrapperProps {
   path: GamePath;
@@ -97,7 +154,20 @@ export function GameRoot({ path }: GameWrapperProps) {
           'flex flex-col items-center justify-around'
         )}
       >
-        {renderedGame}
+        <DragDropProvider
+          // onBeforeDragStart={(event)=>((window as any).foo = event) && console.log("onBeforeDragStart", event)}
+          // onCollision={(event)=>console.log("onCollision", event)}
+          // onDragStart={(event)=>console.log("onDragStart", event)}
+          // onDragMove={(event)=>console.log("onDragMove", event)}
+          // onDragOver={(event)=>console.log("onDragOver", event)}
+          // onDragEnd={(event)=>console.log("onDragEnd", event)}
+        >
+          {debugDrags ? <>
+            <DragMonitor/>
+            {/* <DragLogger /> */}
+          </> : null}
+          {renderedGame}
+        </DragDropProvider>
       </div>
     </>
   );

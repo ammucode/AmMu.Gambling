@@ -9,7 +9,7 @@ import { CRPCError } from 'kitcn/server';
 import z from 'zod';
 import { userTable, gameSessionTable } from '~schema';
 
-const amountSchema = z.object({ amount: z.number().nonnegative() });
+const amountSchema = z.object({ amount: z.number() });
 
 export const info = gameQuery
   .output(gameBalanceSchema.nullable())

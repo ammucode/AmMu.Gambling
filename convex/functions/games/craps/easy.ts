@@ -23,7 +23,7 @@ export const getSession = easyCrapsQuery
   .query(async ({ ctx }) => iHateNull(ctx.game.doc, true));
 
 export const betPassline = easyCrapsMutation
-  .input(z.object({ amount: z.number().positive() }))
+  .input(z.object({ amount: z.number() }))
   .output(z.number())
   .mutation(async ({ ctx, input }) => {
     if (ctx.game.doc.point)
