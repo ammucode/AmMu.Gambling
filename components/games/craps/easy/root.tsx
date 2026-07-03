@@ -41,7 +41,8 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
       useGameMutationCallback(
         gameSessionMeta,
         crpc.games.craps.easy.betPassline.mutationOptions()
-      )
+      ),
+      {min: -activeBets.passLine, max: gameBalance?.playable}
     ),
     !gameLoading && game ? game.point === undefined : false
   );
