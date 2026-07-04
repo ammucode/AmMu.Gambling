@@ -44,7 +44,7 @@ export const EasyCrapsInitialBets = makeEasyCrapsInitialBets() as SimplifyDeep<
 >;
 
 export const EasyCrapsSchema = z.object({
-  point: PointSchema,
+  point: PointSchema.optional(),
   bets: EasyCrapsBetsSchema,
   rollHistory: z.array(rollSchema(2)),
 });

@@ -19,6 +19,7 @@ export const api = {
     craps: {
       easy: {
         betPassline: createApiLeaf<"mutation", typeof import("../functions/games/craps/easy").betPassline>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/craps/easy").betPassline>("games/craps/easy:betPassline"), { auth: "required", type: "mutation" }),
+        betPlace: createApiLeaf<"mutation", typeof import("../functions/games/craps/easy").betPlace>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/craps/easy").betPlace>("games/craps/easy:betPlace"), { auth: "required", type: "mutation" }),
         getSession: createApiLeaf<"query", typeof import("../functions/games/craps/easy").getSession>(createGeneratedFunctionReference<"query", "public", typeof import("../functions/games/craps/easy").getSession>("games/craps/easy:getSession"), { auth: "optional", type: "query" }),
         roll: createApiLeaf<"mutation", typeof import("../functions/games/craps/easy").roll>(createGeneratedFunctionReference<"mutation", "public", typeof import("../functions/games/craps/easy").roll>("games/craps/easy:roll"), { auth: "required", type: "mutation" }),
       },

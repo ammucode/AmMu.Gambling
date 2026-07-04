@@ -15,7 +15,7 @@ export function pointNumsToStr<Ps extends readonly number[]>(ps: Ps) {
 export const Points = PointNums; // PointNums.map(p=>`p${p}`) as unknown as Pipe<typeof PointNums, List.MapRO$<Flow<Str.ToString, Str.Prepend<'p'>>>>;
 export type Point = ArrayElement<typeof Points>;
 
-export const PointSchema = z.union(Points.map((p) => z.literal(p))).optional();
+export const PointSchema = z.union(Points.map((p) => z.literal(p)));
 
 export const TrueOddsPayouts = {
   2: [7, 1],

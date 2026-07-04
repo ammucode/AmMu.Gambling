@@ -9,32 +9,32 @@ type DropOperation<
   Target extends Droppable<T>,
 > = SetRequired<DragOperation<Source, Target>, 'source' | 'target'>;
 
-type SourceFilter<
-  SourceType extends Type,
-  SourcePrefix extends UniqueIdentifier,
+type DragDropFilter<
+  DragDropType extends Type,
+  IdPrefix extends UniqueIdentifier,
 > = unknown &
   If<
-    ExtendsStrict<Type, SourceType>,
+    ExtendsStrict<Type, DragDropType>,
     unknown,
-    SourceType extends string
-      ? If<ExtendsStrict<string, SourceType>, unknown, { type: SourceType }>
-      : SourceType extends number
-        ? If<ExtendsStrict<number, SourceType>, unknown, { type: SourceType }>
-        : SourceType extends symbol
-          ? If<ExtendsStrict<symbol, SourceType>, unknown, { type: SourceType }>
+    DragDropType extends string
+      ? If<ExtendsStrict<string, DragDropType>, unknown, { type: DragDropType }>
+      : DragDropType extends number
+        ? If<ExtendsStrict<number, DragDropType>, unknown, { type: DragDropType }>
+        : DragDropType extends symbol
+          ? If<ExtendsStrict<symbol, DragDropType>, unknown, { type: DragDropType }>
           : unknown
   > &
   If<
-    ExtendsStrict<UniqueIdentifier, SourcePrefix>,
+    ExtendsStrict<UniqueIdentifier, IdPrefix>,
     unknown,
-    SourcePrefix extends string
+    IdPrefix extends string
       ? If<
-          ExtendsStrict<string, SourcePrefix>,
+          ExtendsStrict<string, IdPrefix>,
           unknown,
-          { id: `${SourcePrefix}${string}` }
+          { id: `${IdPrefix}${string}` }
         >
-      : SourcePrefix extends number
-        ? If<ExtendsStrict<number, SourcePrefix>, unknown, { id: SourcePrefix }>
+      : IdPrefix extends number
+        ? If<ExtendsStrict<number, IdPrefix>, unknown, { id: IdPrefix }>
         : unknown
   >;
 
@@ -45,22 +45,27 @@ export function useDropped<
   SourceType extends Type,
   TargetType extends Type,
   SourcePrefix extends UniqueIdentifier,
+  TargetPrefix extends UniqueIdentifier,
 >(
-  onDrop: (
-    source: Source & NoInfer<SourceFilter<SourceType, SourcePrefix>>,
-    target: Target,
+  onDrop: (ctx:{
+    source: Source & NoInfer<DragDropFilter<SourceType, SourcePrefix>>,
+    target: Target & NoInfer<DragDropFilter<TargetType, TargetPrefix>>,
     operation: DropOperation<T, Source, Target>
-  ) => unknown,
+  }) => unknown,
   {
     sourceType,
     targetType,
-    sourceIdPrefix,
+    sourceId,
     targetId,
+    sourceIdPrefix,
+    targetIdPrefix,
   }: {
     sourceType?: SourceType;
     targetType?: TargetType;
-    sourceIdPrefix?: SourcePrefix;
+    sourceId?: UniqueIdentifier;
     targetId?: UniqueIdentifier;
+    sourceIdPrefix?: SourcePrefix;
+    targetIdPrefix?: TargetPrefix;
   }
 ) {
   useDragDropMonitor<T, Source, Target>({
@@ -70,6 +75,8 @@ export function useDropped<
       if (!source || !target) return;
       if (sourceType !== undefined && source.type !== sourceType) return;
       if (targetType !== undefined && target.type !== targetType) return;
+      if (sourceId !== undefined && source.id !== sourceId) return;
+      if (targetId !== undefined && target.id !== targetId) return;
       if (
         sourceIdPrefix !== undefined &&
         (typeof source.id === 'string'
@@ -77,12 +84,18 @@ export function useDropped<
           : source.id === sourceIdPrefix)
       )
         return;
-      if (targetId !== undefined && target.id !== targetId) return;
-      onDrop(
-        source as Source & NoInfer<SourceFilter<SourceType, SourcePrefix>>,
-        target,
-        event.operation as DropOperation<T, Source, Target>
-      );
+      if (
+        targetIdPrefix !== undefined &&
+        (typeof target.id === 'string'
+          ? !target.id.startsWith(`${targetIdPrefix}`)
+          : target.id === targetIdPrefix)
+      )
+        return;
+      onDrop({
+        source: source as Source & NoInfer<DragDropFilter<SourceType, SourcePrefix>>,
+        target: target as Target & NoInfer<DragDropFilter<TargetType, TargetPrefix>>,
+        operation: event.operation as DropOperation<T, Source, Target>
+      });
     },
   });
 }

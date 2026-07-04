@@ -13,6 +13,7 @@ import {
 } from '@/lib/convex/kitcn-mirror';
 import { nullOptXfmr } from '@/lib/utils';
 import { iHateNull } from '../lib/document';
+import { roundMoney } from '@/lib/games/money';
 
 export type OrmSchema = OrmCtx['orm']['query'][TableNames]['_']['schema'];
 
@@ -178,12 +179,12 @@ export const {
   }),
   (o) => {
     return {
-      accountBalance: o.user.balance,
-      playable: o.playable,
-      totalBet: o.totalBet,
+      accountBalance: roundMoney(o.user.balance),
+      playable: roundMoney(o.playable),
+      totalBet: roundMoney(o.totalBet),
       lastResult: {
-        bet: o.lastResultBet,
-        won: o.lastResultWon,
+        bet: roundMoney(o.lastResultBet),
+        won: roundMoney(o.lastResultWon),
       },
     };
   }

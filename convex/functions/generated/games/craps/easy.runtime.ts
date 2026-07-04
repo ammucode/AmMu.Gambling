@@ -15,6 +15,7 @@ import type { OrmTriggerContext } from 'kitcn/orm';
 
 const procedureRegistry = {
   "betPassline": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../../games/craps/easy").betPassline>("games/craps/easy:betPassline"), () => (require("../../../games/craps/easy") as Record<string, unknown>)["betPassline"])],
+  "betPlace": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../../games/craps/easy").betPlace>("games/craps/easy:betPlace"), () => (require("../../../games/craps/easy") as Record<string, unknown>)["betPlace"])],
   "getSession": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../../../games/craps/easy").getSession>("games/craps/easy:getSession"), () => (require("../../../games/craps/easy") as Record<string, unknown>)["getSession"])],
   "roll": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../../games/craps/easy").roll>("games/craps/easy:roll"), () => (require("../../../games/craps/easy") as Record<string, unknown>)["roll"])],
 } as const;

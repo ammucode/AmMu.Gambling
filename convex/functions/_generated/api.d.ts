@@ -55,6 +55,17 @@ export declare const api: {
           { amount: number; path?: any; sessionKey?: string },
           number
         >;
+        betPlace: FunctionReference<
+          "mutation",
+          "public",
+          {
+            amount: number;
+            path?: any;
+            point: 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12;
+            sessionKey?: string;
+          },
+          number
+        >;
         getSession: FunctionReference<
           "query",
           "public",

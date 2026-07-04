@@ -8,6 +8,7 @@ import { eq } from 'kitcn/orm';
 import { CRPCError } from 'kitcn/server';
 import z from 'zod';
 import { userTable, gameSessionTable } from '~schema';
+import { roundMoney } from '@/lib/games/money';
 
 const amountSchema = z.object({ amount: z.number() });
 
@@ -36,7 +37,7 @@ export const invest = gameMutation
 
     await ctx.orm
       .update(gameSessionTable)
-      .set({ playable: ctx.game.session.playable + input.amount })
+      .set({ playable: roundMoney(ctx.game.session.playable + input.amount) })
       .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey));
   });
 
@@ -47,7 +48,7 @@ export const cashOut = gameMutation.mutation(async ({ ctx }) => {
     .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey));
   await ctx.orm
     .update(userTable)
-    .set({ balance: ctx.user.balance + ctx.game.session.playable })
+    .set({ balance: roundMoney(ctx.user.balance + ctx.game.session.playable) })
     .where(eq(userTable.id, ctx.user.id));
 });
 
@@ -63,13 +64,12 @@ export const makeBet = gameMutation
       });
     }
 
-    // return {playable:0,totalBet:0};
     return (
       await ctx.orm
         .update(gameSessionTable)
         .set({
-          playable: ctx.game.session.playable - input.amount,
-          totalBet: ctx.game.session.totalBet + input.amount,
+          playable: roundMoney(ctx.game.session.playable - input.amount),
+          totalBet: roundMoney(ctx.game.session.totalBet + input.amount),
         })
         .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey))
         .returning(gameSessionActiveBetsInfoReturning)

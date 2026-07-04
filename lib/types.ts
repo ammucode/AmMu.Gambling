@@ -148,12 +148,12 @@ export type PickByKeyDeep<T, Key extends PropertyKey> = T extends unknown
         : T
   : never;
 
-export type SumMany<Arr extends number[]> = Arr extends [
+export type SumMany<Arr extends readonly number[]> = Arr extends [
   infer First extends number,
 ]
   ? First
   : Arr extends [infer First extends number, infer Second extends number]
     ? Sum<First, Second>
-    : Arr extends [infer First extends number, ...infer Rest extends number[]]
+    : Arr extends [infer First extends number, ...infer Rest extends readonly number[]]
       ? Sum<First, SumMany<Rest>>
       : never;

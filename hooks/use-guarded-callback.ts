@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 export function useGuardedCallback<
   Callback extends (...args: unknown[]) => unknown,
->(callback: Callback, guard: boolean) {
+>(callback: Callback, guard: unknown) {
   return useCallback(
     (...args: Parameters<Callback>) => {
       if (!guard) return;

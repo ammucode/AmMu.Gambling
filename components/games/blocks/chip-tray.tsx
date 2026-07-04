@@ -1,6 +1,6 @@
 import { ChipDenomination, ChipDenominations } from '@/lib/games/chips';
 import { Chip } from '../chip';
-import { cn } from '@/lib/utils';
+import { cn, stripPrefix } from '@/lib/utils';
 import { useDragDropMonitor, useDraggable, useDroppable } from '@dnd-kit/react';
 import { Feedback } from '@dnd-kit/dom';
 
@@ -21,7 +21,7 @@ export function ChipTray({
       if (source.type !== 'chip') return;
       if (typeof source.id !== 'string') return;
       if (!source.id.startsWith('chip')) return;
-      setActiveChip(parseInt(source.id.substring(4)) as ChipDenomination);
+      setActiveChip(parseInt(stripPrefix(source.id, "chip")) as ChipDenomination);
     },
   });
 
@@ -40,7 +40,39 @@ export function ChipTray({
           id: `chip${chip}`,
           plugins: [
             Feedback.configure({
-              feedback: 'clone',
+              // feedback: 'clone',
+              // dropAnimation: {
+              //   duration: 700,   // milliseconds (default: 250)
+              //   easing: 'ease',  // CSS easing (default: 'ease')
+              // },
+              // dropAnimation: async (ctx) => {
+              //   console.log(ctx);
+              //   await ctx.element.animate(
+              //     [{transform: `translate3d(450px, 0px, 0)`}, {transform: 'translate3d(0, 0, 0)'}],
+              //     {duration: 700, easing: 'ease'}
+              //   ).finished
+              // }
+              // dropAnimation: async ({source, element, translate}) => {
+              //   return await element.animate(
+              //     [{transform: `translate3d(${translate.x}px, ${translate.y}px, 0)`}, {transform: 'translate3d(0, 0, 0)'}],
+              //     {duration: 200, easing: 'ease-out'}
+              //   ).finished;
+              //   // const targetCenter = source.manager?.dragOperation.target?.shape?.center;
+              //   // const elementRect = element.getBoundingClientRect();
+              //   // const sourceCenter = {
+              //   //   x: elementRect.x + elementRect.width/2,
+              //   //   y: elementRect.y + elementRect.height/2,
+              //   // };
+              //   // const translateDest = true//targetCenter
+              //   // // ? `translate3d(${targetCenter.x - sourceCenter.x}px, ${targetCenter.y - sourceCenter.y}px, 0)`
+              //   // ? `translate3d(20px, 20px, 0)`
+              //   // : 'translate3d(0, 0, 0)';
+              //   // console.log({targetCenter,sourceCenter,translateDest});
+              //   // await element.animate(
+              //   //   [{transform: `translate3d(${translate.x}px, ${translate.y}px, 0)`}, {transform: translateDest}],
+              //   //   {duration: 200, easing: 'ease-out'}
+              //   // ).finished
+              // },
             }),
           ],
           type: 'chip',
