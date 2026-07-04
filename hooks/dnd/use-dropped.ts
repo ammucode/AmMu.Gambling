@@ -19,9 +19,17 @@ type DragDropFilter<
     DragDropType extends string
       ? If<ExtendsStrict<string, DragDropType>, unknown, { type: DragDropType }>
       : DragDropType extends number
-        ? If<ExtendsStrict<number, DragDropType>, unknown, { type: DragDropType }>
+        ? If<
+            ExtendsStrict<number, DragDropType>,
+            unknown,
+            { type: DragDropType }
+          >
         : DragDropType extends symbol
-          ? If<ExtendsStrict<symbol, DragDropType>, unknown, { type: DragDropType }>
+          ? If<
+              ExtendsStrict<symbol, DragDropType>,
+              unknown,
+              { type: DragDropType }
+            >
           : unknown
   > &
   If<
@@ -47,10 +55,10 @@ export function useDropped<
   SourcePrefix extends UniqueIdentifier,
   TargetPrefix extends UniqueIdentifier,
 >(
-  onDrop: (ctx:{
-    source: Source & NoInfer<DragDropFilter<SourceType, SourcePrefix>>,
-    target: Target & NoInfer<DragDropFilter<TargetType, TargetPrefix>>,
-    operation: DropOperation<T, Source, Target>
+  onDrop: (ctx: {
+    source: Source & NoInfer<DragDropFilter<SourceType, SourcePrefix>>;
+    target: Target & NoInfer<DragDropFilter<TargetType, TargetPrefix>>;
+    operation: DropOperation<T, Source, Target>;
   }) => unknown,
   {
     sourceType,
@@ -92,9 +100,11 @@ export function useDropped<
       )
         return;
       onDrop({
-        source: source as Source & NoInfer<DragDropFilter<SourceType, SourcePrefix>>,
-        target: target as Target & NoInfer<DragDropFilter<TargetType, TargetPrefix>>,
-        operation: event.operation as DropOperation<T, Source, Target>
+        source: source as Source &
+          NoInfer<DragDropFilter<SourceType, SourcePrefix>>,
+        target: target as Target &
+          NoInfer<DragDropFilter<TargetType, TargetPrefix>>,
+        operation: event.operation as DropOperation<T, Source, Target>,
       });
     },
   });

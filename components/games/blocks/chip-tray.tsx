@@ -21,7 +21,9 @@ export function ChipTray({
       if (source.type !== 'chip') return;
       if (typeof source.id !== 'string') return;
       if (!source.id.startsWith('chip')) return;
-      setActiveChip(parseInt(stripPrefix(source.id, "chip")) as ChipDenomination);
+      setActiveChip(
+        parseInt(stripPrefix(source.id, 'chip')) as ChipDenomination
+      );
     },
   });
 

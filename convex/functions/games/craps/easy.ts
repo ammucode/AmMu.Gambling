@@ -12,7 +12,11 @@ import {
 } from '@/lib/games/craps/easy';
 import { rollDice, RollDiceResult } from '@/lib/games/simulation';
 import { aBetSchema } from '@/lib/games/bets';
-import { getPlaceBetPayout, getTrueOddsPayout, PointSchema } from '@/lib/games/craps';
+import {
+  getPlaceBetPayout,
+  getTrueOddsPayout,
+  PointSchema,
+} from '@/lib/games/craps';
 import { sum } from '@/lib/utils';
 import { roundMoney } from '@/lib/games/money';
 
@@ -27,8 +31,8 @@ const easyCrapsBetMutation = easyCrapsMutation
   .input(z.object({ amount: z.number() }))
   .output(z.number());
 
-export const betPassline = easyCrapsBetMutation
-  .mutation(async ({ ctx, input }) => {
+export const betPassline = easyCrapsBetMutation.mutation(
+  async ({ ctx, input }) => {
     if (ctx.game.doc.point)
       throw new CRPCError({
         code: 'PRECONDITION_FAILED',
@@ -57,7 +61,8 @@ export const betPassline = easyCrapsBetMutation
           bets: easyCrapsSessionTable.bets,
         })
     )[0].bets.passLine;
-  });
+  }
+);
 
 export const betPlace = easyCrapsBetMutation
   .input(z.object({ point: PointSchema }))
@@ -81,7 +86,7 @@ export const betPlace = easyCrapsBetMutation
               place: {
                 ...ctx.game.bets.place,
                 [betKey]: ctx.game.bets.place[betKey] + input.amount,
-              }
+              },
             },
           },
         })
@@ -124,7 +129,6 @@ export const roll = easyCrapsMutation
     const dice = rollDice(2);
     const roll = sum(dice);
 
-
     let gotResult = false;
     let newPoint = game.point;
 
@@ -134,7 +138,7 @@ export const roll = easyCrapsMutation
       if (amount <= 0) return 0;
       totalWinnings += amount;
       return amount;
-    }
+    };
 
     const newBets = EasyCrapsBetsSchema.parse(bets);
     let newTotalBet = session.totalBet;
@@ -143,12 +147,12 @@ export const roll = easyCrapsMutation
       if (amount <= 0) return 0;
       newTotalBet -= amount;
       return amount;
-    }
+    };
     const rebet = (amount: number) => {
       if (amount <= 0) return 0;
       autoRebet += amount;
       return amount;
-    }
+    };
 
     if (game.point) {
       if (roll === 7) {
@@ -162,7 +166,9 @@ export const roll = easyCrapsMutation
           rebet(bets.passLine);
 
           const payoutRatio = getTrueOddsPayout(roll);
-          winnings.passLineOdds = reward(roundMoney(bets.passLineOdds*payoutRatio));
+          winnings.passLineOdds = reward(
+            roundMoney(bets.passLineOdds * payoutRatio)
+          );
           newBets.passLineOdds -= unbet(bets.passLineOdds);
 
           newPoint = undefined;
@@ -189,14 +195,16 @@ export const roll = easyCrapsMutation
       const rollKey = `p${roll}` as const;
       if (bets.place[rollKey] > 0) {
         const payoutRatio = getPlaceBetPayout(roll);
-        winnings.place[rollKey] = reward(roundMoney(bets.place[rollKey]*payoutRatio));
+        winnings.place[rollKey] = reward(
+          roundMoney(bets.place[rollKey] * payoutRatio)
+        );
         rebet(bets.place[rollKey]);
         gotResult = true;
       }
     }
 
     const gameSessionUpdate = (
-      (totalWinnings || autoRebet || newTotalBet != session.totalBet)
+      totalWinnings || autoRebet || newTotalBet != session.totalBet
         ? {
             lastResultBet: session.totalBet,
             lastResultWon: totalWinnings,

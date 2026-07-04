@@ -42,7 +42,7 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
         gameSessionMeta,
         crpc.games.craps.easy.betPassline.mutationOptions()
       ),
-      {min: -activeBets.passLine, max: gameBalance?.playable}
+      { min: -activeBets.passLine, max: gameBalance?.playable }
     ),
     !gameLoading && game ? game.point === undefined : false
   );
@@ -53,7 +53,9 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
         crpc.games.craps.easy.betPlace.mutationOptions()
       ),
       {
-        min: ({point}) => {return -activeBets.place[`p${point}`]},
+        min: ({ point }) => {
+          return -activeBets.place[`p${point}`];
+        },
         max: gameBalance?.playable,
       }
     ),
@@ -83,20 +85,25 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
   const passlineBetDroppable = useDroppable({ id: 'passline', accept: 'chip' });
   const passlineBetDraggable = useDraggable({ id: 'passlineBet', type: 'bet' });
 
-  const placeBetDragDrops = strictFromEntries(Points.map(point => [point as Point, {
-    droppable: useDroppable({
-      id: `place${point}`,
-      accept: "chip",
-    }),
-    betDraggable: useDraggable({
-      id: `placeBet${point}`,
-      type: 'bet',
-    })
-  }]));
+  const placeBetDragDrops = strictFromEntries(
+    Points.map((point) => [
+      point as Point,
+      {
+        droppable: useDroppable({
+          id: `place${point}`,
+          accept: 'chip',
+        }),
+        betDraggable: useDraggable({
+          id: `placeBet${point}`,
+          type: 'bet',
+        }),
+      },
+    ])
+  );
 
   useDropped(
-    ({source}) => {
-      const chip = parseInt(stripPrefix(source.id, "chip")) as ChipDenomination;
+    ({ source }) => {
+      const chip = parseInt(stripPrefix(source.id, 'chip')) as ChipDenomination;
       console.log(`dropped ${chip} chip on passline!`);
       betPassline(chip);
     },
@@ -113,24 +120,23 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
     { sourceType: 'bet', sourceId: 'passlineBet', targetId: 'chipTray' }
   );
 
-
   useDropped(
-    ({source, target}) => {
-      const chip = parseInt(stripPrefix(source.id, "chip")) as ChipDenomination;
-      const point = parseInt(stripPrefix(target.id, "place")) as Point;
+    ({ source, target }) => {
+      const chip = parseInt(stripPrefix(source.id, 'chip')) as ChipDenomination;
+      const point = parseInt(stripPrefix(target.id, 'place')) as Point;
       console.log(`dropped ${chip} chip on place ${point}!`);
-      betPlace(chip, {point});
+      betPlace(chip, { point });
     },
     {
       sourceType: 'chip',
       sourceIdPrefix: 'chip',
-      targetIdPrefix: "place",
+      targetIdPrefix: 'place',
     }
   );
   useDropped(
-    ({source}) => {
-      const point = parseInt(stripPrefix(source.id, "placeBet")) as Point;
-      betPlace(-Infinity, {point});
+    ({ source }) => {
+      const point = parseInt(stripPrefix(source.id, 'placeBet')) as Point;
+      betPlace(-Infinity, { point });
     },
     { sourceType: 'bet', sourceIdPrefix: 'placeBet', targetId: 'chipTray' }
   );
@@ -148,12 +154,12 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
             const isPoint = point === game?.point;
             const [payoutNumerator, payoutDenominator] = PlaceBetPayouts[point];
             const bet = activeBets.place[`p${point}`];
-            const {droppable, betDraggable} = placeBetDragDrops[point];
+            const { droppable, betDraggable } = placeBetDragDrops[point];
             return (
               <div
                 ref={droppable.ref}
                 key={point}
-                onClick={() => betPlace(activeChip, {point})}
+                onClick={() => betPlace(activeChip, { point })}
                 className={cn(
                   'col-span-1 flex flex-col items-center justify-center rounded-md border border-white/70 bg-black/20 px-1 text-center text-white inset-shadow-sm inset-shadow-black/50',
                   isPoint && 'bg-white/20'

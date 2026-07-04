@@ -154,6 +154,9 @@ export type SumMany<Arr extends readonly number[]> = Arr extends [
   ? First
   : Arr extends [infer First extends number, infer Second extends number]
     ? Sum<First, Second>
-    : Arr extends [infer First extends number, ...infer Rest extends readonly number[]]
+    : Arr extends [
+          infer First extends number,
+          ...infer Rest extends readonly number[],
+        ]
       ? Sum<First, SumMany<Rest>>
       : never;

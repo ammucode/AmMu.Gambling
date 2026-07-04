@@ -31,12 +31,14 @@ export function sum<Nums extends readonly number[]>(arr: Nums) {
   return arr.reduce((sum, val) => sum + val, 0) as SumMany<Nums>;
 }
 
-
-export function strictFromEntries<K extends PropertyKey, V>(entries: [K,V][]) {
+export function strictFromEntries<K extends PropertyKey, V>(entries: [K, V][]) {
   return Object.fromEntries(entries) as Simplify<Record<K, V>>;
 }
 
-export function stripPrefix<Str extends string, Prefix extends string>(str: Str, prefix: Prefix): RemovePrefix<Str, Prefix> {
+export function stripPrefix<Str extends string, Prefix extends string>(
+  str: Str,
+  prefix: Prefix
+): RemovePrefix<Str, Prefix> {
   if (str.startsWith(prefix)) {
     return str.slice(prefix.length) as RemovePrefix<Str, Prefix>; // Removes the exact prefix length
   }
