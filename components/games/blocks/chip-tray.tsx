@@ -86,7 +86,8 @@ export function ChipTray({
             highlight={activeChip === chip}
             className={cn(
               'transition-all duration-100 ease-in-out hover:scale-125',
-              className
+              className,
+              activeChip === chip && "-translate-y-4",
             )}
             ref={draggable.ref}
             onClick={() => setActiveChip(chip)}
