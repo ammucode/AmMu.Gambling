@@ -16,6 +16,7 @@ import {
   InferInsertModel,
   InferSelectModel,
   integer,
+  json,
   text,
   timestamp,
   uniqueIndex,
@@ -24,6 +25,7 @@ import z from 'zod';
 import { Points } from '@/lib/games/craps';
 import { Arg0, Call1, Pipe, TypeLambda1 } from 'hkt-core';
 import { List, ObjectHKTs } from '@/lib/hkt';
+import {EasyCrapsBets, EasyCrpsInitialBets} from '@/lib/games/craps/easy';
 
 export const userTable = convexTable(
   'user',
@@ -156,13 +158,16 @@ export const easyCrapsSessionTable = convexTable(
         v.nullable(v.union(...Points.map((point) => v.literal(point))))
       )
     ),
+    bets: json<EasyCrapsBets>().notNull().default(EasyCrpsInitialBets),
   },
   (easyCrapsSessionTable) => [...genericGameExtras(easyCrapsSessionTable)]
 );
 
 export const videoPokerSessionTable = convexTable(
   'videoPokerSession',
-  { ...genericGameColumns },
+  { ...genericGameColumns,
+    bets: json<object>().notNull()
+   },
   (videoPokerSessionTable) => [...genericGameExtras(videoPokerSessionTable)]
 );
 

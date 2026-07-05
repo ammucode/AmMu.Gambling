@@ -1,5 +1,6 @@
 import {
   GAME_PATH_SCHEMA,
+  GamePathString,
   GamePathStringToGame,
   GameSlugSchema,
   getGameByPath,
@@ -21,16 +22,44 @@ import {
   perGameTableObj,
 } from '~schema';
 import { Arg0 } from 'hkt-core';
+import { Simplify } from 'type-fest';
 
-const gameInputSchema = z
-  .object({
-    path: GAME_PATH_SCHEMA.optional(),
-    sessionKey: GameSlugSchema.optional(),
-  })
-  .refine((data) => data.path || data.sessionKey, {
-    message: 'Either path or sessionKey must be provided',
-    path: ['path'],
-  });
+type gameInputSchemaPath = ReturnType<
+  typeof z.object<{
+    path: typeof GAME_PATH_SCHEMA;
+    sessionKey: z.ZodOptional<z.ZodNever>;
+  }>
+>;
+type gameInputSchemaSessionKey = ReturnType<
+  typeof z.object<{
+    path: z.ZodOptional<z.ZodNever>;
+    sessionKey: typeof GameSlugSchema;
+  }>
+>;
+type gameInputSchemaBoth = ReturnType<
+  typeof z.object<{
+    path: typeof GAME_PATH_SCHEMA;
+    sessionKey: typeof GameSlugSchema;
+  }>
+>;
+const gameInputSchemaInitial = z.object({
+  path: GAME_PATH_SCHEMA.optional(),
+  sessionKey: GameSlugSchema.optional(),
+});
+
+function gameInputRefinement(
+  data: z.infer<typeof gameInputSchemaInitial>
+): data is z.infer<gameInputSchemaPath> | z.infer<gameInputSchemaSessionKey> {
+  return !!(data.path || data.sessionKey);
+}
+
+const gameInputSchema = gameInputSchemaInitial.refine(gameInputRefinement, {
+  message: 'Either path or sessionKey must be provided',
+  path: ['path'],
+}) as unknown as
+  | gameInputSchemaPath
+  | gameInputSchemaSessionKey
+  | gameInputSchemaBoth;
 
 // type QueryCtxForMiddleware<QueryBuilder> =
 //   QueryBuilder extends QueryProcedureBuilder<
@@ -369,10 +398,11 @@ const gameInputSchema = z
 export const maybeGameMutation = authMutation
   .input(gameInputSchema)
   .use(async ({ ctx, next, input }) => {
-    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
+    const path = input.path ?? pathFromGameSessionKey(input.sessionKey);
+    const pathString = path.join('/') as GamePathString;
     const sessionKey =
       input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
+      (ctx.user && makeGameSessionKey(ctx.user.username, input.path));
     const gamePair = getGameByPath(path);
     const activeGame = gamePair[1] ?? gamePair[0];
     const gameSession = sessionKey
@@ -389,9 +419,10 @@ export const maybeGameMutation = authMutation
         ...ctx,
         game: {
           path: path,
+          pathString,
           sessionKey,
           pair: gamePair,
-          data: activeGame,
+          info: activeGame,
           session: gameSession,
         },
       },
@@ -401,10 +432,10 @@ export const maybeGameMutation = authMutation
 export const maybeGameQuery = optionalAuthQuery
   .input(gameInputSchema)
   .use(async ({ ctx, next, input }) => {
-    const path = input.path ?? pathFromGameSessionKey(input.sessionKey!);
+    const path = input.path ?? pathFromGameSessionKey(input.sessionKey);
     const sessionKey =
       input.sessionKey ??
-      (ctx.user && makeGameSessionKey(ctx.user.username, input.path!));
+      (ctx.user && makeGameSessionKey(ctx.user.username, input.path));
     const gamePair = getGameByPath(path);
     const activeGame = gamePair[1] ?? gamePair[0];
     const gameSession = sessionKey
@@ -423,7 +454,7 @@ export const maybeGameQuery = optionalAuthQuery
           path: path,
           sessionKey,
           pair: gamePair,
-          data: activeGame,
+          info: activeGame,
           session: gameSession,
         },
       },
@@ -434,7 +465,7 @@ export const gameMutation = maybeGameMutation.use(async ({ ctx, next }) => {
   if (!ctx.game.session) {
     throw new CRPCError({
       code: 'PRECONDITION_FAILED',
-      message: `Requires active game session for ${ctx.game.data.title}`,
+      message: `Requires active game session for ${ctx.game.info.title}`,
     });
   }
 
@@ -450,7 +481,7 @@ export const gameQuery = maybeGameQuery.use(async ({ ctx, next }) => {
   if (!ctx.game.session) {
     throw new CRPCError({
       code: 'PRECONDITION_FAILED',
-      message: `Requires active game session for ${ctx.game.data.title}`,
+      message: `Requires active game session for ${ctx.game.info.title}`,
     });
   }
 
@@ -476,7 +507,7 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
     const wrongGameError = () =>
       new CRPCError({
         code: 'PRECONDITION_FAILED',
-        message: `No game session is not for ${expectedGame.title}! (got ${ctx.game.sessionKey} for ${ctx.game.data.title})`,
+        message: `No game session is not for ${expectedGame.title}! (got ${ctx.game.sessionKey} for ${ctx.game.info.title})`,
       });
     if (!sessionKeyForGame(ctx.game.sessionKey, path)) {
       throw wrongGameError();
@@ -484,7 +515,7 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
     const sessionDoc = iHateNull(
       await ctx.orm.query.gameSession.findFirst({
         where: { sessionKey: ctx.game.session.sessionKey },
-        with: { [tblName]: true },
+        with: { [tblName]: { limit: 1 } },
       }),
       true
     );
@@ -492,13 +523,18 @@ const PerGameTableKey_CRPCDefs_Func = <Path extends GameTablesKey>({
       throw wrongGameError();
     }
 
-    const gameDoc = sessionDoc[tblName][0] as Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+    type TGameDoc = Pick<typeof sessionDoc, typeof tblName>[typeof tblName][0];
+    const gameDoc = sessionDoc[tblName][0] as TGameDoc;
 
 
     return next({
       ctx: {
         ...ctx,
-        gameDoc, // (gameDoc as Pick<typeof gameDoc, typeof tblName>)[tblName][0],
+        game: {
+          ...ctx.game,
+          doc: gameDoc,
+          bets: gameDoc.bets as TGameDoc["bets"],
+        },
       },
     });
   }) satisfies Parameters<mutationOrQueryBuilder['use']>[0];

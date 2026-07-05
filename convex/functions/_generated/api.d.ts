@@ -102,6 +102,16 @@ export declare const api: {
  * ```
  */
 export declare const internal: {
+  games: {
+    balance: {
+      makeBet: FunctionReference<
+        "mutation",
+        "internal",
+        { amount: number; path?: any; sessionKey?: string },
+        { playable: number; totalBet: number }
+      >;
+    };
+  };
   generated: {
     auth: {
       create: FunctionReference<

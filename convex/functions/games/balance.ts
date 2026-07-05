@@ -1,9 +1,11 @@
 import { gameMutation, gameQuery } from '@convex-lib/crpc-games';
-import { gameBalanceSchema } from '@convex/models';
+import { gameBalanceSchema, gameSessionActiveBetsInfo, gameSessionActiveBetsInfoReturning } from '@convex/models';
 import { eq } from 'kitcn/orm';
 import { CRPCError } from 'kitcn/server';
 import z from 'zod';
 import { userTable, gameSessionTable } from '~schema';
+
+const amountSchema = z.object({ amount: z.number().nonnegative() });
 
 export const info = gameQuery
   .output(gameBalanceSchema.nullable())
@@ -12,17 +14,10 @@ export const info = gameQuery
       ...ctx.game.session,
       user: ctx.user,
     };
-    // return await ctx.orm.query.gameSession.findFirst({
-    //   ...gameBalanceQuery,
-    //   where: { id: ctx.game.session.id },
-    // });
   });
-const amountSchema = z.object({ amount: z.number().nonnegative() });
 export const invest = gameMutation
   .input(amountSchema)
-  .mutation(async ({ ctx, input: input_ }) => {
-    const input = input_ as z.infer<typeof amountSchema>;
-
+  .mutation(async ({ ctx, input }) => {
     if (ctx.user.balance < input.amount) {
       throw new CRPCError({
         code: 'PAYMENT_REQUIRED',
@@ -51,3 +46,25 @@ export const cashOut = gameMutation.mutation(async ({ ctx }) => {
     .set({ balance: ctx.user.balance + ctx.game.session.playable })
     .where(eq(userTable.id, ctx.user.id));
 });
+
+export const makeBet = gameMutation
+  .internal()
+  .input(amountSchema)
+  .output(gameSessionActiveBetsInfo)
+  .mutation(async ({ ctx, input }) => {
+    if (ctx.game.session.playable < input.amount) {
+      throw new CRPCError({
+        code: 'PAYLOAD_TOO_LARGE',
+        message: `You don't have enough money!`,
+      });
+    }
+
+    return (await ctx.orm
+      .update(gameSessionTable)
+      .set({
+        playable: ctx.game.session.playable - input.amount,
+        totalBet: ctx.game.session.totalBet + input.amount,
+      })
+      .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey))
+      .returning(gameSessionActiveBetsInfoReturning))[0];
+  });

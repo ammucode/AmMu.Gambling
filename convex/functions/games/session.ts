@@ -1,6 +1,8 @@
-import { gameSessionTable } from '~schema';
+import { gameSessionTable, GameTables } from '~schema';
 import { gameSessionInfo, gameSessionInfoReturning } from '@convex/models';
 import { maybeGameMutation, maybeGameQuery } from '@convex-lib/crpc-games';
+import { GamePathString } from '@/lib/games';
+import { EasyCrpsInitialBets } from '@/lib/games/craps/easy';
 
 export const maybeStartSession = maybeGameMutation
   .output(gameSessionInfo)
@@ -9,7 +11,7 @@ export const maybeStartSession = maybeGameMutation
       return ctx.game.session;
     }
 
-    return (
+    const gameSession = (
       await ctx.orm
         .insert(gameSessionTable)
         .values({
@@ -19,6 +21,12 @@ export const maybeStartSession = maybeGameMutation
         })
         .returning(gameSessionInfoReturning)
     )[0];
+
+    await ctx.orm.insert(GameTables[ctx.game.pathString]).values({
+      sessionKey: ctx.game.sessionKey,
+      bets: EasyCrpsInitialBets
+    });
+    return gameSession;
   });
 
 export const getSession = maybeGameQuery

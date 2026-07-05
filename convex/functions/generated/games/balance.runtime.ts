@@ -17,6 +17,7 @@ const procedureRegistry = {
   "cashOut": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/balance").cashOut>("games/balance:cashOut"), () => (require("../../games/balance") as Record<string, unknown>)["cashOut"])],
   "info": ["query", typedProcedureResolver(createGeneratedFunctionReference<"query", "public", typeof import("../../games/balance").info>("games/balance:info"), () => (require("../../games/balance") as Record<string, unknown>)["info"])],
   "invest": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "public", typeof import("../../games/balance").invest>("games/balance:invest"), () => (require("../../games/balance") as Record<string, unknown>)["invest"])],
+  "makeBet": ["mutation", typedProcedureResolver(createGeneratedFunctionReference<"mutation", "internal", typeof import("../../games/balance").makeBet>("games/balance:makeBet"), () => (require("../../games/balance") as Record<string, unknown>)["makeBet"])],
 } as const;
 
   const handlerRegistry = procedureRegistry;
