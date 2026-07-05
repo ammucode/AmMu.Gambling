@@ -1,6 +1,6 @@
 import { GameRoot } from '@/components/games/root';
 import { caller, crpc, prefetch } from '@/lib/convex/rsc';
-import { GamePath } from '@/lib/games/games';
+import { GamePath } from '@/lib/games';
 
 export default async function Page({ params }: PageProps<'/games/[...path]'>) {
   const { path } = (await params) as { path: GamePath };

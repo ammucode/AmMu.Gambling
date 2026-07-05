@@ -6,7 +6,7 @@ import {
   makeGameSessionKey,
   pathFromGameSessionKey,
   sessionKeyForGame,
-} from '@/lib/games/games';
+} from '@/lib/games';
 import { MarkNonNull } from '@/lib/types';
 import { AnyMiddlewareBuilder, CRPCError } from 'kitcn/server';
 import z from 'zod';

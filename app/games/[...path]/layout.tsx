@@ -1,5 +1,5 @@
 import { SidebarTrigger } from '@ui/sidebar';
-import { getGameByPath } from '@/lib/games/games';
+import { getGameByPath } from '@/lib/games';
 import { notFound } from 'next/navigation';
 
 export default async function Layout({

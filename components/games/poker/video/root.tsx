@@ -1,4 +1,4 @@
-import { GameProps } from '../../types';
+import { GameProps } from '@/lib/games/client';
 
 export function VideoPoker({}: GameProps) {
   return (

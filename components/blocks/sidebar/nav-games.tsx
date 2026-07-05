@@ -14,7 +14,7 @@ import {
   SidebarMenuSubButton,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Game, GAMES, BaseGame, SubGame } from '@/lib/games/games';
+import { Game, GAMES, BaseGame, SubGame } from '@/lib/games';
 import { ChevronRight } from 'lucide-react';
 import Link, { LinkProps } from 'next/link';
 import { useMemo } from 'react';
@@ -35,16 +35,16 @@ function GameLink<Raw extends boolean>({
     () => (open && !raw ? ['', 'games', ...path!].join('/') : ''),
     [open, path, raw]
   );
-  const icon = game.icon ? (
-    'lucideIcon' in game.icon ? (
-      <game.icon.lucideIcon {...game.icon} />
-    ) : (
-      <game.icon />
-    )
-  ) : null;
+  // const icon = game.icon ? (
+  //   'lucideIcon' in game.icon ? (
+  //     <game.icon.lucideIcon {...game.icon} />
+  //   ) : (
+  //     <game.icon />
+  //   )
+  // ) : null;
   const children = (
     <>
-      {icon}
+      {/* {icon} */}
       <span>{game.title}</span>
     </>
   );

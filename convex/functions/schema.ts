@@ -3,7 +3,7 @@ import {
   GamePathString,
   GamePathStrings,
   GameSlug,
-} from '@/lib/games/games';
+} from '@/lib/games';
 import { TableDefinition } from 'convex/server';
 import { v } from 'convex/values';
 import {

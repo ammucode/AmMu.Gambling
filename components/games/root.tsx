@@ -1,6 +1,6 @@
 'use client';
 
-import { clientifyGame, GamePath, getGameByPath } from '@/lib/games/games';
+import { GamePath, GamePathString, getGameByPath } from '@/lib/games';
 import { NoAccountBlock } from '../blocks/auth/no-account';
 import { useCRPC } from '@/lib/convex/crpc';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,6 +9,8 @@ import { useGameSession } from '@/hooks/games/use-game-session';
 import { Skeleton } from '@ui/skeleton';
 import { BalanceManager } from './balance-manager';
 import { MoneyStats } from '../blocks/games/money-stats';
+import { Card, CardContent } from '@ui/card';
+import { GameComponents } from '@/lib/games/client';
 
 export interface GameWrapperProps {
   path: GamePath;
@@ -41,26 +43,41 @@ export function GameRoot({ path }: GameWrapperProps) {
     }
   }, [needsSession, maybeStartSession]);
 
-  if (user ? !gameSession : userLoading) {
-    return <Skeleton className="m-4 h-full w-full bg-accent" />;
-  }
+  const loadingDisplay = <Skeleton className="m-4 h-full w-full bg-accent" />;
 
-  if (!user) {
+  if (userLoading) return loadingDisplay;
+  else if (!user) {
     return <NoAccountBlock onAuth={maybeStartSession} />;
   }
 
+  if (gameSessionLoading) return loadingDisplay;
+  else if (!gameSession) {
+    return (
+      <Card className="flex min-w-72 flex-col gap-6 sm:min-w-sm md:max-w-md">
+        <CardContent>
+          something broken! try reloading...
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const [rootComponent,subComponent] = GameComponents[path.join('/') as GamePathString];
+  const activeComponent = subComponent ?? rootComponent;
+
   let renderedGame: React.ReactNode = (
-    <activeGame.component game={clientifyGame(activeGame)} fullPath={path} />
+    <activeComponent.component game={activeGame} fullPath={path} gameSession={gameSession} />
   );
 
-  if (subGame && rootGame.rootComponent) {
+  if (subGame) {
     renderedGame = (
-      <rootGame.rootComponent
-        game={clientifyGame(rootGame)}
-        subGame={clientifyGame(subGame)}
+      <rootComponent.component
+        game={rootGame}
+        subGame={subGame}
+        fullPath={path}
+        gameSession={gameSession}
       >
         {renderedGame}
-      </rootGame.rootComponent>
+      </rootComponent.component>
     );
   }
 
@@ -68,11 +85,7 @@ export function GameRoot({ path }: GameWrapperProps) {
     <>
       <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row md:justify-between md:gap-0">
         <BalanceManager />
-        <MoneyStats
-        // playable={gameSession.money}
-        // bet={0}
-        // lastResult={{ bet: 10, win: 50 }}
-        />
+        <MoneyStats />
       </div>
       {renderedGame}
     </>

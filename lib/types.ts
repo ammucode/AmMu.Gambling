@@ -105,3 +105,27 @@ export type ZipObject<
     ? ZipObject<KTail, VTail, Obj & { [P in KHead & string]: VHead }>
     : Obj
   : Obj;
+
+export type BuiltIns = Primitive | void | Date | RegExp;
+export type NonRecursiveType = BuiltIns | Function | (new (...arguments_: any[]) => unknown) | Promise<unknown>;
+
+
+export type AnyFieldValueOf<Obj> = 
+  Obj extends NonRecursiveType ? Obj
+  : Obj extends object ? AnyFieldValueOf<Obj[keyof Obj]>
+  : Obj;
+
+
+export type ReplaceTypeDeep<Within, From, To> = Within extends unknown ?
+  Within extends From ? To
+  : Within extends NonRecursiveType ? Within
+  : Within extends unknown[] ? { [I in keyof Within]: ReplaceTypeDeep<Within[I], From, To> }
+  : { [K in keyof Within]: Within[K] } & {}
+  : never;
+
+export type PickByKeyDeep<T, Key extends PropertyKey> = T extends unknown ?
+  T extends NonRecursiveType ? T
+  : T extends unknown[] ? { [I in keyof T]: PickByKeyDeep<T[I], Key> }
+  : T extends object ? { [K in keyof T]: K extends Key ? T[K] : never } & {}
+  : T
+  : never;
