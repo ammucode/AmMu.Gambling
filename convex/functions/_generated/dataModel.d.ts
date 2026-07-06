@@ -304,12 +304,19 @@ export type DataModel = {
   easyCrapsSession: {
     document: {
       bets: any;
-      point?: null | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | null;
+      point?: null | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 11 | 12 | null;
+      rollHistory: Array<any>;
       sessionKey: string;
       _id: Id<"easyCrapsSession">;
       _creationTime: number;
     };
-    fieldPaths: "_creationTime" | "_id" | "bets" | "point" | "sessionKey";
+    fieldPaths:
+      | "_creationTime"
+      | "_id"
+      | "bets"
+      | "point"
+      | "rollHistory"
+      | "sessionKey";
     indexes: {
       by_id: ["_id"];
       by_creation_time: ["_creationTime"];

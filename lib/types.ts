@@ -9,6 +9,12 @@ import {
   Primitive,
 } from 'type-fest';
 
+
+export type BuiltIns = Primitive | void | Date | RegExp;
+export type NonRecursiveType = BuiltIns | Function | (new (...arguments_: any[]) => unknown) | Promise<unknown>;
+export type ValidTemplateLiteralType = string | number | bigint | boolean | null | undefined;
+
+
 export type MyPartialDeep<T> = {
   [P in keyof T]?: T[P] extends object ? MyPartialDeep<T[P]> : T[P];
 };
@@ -105,10 +111,6 @@ export type ZipObject<
     ? ZipObject<KTail, VTail, Obj & { [P in KHead & string]: VHead }>
     : Obj
   : Obj;
-
-export type BuiltIns = Primitive | void | Date | RegExp;
-export type NonRecursiveType = BuiltIns | Function | (new (...arguments_: any[]) => unknown) | Promise<unknown>;
-
 
 export type AnyFieldValueOf<Obj> = 
   Obj extends NonRecursiveType ? Obj

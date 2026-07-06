@@ -1,15 +1,14 @@
 import { z } from "zod";
-import { Points } from ".";
+import { PointNums, pointNumsToStr, Points, PointSchema } from ".";
 import { defaultObject, defaultObjectByDef } from "@/lib/zod";
+import { ReadonlyDeep, Simplify, SimplifyDeep } from "type-fest";
+import { betGroupSchema, betGroupSchemaObject } from "../bets";
+import { RollDiceResult, rollSchema } from "../simulation";
 
-const aBetSchema = z.number().nonnegative().default(0);
 
-const betGroupSchema = <Bets extends readonly PropertyKey[]>(bets: Bets) => {
-  return Object.fromEntries(bets.map(bet => [bet, aBetSchema])) as Record<Bets[number], typeof aBetSchema>
-};
-const betGroupSchemaObject = <Bets extends readonly PropertyKey[]>(bets: Bets) => {
-  return defaultObjectByDef(betGroupSchema(bets));
-};
+const pointListToSchema = <Ps extends readonly number[]>(ps: Ps) => {
+  return betGroupSchemaObject(pointNumsToStr(ps));
+}
 
 export const EasyCrapsBetsSchema = defaultObjectByDef({
   ...betGroupSchema([
@@ -19,8 +18,8 @@ export const EasyCrapsBetsSchema = defaultObjectByDef({
     "passLineOdds"
   ] as const),
   // multi-roll
-  place: betGroupSchemaObject(Points),
-  hardWays: betGroupSchemaObject([4,6,8,10] as const),
+  place: pointListToSchema(PointNums),
+  hardWays: pointListToSchema([4,6,8,10] as const),
   // single-roll
   ...betGroupSchema([
     "field", "lowField", "highField",
@@ -28,9 +27,18 @@ export const EasyCrapsBetsSchema = defaultObjectByDef({
     "seven",
     "anyCraps",
   ] as const),
-  horn: betGroupSchemaObject([2,3,11,12] as const),
-  hop: betGroupSchemaObject([13,14,23,24,15,16,25,34,26,35,36,45,46] as const),
-  hoppingHardWays: betGroupSchemaObject([4,6,8,10] as const),
+  horn: pointListToSchema([2,3,11,12] as const),
+  hop: pointListToSchema([13,14,23,24,15,16,25,34,26,35,36,45,46] as const),
+  hoppingHardWays: pointListToSchema([4,6,8,10] as const),
 });
 export type EasyCrapsBets = z.infer<typeof EasyCrapsBetsSchema>;
-export const EasyCrpsInitialBets = EasyCrapsBetsSchema.parse({});
+export const makeEasyCrapsInitialBets = () => EasyCrapsBetsSchema.parse({});
+
+export const EasyCrapsInitialBets = makeEasyCrapsInitialBets() as SimplifyDeep<ReadonlyDeep<EasyCrapsBets>>;
+
+
+export const EasyCrapsSchema = z.object({
+  point: PointSchema,
+  bets: EasyCrapsBetsSchema,
+  rollHistory: z.array(rollSchema(2)),
+});

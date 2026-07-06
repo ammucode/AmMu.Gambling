@@ -14,6 +14,7 @@ import {
   TypeLambda2,
   TypeLambdaG,
 } from 'hkt-core';
+import { ValidTemplateLiteralType } from './types';
 
 export namespace Any {
   /* NotExtend */
@@ -74,6 +75,25 @@ export namespace List {
       xs: TArg<this, 'T'>[]
     ) => TArg<this, 'U'>[];
     return: _Map<Arg0<this>, Arg1<this>>;
+  }
+
+  export type MapRO<
+    F extends TypeLambda1<TS[number]>,
+    TS extends readonly unknown[],
+  > = _MapRO<F, TS>;
+  type _MapRO<F, TS> = { [K in keyof TS]: Call1W<F, TS[K]> };
+  export interface MapRO$<F extends TypeLambda1> extends TypeLambda<
+    [xs: readonly Param0<F>[]],
+    readonly RetType<F>[]
+  > {
+    return: _MapRO<F, Arg0<this>>;
+  }
+  export interface MapRO$$ extends TypeLambdaG<['T', 'U']> {
+    signature: (
+      f: TypeLambda<[x: TArg<this, 'T'>], TArg<this, 'U'>>,
+      xs: readonly TArg<this, 'T'>[]
+    ) => readonly TArg<this, 'U'>[];
+    return: _MapRO<Arg0<this>, Arg1<this>>;
   }
 
   /* Reduce */
@@ -139,6 +159,21 @@ export namespace Str {
     return: Cap<Arg0<this>>;
   }
 
+  /* Append */
+  export interface Append<Suffix extends string> extends TypeLambda<[s: string], string> {
+    return: `${Arg0<this>}${Suffix}`;
+  }
+
+  /* Prepend */
+  export interface Prepend<Prefix extends string> extends TypeLambda<[s: string], string> {
+    return: `${Prefix}${Arg0<this>}`;
+  }
+
+  /* ToString */
+  export interface ToString extends TypeLambda1<ValidTemplateLiteralType, string> {
+    return: `${Arg0<this>}`;
+  }
+
   /* Length */
   export type Length<S extends string> = _Length<S>;
   type _Length<
@@ -178,13 +213,13 @@ export namespace ObjectHKTs {
   type _PrettifyObject<O> = O extends infer U
     ? { [K in keyof U]: U[K] }
     : never;
-  type _FromEntries<Entries extends [PropertyKey, unknown][]> =
+  type _FromEntries<Entries extends readonly [PropertyKey, unknown][]> =
     _PrettifyObject<{
       [K in Entries[number][0]]: Extract<Entries[number], [K, unknown]>[1];
     }>;
   export interface FromEntries extends TypeLambdaG<[['K', PropertyKey], 'V']> {
     signature: (
-      entries: [TArg<this, 'K'>, TArg<this, 'V'>][]
+      entries: readonly [TArg<this, 'K'>, TArg<this, 'V'>][]
     ) => Record<TArg<this, 'K'>, TArg<this, 'V'>>;
     return: _FromEntries<Arg0<this>>;
   }
