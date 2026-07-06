@@ -39,13 +39,13 @@ export type RootGameComponent = (props: RootGameProps) => React.ReactNode;
 type aGameComponent = RootGameComponent|SubGameComponent|GameComponent;
 type CompForAGameComponent<Comp extends aGameComponent> = Parameters<Comp>[0]['game'] extends RootGameWithSubs ? Optional<Comp> : Comp;
 
-type GameCompWithIcon<Comp extends aGameComponent> = {
-  component: CompForAGameComponent<Comp>;
-  icon?:
-    | LucideIcon
+export type GameIcon = | LucideIcon
     | (LucideProps & {
         lucideIcon: LucideIcon;
       });
+type GameCompWithIcon<Comp extends aGameComponent> = {
+  component: CompForAGameComponent<Comp>;
+  icon?: GameIcon;
 };
 function withIcon<Comp extends aGameComponent, Icon extends LucideIcon>(component: Comp, icon?: Icon) {
   return { component, icon } as const;
@@ -55,8 +55,9 @@ function withIcon<Comp extends aGameComponent, Icon extends LucideIcon>(componen
 type GameComponentsDef = {
   [Path in GamePathString]: Path extends `${string}/${string}` ? [GameCompWithIcon<RootGameComponent>,GameCompWithIcon<SubGameComponent>] : [GameCompWithIcon<GameComponent>,undefined];
 }
-export const GameComponents = {
-  'craps/easy': [withIcon(Craps, Dices),withIcon(EasyCraps)],
+export const GameComponentDefs = {
+  'craps/easy': [withIcon(Craps, Dices), withIcon(EasyCraps)],
   'video-poker': [withIcon(VideoPoker, Spade),undefined],
 } as const satisfies GameComponentsDef;
-export type GameComponents = typeof GameComponents;
+export type GameComponentDefs = typeof GameComponentDefs;
+export type GameComponentDef = Exclude<GameComponentDefs[keyof GameComponentDefs][number], undefined>;
