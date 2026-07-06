@@ -35,16 +35,16 @@ function GameLink<Raw extends boolean>({
     () => (open && !raw ? ['', 'games', ...path!].join('/') : ''),
     [open, path, raw]
   );
-  const icon = game.icon ? (
-    'lucideIcon' in game.icon ? (
-      <game.icon.lucideIcon {...game.icon} />
-    ) : (
-      <game.icon />
-    )
-  ) : null;
+  // const icon = game.icon ? (
+  //   'lucideIcon' in game.icon ? (
+  //     <game.icon.lucideIcon {...game.icon} />
+  //   ) : (
+  //     <game.icon />
+  //   )
+  // ) : null;
   const children = (
     <>
-      {icon}
+      {/* {icon} */}
       <span>{game.title}</span>
     </>
   );
