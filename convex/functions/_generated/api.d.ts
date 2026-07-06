@@ -53,7 +53,7 @@ export declare const api: {
           "mutation",
           "public",
           { amount: number; path?: any; sessionKey?: string },
-          any
+          number
         >;
         getPoint: FunctionReference<
           "query",
