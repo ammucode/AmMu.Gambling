@@ -45,7 +45,7 @@ export default async function Layout({
           {activeGame.title}
         </h1>
       </header>
-      <div className="relative flex w-full flex-1 flex-col items-center p-4 pt-2">
+      <div className="relative flex w-full flex-1 flex-col items-center p-4 pt-2 max-md:scale-75">
         {children}
       </div>
     </>
