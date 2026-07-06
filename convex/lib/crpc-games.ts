@@ -24,32 +24,42 @@ import {
 import { Arg0 } from 'hkt-core';
 import { Simplify } from 'type-fest';
 
-const gameInputSchemaPath = z
-  .object({
-    path: GAME_PATH_SCHEMA,
-    sessionKey: z.never().optional(),
-  });
-const gameInputSchemaSessionKey = z
-  .object({
-    path: z.never().optional(),
-    sessionKey: GameSlugSchema,
-  });
-const gameInputSchemaInitial = z
-  .object({
-    path: GAME_PATH_SCHEMA.optional(),
-    sessionKey: GameSlugSchema.optional(),
-  });
+type gameInputSchemaPath = ReturnType<
+  typeof z.object<{
+    path: typeof GAME_PATH_SCHEMA;
+    sessionKey: z.ZodOptional<z.ZodNever>;
+  }>
+>;
+type gameInputSchemaSessionKey = ReturnType<
+  typeof z.object<{
+    path: z.ZodOptional<z.ZodNever>;
+    sessionKey: typeof GameSlugSchema;
+  }>
+>;
+type gameInputSchemaBoth = ReturnType<
+  typeof z.object<{
+    path: typeof GAME_PATH_SCHEMA;
+    sessionKey: typeof GameSlugSchema;
+  }>
+>;
+const gameInputSchemaInitial = z.object({
+  path: GAME_PATH_SCHEMA.optional(),
+  sessionKey: GameSlugSchema.optional(),
+});
 
-function gameInputRefinement(data: z.infer<typeof gameInputSchemaInitial>): data is z.infer<typeof gameInputSchemaPath>|z.infer<typeof gameInputSchemaSessionKey> {
+function gameInputRefinement(
+  data: z.infer<typeof gameInputSchemaInitial>
+): data is z.infer<gameInputSchemaPath> | z.infer<gameInputSchemaSessionKey> {
   return !!(data.path || data.sessionKey);
 }
 
-const gameInputSchema = gameInputSchemaInitial
-  .refine(gameInputRefinement, {
-    message: 'Either path or sessionKey must be provided',
-    path: ['path'],
-  }) as unknown as typeof gameInputSchemaPath|typeof gameInputSchemaSessionKey;
-type t = Simplify<z.infer<typeof gameInputSchema>>;
+const gameInputSchema = gameInputSchemaInitial.refine(gameInputRefinement, {
+  message: 'Either path or sessionKey must be provided',
+  path: ['path'],
+}) as unknown as
+  | gameInputSchemaPath
+  | gameInputSchemaSessionKey
+  | gameInputSchemaBoth;
 
 // type QueryCtxForMiddleware<QueryBuilder> =
 //   QueryBuilder extends QueryProcedureBuilder<
