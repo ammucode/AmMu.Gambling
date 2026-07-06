@@ -59,12 +59,13 @@ export const makeBet = gameMutation
       });
     }
 
-    return (await ctx.orm
-      .update(gameSessionTable)
-      .set({
-        playable: ctx.game.session.playable - input.amount,
-        totalBet: ctx.game.session.totalBet + input.amount,
-      })
-      .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey))
-      .returning(gameSessionActiveBetsInfoReturning))[0];
-  });
+  // return {playable:0,totalBet:0};
+  return (await ctx.orm
+    .update(gameSessionTable)
+    .set({
+      playable: ctx.game.session.playable - input.amount,
+      totalBet: ctx.game.session.totalBet + input.amount,
+    })
+    .where(eq(gameSessionTable.sessionKey, ctx.game.session.sessionKey))
+    .returning(gameSessionActiveBetsInfoReturning))[0];
+});

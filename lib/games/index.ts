@@ -32,7 +32,7 @@ export interface SubGame extends BaseGame {
 export interface RootGameWithSubs extends Required<BaseGame> {
   // component?: never;
   // rootComponent?: RootGameComponentPlaceholder;
-  subGames: SubGame[];
+  subGames: [SubGame, ...[]];
 }
 export type Game = RootGame | RootGameWithSubs;
 export const GAMES = [

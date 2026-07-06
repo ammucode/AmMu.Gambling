@@ -15,6 +15,8 @@ const fontMono = Geist_Mono({
   variable: '--font-mono',
 });
 
+export const maybeGradientBackground = "bg-radial-[at_50%_30%] from-[rgb(63,140,46)] to-[rgb(25,63,19)]";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,7 +38,7 @@ export default function RootLayout({
           <Providers>
             <UIProviders>
               <SidebarRoot />
-              <SidebarInset className="bg-green-900">{children}</SidebarInset>
+              <SidebarInset className="bg-green-800">{children}</SidebarInset>
             </UIProviders>
           </Providers>
         </ThemeProvider>
