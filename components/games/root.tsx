@@ -14,6 +14,7 @@ import { GameComponentDefs } from '@/lib/games/client';
 import { cn } from '@/lib/utils';
 import { DragDropProvider, useDragDropMonitor } from '@dnd-kit/react';
 import HeaderPortal from '../header/portal';
+import { PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom';
 
 const debugDrags = true;
 
@@ -158,6 +159,17 @@ export function GameRoot({ path }: GameWrapperProps) {
         // onDragMove={(event)=>console.log("onDragMove", event)}
         // onDragOver={(event)=>console.log("onDragOver", event)}
         // onDragEnd={(event)=>console.log("onDragEnd", event)}
+          sensors={(defaults) => [
+            ...defaults.filter((sensor) => sensor !== PointerSensor),
+            PointerSensor.configure({
+              activationConstraints: [
+                // Drag starts after the pointer moves 8px
+                new PointerActivationConstraints.Distance({value: 2}),
+                // ...or after holding for 200ms with up to 10px tolerance
+                new PointerActivationConstraints.Delay({value: 10, tolerance: 10}),
+              ],
+            }),
+          ]}
         >
           {debugDrags ? (
             <>
