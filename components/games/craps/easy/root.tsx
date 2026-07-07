@@ -145,100 +145,102 @@ export function EasyCraps({ gameSessionMeta }: EasyCrapsProps) {
 
   return (
     <>
-      <div className="grid aspect-2/1 max-w-full min-w-0 grid-cols-14 grid-rows-22 transition-[max-width] duration-300 ease-in-out @5xl:max-w-[90%] @6xl:max-w-[80%]">
-        <div className="col-span-4 col-start-1 row-span-19 row-start-1 grid bg-gray-800/30">
-          hard
-        </div>
-        <div className="col-span-10 col-start-5 row-span-8 row-start-1 -mb-2 grid min-h-0 max-w-full min-w-0 grid-cols-10 gap-0.75 overflow-x-scroll py-4 transition-[gap] duration-300 @lg:gap-1 @2xl:gap-1.5 @3xl:gap-2">
-          {Points.map((point) => {
-            const isPoint = point === game?.point;
-            const [payoutNumerator, payoutDenominator] = PlaceBetPayouts[point];
-            const bet = activeBets.place[`p${point}`];
-            const { droppable, betDraggable } = placeBetDragDrops[point];
-            return (
-              <div
-                ref={droppable.ref}
-                key={point}
-                onClick={() => betPlace(activeChip, { point })}
-                className={cn(
-                  'col-span-1 flex flex-col items-center justify-center rounded-md border border-white/70 bg-black/20 px-1 text-center text-white inset-shadow-sm inset-shadow-black/50',
-                  isPoint && 'bg-white/20'
-                )}
-              >
-                <p className="text-xl font-bold transition-[font-size] duration-300 @lg:text-2xl @2xl:text-3xl @3xl:text-4xl @5xl:text-5xl">
-                  {point}
-                </p>
-                <p className="text-[5px] font-medium text-nowrap transition-[font-size] duration-300 @lg:text-[6px] @2xl:text-[8px] @3xl:text-[10px] @5xl:text-xs">
-                  PAYS
-                  <br />
-                  {payoutNumerator} FOR {payoutDenominator}
-                </p>
-                <Chip
-                  ref={betDraggable.ref}
-                  value={bet}
-                  dynamicSizing={true}
-                  hideOnZero={true}
-                  className={cn('@2xl:mt-3')}
-                />
-              </div>
-            );
-          })}
-        </div>
-        <div className="col-span-3 col-start-5 row-span-10 row-start-10 grid bg-gray-800/30">
-          C/E
-        </div>
-        <div
-          className={cn(
-            'col-span-7 col-start-8 row-span-10 row-start-10',
-            'flex flex-col items-center gap-0.5'
-          )}
-        >
-          <div
-            className={cn(
-              'mt-[4%] min-h-0 w-full flex-1 rounded-md inset-ring inset-ring-white/50',
-              'bg-white/10 inset-shadow-sm inset-shadow-black/20'
-            )}
-          >
-            field
+      <div className="@container-size w-full flex-1 min-w-0 min-h-0 grid place-content-center">
+        <div className="grid caspect-2/1 grid-cols-14 grid-rows-22">
+          <div className="col-span-4 col-start-1 row-span-19 row-start-1 grid bg-gray-800/30">
+            hard
+          </div>
+          <div className="col-span-10 col-start-5 row-span-8 row-start-1 -mb-2 grid min-h-0 max-w-full min-w-0 grid-cols-10 gap-0.75 overflow-x-scroll py-4 transition-[gap] duration-300 @lg:gap-1 @2xl:gap-1.5 @3xl:gap-2">
+            {Points.map((point) => {
+              const isPoint = point === game?.point;
+              const [payoutNumerator, payoutDenominator] = PlaceBetPayouts[point];
+              const bet = activeBets.place[`p${point}`];
+              const { droppable, betDraggable } = placeBetDragDrops[point];
+              return (
+                <div
+                  ref={droppable.ref}
+                  key={point}
+                  onClick={() => betPlace(activeChip, { point })}
+                  className={cn(
+                    'col-span-1 flex flex-col items-center justify-center rounded-md border border-white/70 bg-black/20 px-1 text-center text-white inset-shadow-sm inset-shadow-black/50',
+                    isPoint && 'bg-white/20'
+                  )}
+                >
+                  <p className="text-xl font-bold transition-[font-size] duration-300 @lg:text-2xl @2xl:text-3xl @3xl:text-4xl @5xl:text-5xl">
+                    {point}
+                  </p>
+                  <p className="text-[5px] font-medium text-nowrap transition-[font-size] duration-300 @lg:text-[6px] @2xl:text-[8px] @3xl:text-[10px] @5xl:text-xs">
+                    PAYS
+                    <br />
+                    {payoutNumerator} FOR {payoutDenominator}
+                  </p>
+                  <Chip
+                    ref={betDraggable.ref}
+                    value={bet}
+                    dynamicSizing={true}
+                    hideOnZero={true}
+                    className={cn('@2xl:mt-3')}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="col-span-3 col-start-5 row-span-10 row-start-10 grid bg-gray-800/30">
+            C/E
           </div>
           <div
             className={cn(
-              'min-h-0 w-full flex-1 rounded-md inset-ring inset-ring-white/50',
-              'bg-white/10 inset-shadow-sm inset-shadow-black/20'
+              'col-span-7 col-start-8 row-span-10 row-start-10',
+              'flex flex-col items-center gap-0.5'
             )}
           >
-            low/high field
-          </div>
-          <div className={cn('min-h-0 w-full flex-1', '')}>
             <div
-              ref={passlineBetDroppable.ref}
-              onClick={() => betPassline(activeChip)}
               className={cn(
-                'mt-[3%] h-fill w-full',
-                'rounded-md inset-ring inset-ring-white/50',
-                'bg-black/10 inset-shadow-sm inset-shadow-black/20',
-                'grid place-items-center'
+                'mt-[4%] min-h-0 w-full flex-1 rounded-md inset-ring inset-ring-white/50',
+                'bg-white/10 inset-shadow-sm inset-shadow-black/20'
               )}
             >
-              <Chip
-                ref={passlineBetDraggable.ref}
-                value={activeBets.passLine}
-                hideOnZero={true}
+              field
+            </div>
+            <div
+              className={cn(
+                'min-h-0 w-full flex-1 rounded-md inset-ring inset-ring-white/50',
+                'bg-white/10 inset-shadow-sm inset-shadow-black/20'
+              )}
+            >
+              low/high field
+            </div>
+            <div className={cn('min-h-0 w-full flex-1', '')}>
+              <div
+                ref={passlineBetDroppable.ref}
+                onClick={() => betPassline(activeChip)}
                 className={cn(
-                  'h-3/4',
-                  passlineBetDroppable.isDropTarget &&
-                    'shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]'
+                  'mt-[3%] h-[stretch] w-full',
+                  'rounded-md inset-ring inset-ring-white/50',
+                  'bg-black/10 inset-shadow-sm inset-shadow-black/20',
+                  'grid place-items-center'
                 )}
-                dynamicTextSizing={true}
-              />
+              >
+                <Chip
+                  ref={passlineBetDraggable.ref}
+                  value={activeBets.passLine}
+                  hideOnZero={true}
+                  className={cn(
+                    'h-3/4',
+                    passlineBetDroppable.isDropTarget &&
+                      'shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]'
+                  )}
+                  dynamicTextSizing={true}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="col-span-14 col-start-1 row-span-2 row-start-21 -mt-2 min-h-0 min-w-0">
-          <RollHistory
-            lastRoll={lastRoll}
-            history={game?.rollHistory?.slice(1) ?? []}
-          />
+          <div className="col-span-14 col-start-1 row-span-2 row-start-21 -mt-2 min-h-0 min-w-0">
+            <RollHistory
+              lastRoll={lastRoll}
+              history={game?.rollHistory?.slice(1) ?? []}
+            />
+          </div>
         </div>
       </div>
       <ChipTray activeChip={activeChip} setActiveChip={setActiveChip} />

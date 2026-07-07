@@ -33,7 +33,7 @@ export function ChipTray({
     <div
       ref={chipTrayDroppable.ref}
       className={cn(
-        'flex flex-row items-center justify-between gap-4'
+        'flex flex-row items-center justify-between gap-4 mt-5'
         // chipTrayDroppable.isDropTarget && "shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]"
       )}
     >
@@ -84,6 +84,7 @@ export function ChipTray({
             key={chip}
             value={chip}
             highlight={activeChip === chip}
+            dynamicSizing="lg"
             className={cn(
               'transition-all duration-100 ease-in-out hover:scale-125',
               className,

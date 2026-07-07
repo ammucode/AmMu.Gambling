@@ -12,32 +12,32 @@ export function BalanceManager() {
     <FadingBar className="mr-auto justify-start bg-linear-to-l">
       <Button
         variant="outline"
-        className="my-1 flex w-50 max-w-full flex-row justify-between"
+        size="sm"
+        className="my-1 flex flex-row justify-between max-lg:text-xs"
         onClick={() => invest?.(100)}
       >
         <span>Add Balance</span>
         <span className="flex flex-row items-center">
           <SkeletonOr
-            className="h-4 w-[80%]"
+            className="h-2 lg:h-4 w-[80%]"
             render={gameBalance?.accountBalance}
             before="$"
           />
-          <BanknoteArrowDownIcon className="ml-3" />
+          <BanknoteArrowDownIcon className="ml-1 lg:ml-3" />
         </span>
       </Button>
       <Button
         size="sm"
-        className="my-1 max-w-full"
+        className="my-1 flex flex-row justify-between max-lg:text-xs"
         onClick={() => cashOut?.()}
         disabled={gameBalance ? gameBalance.totalBet > 0 : true}
       >
-        Cash out (
+        <span>Cash out</span>
         <SkeletonOr
-          className="h-4 w-[80%]"
+          className="h-2 lg:h-4 w-[80%]"
           render={gameBalance?.playable}
           before="$"
         />
-        )!
         <BanknoteArrowUpIcon />
       </Button>
     </FadingBar>

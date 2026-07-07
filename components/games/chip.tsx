@@ -6,7 +6,7 @@ export interface ChipProps extends React.ComponentProps<'div'> {
   hideOnZero?: boolean;
   highlight?: boolean;
   size?: number;
-  dynamicSizing?: boolean;
+  dynamicSizing?: boolean | "lg";
   dynamicTextSizing?: boolean;
 }
 export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
@@ -28,11 +28,13 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
         ref={ref}
         className={cn(
           'grid aspect-square min-w-0 place-items-center rounded-full bg-white mask-circle text-black',
-          dynamicSizing
-            ? 'h-3 @lg:h-4 @2xl:h-6 @3xl:h-8 @4xl:h-10 @5xl:h-12'
+          false ? ""
+            : dynamicSizing === "lg" ? "h-4 @lg:h-6 @2xl:h-8 @3xl:h-10 @4xl:h-12"
+            : dynamicSizing ? 'h-3 @lg:h-4 @2xl:h-6 @3xl:h-8 @4xl:h-10 @5xl:h-12'
             : 'h-12',
-          (dynamicTextSizing ?? dynamicSizing)
-            ? 'text-[8px] @lg:text-xs @3xl:text-sm @4xl:text-lg'
+          false ? ""
+            : dynamicSizing === "lg" ? 'text-xs @lg:text-sm @3xl:text-lg'
+            : (dynamicTextSizing ?? dynamicSizing) ? 'text-[8px] @lg:text-xs @3xl:text-sm @4xl:text-lg'
             : 'text-lg',
           size && `h-${size}`,
           highlight && 'shadow-[0px_0px_64px_10px_rgba(255,221,0,1)]',

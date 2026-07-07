@@ -23,7 +23,7 @@ export function FadingBar({ className, children }: FadingBarProps) {
   return (
     <div
       className={cn(
-        'flex h-12 min-h-fit max-w-full flex-row flex-wrap items-center justify-end gap-2 bg-linear-to-r from-green-900/0 via-green-900/60 via-30% to-green-950 px-2 inset-shadow-sm inset-shadow-green-900/50',
+        'flex py-0.5 h-12 max-lg:h-11 min-h-fit max-w-full flex-row flex-wrap items-center justify-end gap-2 bg-linear-to-r from-green-900/0 via-green-900/60 via-30% to-green-950 px-2 inset-shadow-sm inset-shadow-green-900/50',
         className
       )}
     >

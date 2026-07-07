@@ -8,11 +8,11 @@ interface IndicatorProps {
 }
 function LastResultIndicatorRow({ title, amount }: IndicatorProps) {
   return (
-    <span className="">
-      <span className="text-xs font-light text-gray-400 uppercase">
+    <span className="flex flex-row items-center justify-end">
+      <span className="text-xs max-lg:text-[10px] font-light text-gray-400 uppercase">
         {title}:&nbsp;
       </span>
-      <span className="text-sm font-extrabold text-white">${amount}</span>
+      <span className="text-sm max-lg:text-xs font-extrabold text-white">${amount}</span>
     </span>
   );
 }
@@ -22,7 +22,7 @@ interface LastResultIndicatorProps {
 }
 function LastResultIndicator({ bet, won }: LastResultIndicatorProps) {
   return (
-    <p className="h-min w-24 min-w-max align-middle leading-0">
+    <p className="h-min w-24 max-lg:w-16 min-w-max align-middle leading-0 text-right">
       <LastResultIndicatorRow title="last bet" amount={bet} />
       <br />
       <LastResultIndicatorRow title="last win" amount={won} />
@@ -32,12 +32,12 @@ function LastResultIndicator({ bet, won }: LastResultIndicatorProps) {
 
 function BigMoneyIndicator({ title, amount }: IndicatorProps) {
   return (
-    <p className="w-24 min-w-max leading-0.5">
-      <span className="text-sm font-light text-gray-400 uppercase">
+    <p className="w-24 max-lg:w-16 min-w-max leading-0.5">
+      <span className="text-sm max-lg:text-xs font-light text-gray-400 uppercase">
         {title}:
       </span>
       <br />
-      <span className="text-lg font-extrabold text-white uppercase">
+      <span className="text-lg max-lg:text-sm font-extrabold text-white uppercase">
         ${amount}
       </span>
     </p>

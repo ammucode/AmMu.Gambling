@@ -128,26 +128,10 @@
     }
 }
 
-@utility h-fill {
-  height: -webkit-fill-available;
-  height: -moz-available;
-  height: fill-available;
-  height: stretch;
-}
-@utility min-h-fill {
-  min-height: -webkit-fill-available;
-  min-height: -moz-available;
-  min-height: fill-available;
-  min-height: stretch;
-}
-@utility max-h-fill {
-  max-height: -webkit-fill-available;
-  max-height: -moz-available;
-  max-height: fill-available;
-  max-height: stretch;
-}
-@utility h-fill-strict {
-  @apply h-fill;
-  @apply min-h-fill;
-  @apply max-h-fill;
+@utility caspect-* {
+  --container-aspect-num: --value(integer);
+  --container-aspect-denom: --modifier(integer);
+  /* min-width: var(--container-aspect); */
+  aspect-ratio: var(--container-aspect-num) / var(--container-aspect-denom);
+  width: min(100cqw, calc(100cqh * var(--container-aspect-num) / var(--container-aspect-denom)));
 }

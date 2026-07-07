@@ -13,6 +13,7 @@ import { Card, CardContent } from '@ui/card';
 import { GameComponentDefs } from '@/lib/games/client';
 import { cn } from '@/lib/utils';
 import { DragDropProvider, useDragDropMonitor } from '@dnd-kit/react';
+import HeaderPortal from '../header/portal';
 
 const debugDrags = true;
 
@@ -134,13 +135,19 @@ export function GameRoot({ path }: GameWrapperProps) {
 
   return (
     <>
-      <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row md:justify-between md:gap-0 md:gap-y-4">
-        <BalanceManager />
-        <MoneyStats />
-      </div>
+      <HeaderPortal>
+        <div className="flex-1 flex flex-row flex-wrap items-center justify-between gap-1 gap-y-4">
+          <BalanceManager />
+          <MoneyStats />
+        </div>
+      </HeaderPortal>
+      {/* <div className="flex w-full flex-col flex-wrap items-center gap-4 md:flex-row md:justify-between md:gap-0 md:gap-y-4">
+      </div> */}
       <div
         className={cn(
-          '@container relative w-full max-w-full flex-1 max-[28rem]:hidden',
+          // 'bg-white',
+          '@container',
+          'relative w-[stretch] flex-1 min-h-0',
           'flex flex-col items-center justify-around'
         )}
       >
